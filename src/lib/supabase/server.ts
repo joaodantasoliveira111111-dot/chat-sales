@@ -35,6 +35,10 @@ export async function getAdminUser() {
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
+    if (process.env.NODE_ENV === "production") {
+      return null;
+    }
+
     return {
       id: "local-demo-admin",
       email: "local@acessopro.dev",
