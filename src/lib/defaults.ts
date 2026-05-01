@@ -1,0 +1,147 @@
+import type { ChatStep, Faq, InventoryItem, Product } from "@/lib/types";
+
+export const defaultProduct: Product = {
+  id: "00000000-0000-4000-8000-000000000001",
+  name: "CapCut Pro - Acesso Digital",
+  slug: "capcut-pro",
+  description:
+    "Acesso digital autorizado para uso pessoal, com entrega automatizada apos confirmacao do pagamento.",
+  price: 27.9,
+  is_active: true,
+  delivery_type: "digital_credential",
+  image_url: null,
+  support_text: "Suporte disponivel em caso de duvida ou problema de acesso.",
+  default_instructions:
+    "1. Abra o CapCut.\n2. Faça login com os dados acima.\n3. Não altere e-mail, senha ou dados de segurança.\n4. Use conforme as orientações recebidas.\n5. Se tiver dificuldade, clique no botão de suporte.",
+};
+
+export const defaultChatSteps: ChatStep[] = [
+  {
+    id: "00000000-0000-4000-8000-000000000101",
+    product_id: defaultProduct.id,
+    step_order: 1,
+    message_text:
+      "Você usa CapCut e vive encontrando efeito, template ou recurso bom… mas ele está bloqueado no Pro?",
+    primary_button_text: "Sim, acontece comigo",
+    primary_button_action: "next_step",
+    secondary_button_text: null,
+    secondary_button_action: null,
+    delay_ms: 550,
+    is_active: true,
+  },
+  {
+    id: "00000000-0000-4000-8000-000000000102",
+    product_id: defaultProduct.id,
+    step_order: 2,
+    message_text:
+      "É bem chato.\n\nVocê grava o vídeo, começa a editar, tenta deixar mais bonito para postar no Instagram, TikTok ou Reels… e justamente o recurso que faria diferença aparece como Pro.",
+    primary_button_text: "Quero resolver isso",
+    primary_button_action: "next_step",
+    secondary_button_text: null,
+    secondary_button_action: null,
+    delay_ms: 650,
+    is_active: true,
+  },
+  {
+    id: "00000000-0000-4000-8000-000000000103",
+    product_id: defaultProduct.id,
+    step_order: 3,
+    message_text:
+      "Com o acesso CapCut Pro, você edita com mais liberdade e consegue usar mais recursos para deixar seus vídeos com aparência melhor, sem ficar preso só no básico.",
+    primary_button_text: "Como funciona?",
+    primary_button_action: "next_step",
+    secondary_button_text: null,
+    secondary_button_action: null,
+    delay_ms: 650,
+    is_active: true,
+  },
+  {
+    id: "00000000-0000-4000-8000-000000000104",
+    product_id: defaultProduct.id,
+    step_order: 4,
+    message_text:
+      "Funciona de forma simples:\n\nVocê compra, faz o pagamento e, assim que for confirmado, recebe os dados e instruções de acesso aqui mesmo na tela.\n\nSem complicação.",
+    primary_button_text: "Entendi",
+    primary_button_action: "next_step",
+    secondary_button_text: null,
+    secondary_button_action: null,
+    delay_ms: 700,
+    is_active: true,
+  },
+  {
+    id: "00000000-0000-4000-8000-000000000105",
+    product_id: defaultProduct.id,
+    step_order: 5,
+    message_text:
+      "Serve para quem cria vídeos para Instagram, TikTok, Reels, anúncios, status, loja, trabalho ou conteúdo próprio.\n\nSe você já usa CapCut e quer editar melhor pagando menos, faz sentido para você.",
+    primary_button_text: "Serve para mim",
+    primary_button_action: "next_step",
+    secondary_button_text: null,
+    secondary_button_action: null,
+    delay_ms: 650,
+    is_active: true,
+  },
+  {
+    id: "00000000-0000-4000-8000-000000000106",
+    product_id: defaultProduct.id,
+    step_order: 6,
+    message_text:
+      "Hoje você pode adquirir o acesso CapCut Pro por:\n\nR$ 27,90\n\nEntrega digital após confirmação do pagamento.\nVocê recebe os dados de acesso aqui mesmo, dentro desta conversa.\nSuporte em caso de dúvida ou problema de acesso.",
+    primary_button_text: "Comprar agora",
+    primary_button_action: "open_checkout",
+    secondary_button_text: "Tenho dúvidas",
+    secondary_button_action: "open_faq",
+    delay_ms: 750,
+    is_active: true,
+  },
+];
+
+export const defaultFaqs: Faq[] = [
+  {
+    id: "00000000-0000-4000-8000-000000000201",
+    product_id: defaultProduct.id,
+    question: "O que eu recebo?",
+    answer: "Você recebe os dados de acesso e as instruções para usar.",
+    order: 1,
+    is_active: true,
+  },
+  {
+    id: "00000000-0000-4000-8000-000000000202",
+    product_id: defaultProduct.id,
+    question: "A entrega é rápida?",
+    answer:
+      "Sim. Após a confirmação do pagamento, a entrega é feita de forma digital dentro desta própria conversa.",
+    order: 2,
+    is_active: true,
+  },
+  {
+    id: "00000000-0000-4000-8000-000000000203",
+    product_id: defaultProduct.id,
+    question: "Tem suporte?",
+    answer: "Sim. Se tiver algum problema de acesso, você pode chamar o suporte.",
+    order: 3,
+    is_active: true,
+  },
+  {
+    id: "00000000-0000-4000-8000-000000000204",
+    product_id: defaultProduct.id,
+    question: "É para uso pessoal?",
+    answer: "Sim. Essa oferta é para quem quer usar o CapCut Pro nos próprios vídeos.",
+    order: 4,
+    is_active: true,
+  },
+];
+
+export const defaultInventoryItem: InventoryItem = {
+  id: "00000000-0000-4000-8000-000000000301",
+  product_id: defaultProduct.id,
+  title: "CapCut Pro - Demo",
+  access_email: "demo.capcut@example.com",
+  access_password: "SenhaDemo123",
+  access_url: "https://www.capcut.com",
+  extra_instructions:
+    "Entregavel demonstrativo para testar o fluxo. Substitua por um acesso autorizado real no painel.",
+  status: "available",
+  assigned_order_id: null,
+  delivered_at: null,
+};
