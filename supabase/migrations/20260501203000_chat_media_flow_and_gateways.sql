@@ -49,3 +49,10 @@ values (
   )
 )
 on conflict (key) do nothing;
+
+drop policy if exists "Anon can manage encrypted payment settings" on public.admin_settings;
+create policy "Anon can manage encrypted payment settings"
+on public.admin_settings for all
+to anon
+using (key = 'payment_gateway')
+with check (key = 'payment_gateway');

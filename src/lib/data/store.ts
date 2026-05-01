@@ -1,4 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
+import { createCipheriv, createDecipheriv, createHash, randomBytes } from "crypto";
+import { getAdminCredentials } from "@/lib/adminAuth";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getPublicSupabaseKey, hasSupabaseBrowserEnv } from "@/lib/env";
 import {
@@ -269,7 +271,7 @@ export async function getPaymentGatewaySettings(): Promise<PaymentGatewaySetting
     amplopaySecretKey: process.env.AMPLOPAY_SECRET_KEY,
   };
 
-  const supabase = supabaseOrNull();
+  const supabase = supabaseOrNull() ?? publicSupabaseOrNull();
   if (!supabase) return fallback;
 
   const { data } = await supabase
@@ -280,27 +282,76 @@ export async function getPaymentGatewaySettings(): Promise<PaymentGatewaySetting
 
   return {
     ...fallback,
-    ...((data?.value ?? {}) as Partial<PaymentGatewaySettings>),
+    ...openSettingsValue(data?.value),
   };
 }
 
 export async function savePaymentGatewaySettings(
   settings: PaymentGatewaySettings,
 ) {
-  const supabase = supabaseOrNull();
+  const supabase = supabaseOrNull() ?? publicSupabaseOrNull();
   if (!supabase) return settings;
 
   const { data, error } = await supabase
     .from("admin_settings")
     .upsert({
       key: "payment_gateway",
-      value: settings,
+      value: sealSettingsValue(settings),
     })
     .select("value")
     .single();
 
   if (error) throw error;
-  return data.value as PaymentGatewaySettings;
+  return openSettingsValue(data.value) as PaymentGatewaySettings;
+}
+
+function sealSettingsValue(settings: PaymentGatewaySettings) {
+  const iv = randomBytes(12);
+  const cipher = createCipheriv("aes-256-gcm", settingsCryptoKey(), iv);
+  const encrypted = Buffer.concat([
+    cipher.update(JSON.stringify(settings), "utf8"),
+    cipher.final(),
+  ]);
+  const tag = cipher.getAuthTag();
+
+  return {
+    sealed: true,
+    iv: iv.toString("base64url"),
+    tag: tag.toString("base64url"),
+    data: encrypted.toString("base64url"),
+  };
+}
+
+function openSettingsValue(value: unknown): Partial<PaymentGatewaySettings> {
+  const maybeSealed = value as
+    | { sealed?: boolean; iv?: string; tag?: string; data?: string }
+    | null
+    | undefined;
+
+  if (!maybeSealed?.sealed) {
+    return (value ?? {}) as Partial<PaymentGatewaySettings>;
+  }
+
+  try {
+    const decipher = createDecipheriv(
+      "aes-256-gcm",
+      settingsCryptoKey(),
+      Buffer.from(maybeSealed.iv ?? "", "base64url"),
+    );
+    decipher.setAuthTag(Buffer.from(maybeSealed.tag ?? "", "base64url"));
+    const decrypted = Buffer.concat([
+      decipher.update(Buffer.from(maybeSealed.data ?? "", "base64url")),
+      decipher.final(),
+    ]).toString("utf8");
+
+    return JSON.parse(decrypted) as Partial<PaymentGatewaySettings>;
+  } catch {
+    return {};
+  }
+}
+
+function settingsCryptoKey() {
+  return createHash("sha256").update(getAdminCredentials().secret).digest();
 }
 
 export async function listFaqs(productId?: string) {
