@@ -26,11 +26,21 @@ export type ChatButtonAction =
   | "external_link"
   | "support";
 
+export type ChatMediaType = "none" | "image" | "video";
+
 export type ChatStep = {
   id: string;
   product_id: string;
   step_order: number;
   message_text: string;
+  media_type: ChatMediaType;
+  media_url: string | null;
+  media_alt: string | null;
+  node_id: string | null;
+  position_x: number;
+  position_y: number;
+  next_step_id: string | null;
+  secondary_step_id: string | null;
   primary_button_text: string | null;
   primary_button_action: ChatButtonAction;
   secondary_button_text: string | null;
@@ -125,6 +135,17 @@ export type PublicProductPayload = {
   product: Product;
   chatSteps: ChatStep[];
   faqs: Faq[];
+};
+
+export type PaymentProviderKey = "mock" | "pushinpay" | "amplopay";
+
+export type PaymentProviderMode = "sandbox" | "production";
+
+export type PaymentGatewaySettings = {
+  activeProvider: PaymentProviderKey;
+  mode: PaymentProviderMode;
+  webhookUrl: string;
+  qrImageApiUrl: string;
 };
 
 export type AdminStats = {

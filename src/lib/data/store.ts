@@ -1,4 +1,6 @@
+import { createClient } from "@supabase/supabase-js";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { getPublicSupabaseKey, hasSupabaseBrowserEnv } from "@/lib/env";
 import {
   buildDeliveryPayload,
   createId,
@@ -16,6 +18,7 @@ import type {
   InventoryItem,
   Order,
   OrderStatus,
+  PaymentGatewaySettings,
   Product,
   PublicProductPayload,
 } from "@/lib/types";
@@ -24,10 +27,24 @@ function supabaseOrNull() {
   return getSupabaseAdmin();
 }
 
+function publicSupabaseOrNull() {
+  if (!hasSupabaseBrowserEnv()) return null;
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    getPublicSupabaseKey(),
+    {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    },
+  );
+}
+
 export async function getPublicProduct(
   slug = "capcut-pro",
 ): Promise<PublicProductPayload> {
-  const supabase = supabaseOrNull();
+  const supabase = supabaseOrNull() ?? publicSupabaseOrNull();
 
   if (!supabase) {
     const store = getMockStore();
@@ -204,6 +221,14 @@ export async function saveChatStep(input: Partial<ChatStep>) {
     product_id: productId,
     step_order: Number(input.step_order ?? 1),
     message_text: input.message_text ?? "",
+    media_type: input.media_type ?? "none",
+    media_url: input.media_url ?? null,
+    media_alt: input.media_alt ?? null,
+    node_id: input.node_id ?? null,
+    position_x: Number(input.position_x ?? 80),
+    position_y: Number(input.position_y ?? 80),
+    next_step_id: input.next_step_id ?? null,
+    secondary_step_id: input.secondary_step_id ?? null,
     primary_button_text: input.primary_button_text ?? null,
     primary_button_action: input.primary_button_action ?? "next_step",
     secondary_button_text: input.secondary_button_text ?? null,
@@ -223,6 +248,56 @@ export async function saveChatStep(input: Partial<ChatStep>) {
     .single();
   if (error) throw error;
   return data as ChatStep;
+}
+
+export async function getPaymentGatewaySettings(): Promise<PaymentGatewaySettings> {
+  const fallback: PaymentGatewaySettings = {
+    activeProvider:
+      (process.env.PAYMENT_PROVIDER as PaymentGatewaySettings["activeProvider"]) ||
+      "mock",
+    mode:
+      (process.env.PAYMENT_PROVIDER_MODE as PaymentGatewaySettings["mode"]) ||
+      "production",
+    webhookUrl:
+      process.env.PAYMENT_WEBHOOK_URL ||
+      "http://localhost:3000/api/payments/webhook",
+    qrImageApiUrl:
+      process.env.QR_IMAGE_API_URL ||
+      "https://api.qrserver.com/v1/create-qr-code/",
+  };
+
+  const supabase = supabaseOrNull();
+  if (!supabase) return fallback;
+
+  const { data } = await supabase
+    .from("admin_settings")
+    .select("value")
+    .eq("key", "payment_gateway")
+    .maybeSingle();
+
+  return {
+    ...fallback,
+    ...((data?.value ?? {}) as Partial<PaymentGatewaySettings>),
+  };
+}
+
+export async function savePaymentGatewaySettings(
+  settings: PaymentGatewaySettings,
+) {
+  const supabase = supabaseOrNull();
+  if (!supabase) return settings;
+
+  const { data, error } = await supabase
+    .from("admin_settings")
+    .upsert({
+      key: "payment_gateway",
+      value: settings,
+    })
+    .select("value")
+    .single();
+
+  if (error) throw error;
+  return data.value as PaymentGatewaySettings;
 }
 
 export async function listFaqs(productId?: string) {

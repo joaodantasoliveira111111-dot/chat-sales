@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { CheckCircle2, Copy } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { NeonButton } from "@/components/ui/NeonButton";
@@ -49,12 +48,10 @@ export function PixPaymentCard({
         </p>
       </div>
       <div className="grid place-items-center rounded-3xl border border-white/10 bg-white p-4">
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src={qrCodeUrl}
           alt="QR Code Pix"
-          width={220}
-          height={220}
-          unoptimized
           className="h-[220px] w-[220px]"
         />
       </div>

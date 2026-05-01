@@ -30,7 +30,13 @@ export function ChatLanding({
   chatSteps: ChatStep[];
   faqs: Faq[];
 }) {
-  const [visibleCount, setVisibleCount] = useState(1);
+  const orderedSteps = useMemo(
+    () => [...chatSteps].sort((a, b) => a.step_order - b.step_order),
+    [chatSteps],
+  );
+  const [visibleSteps, setVisibleSteps] = useState<ChatStep[]>(() =>
+    orderedSteps[0] ? [orderedSteps[0]] : [],
+  );
   const [typing, setTyping] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [faqOpen, setFaqOpen] = useState(false);
@@ -49,7 +55,7 @@ export function ChatLanding({
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [visibleCount, typing, checkoutOpen, faqOpen, payment, delivery]);
+  }, [visibleSteps, typing, checkoutOpen, faqOpen, payment, delivery]);
 
   useEffect(() => {
     if (!payment?.orderId || delivery) return;
@@ -74,7 +80,7 @@ export function ChatLanding({
       setFaqOpen(true);
       return;
     }
-    showNext(step.delay_ms);
+    showNext(step, step.delay_ms);
   }
 
   function secondary(step: ChatStep) {
@@ -85,10 +91,20 @@ export function ChatLanding({
     }
   }
 
-  function showNext(delay = 600) {
+  function showNext(step: ChatStep, delay = 600) {
+    const nextStep =
+      orderedSteps.find((item) => item.id === step.next_step_id) ??
+      orderedSteps.find((item) => item.step_order === step.step_order + 1);
+
+    if (!nextStep) return;
+
     setTyping(true);
     window.setTimeout(() => {
-      setVisibleCount((count) => Math.min(count + 1, chatSteps.length));
+      setVisibleSteps((current) =>
+        current.some((item) => item.id === nextStep.id)
+          ? current
+          : [...current, nextStep],
+      );
       setTyping(false);
     }, delay);
   }
@@ -113,7 +129,7 @@ export function ChatLanding({
 
   function restart() {
     window.localStorage.removeItem("acessopro_order_id");
-    setVisibleCount(1);
+    setVisibleSteps(orderedSteps[0] ? [orderedSteps[0]] : []);
     setCheckoutOpen(false);
     setFaqOpen(false);
     setPayment(null);
@@ -152,11 +168,14 @@ export function ChatLanding({
           </div>
 
           <div className="chat-scroll flex-1 space-y-4 overflow-y-auto px-4 py-5 sm:px-5">
-            {chatSteps.slice(0, visibleCount).map((step) => (
+            {visibleSteps.map((step) => (
               <div key={step.id} className="space-y-3">
-                <ChatMessageBubble>{step.message_text}</ChatMessageBubble>
+                {step.message_text ? (
+                  <ChatMessageBubble>{step.message_text}</ChatMessageBubble>
+                ) : null}
+                <StepMedia step={step} />
                 {step.step_order === 6 ? <OfferCard product={product} /> : null}
-                {visibleCount === step.step_order &&
+                {visibleSteps[visibleSteps.length - 1]?.id === step.id &&
                 !checkoutOpen &&
                 !faqOpen &&
                 !payment &&
@@ -222,6 +241,32 @@ export function ChatLanding({
         </div>
       </footer>
     </main>
+  );
+}
+
+function StepMedia({ step }: { step: ChatStep }) {
+  if (!step.media_url || step.media_type === "none") return null;
+
+  if (step.media_type === "video") {
+    return (
+      <video
+        className="max-h-[360px] w-full rounded-3xl border border-white/10 bg-black object-cover"
+        src={step.media_url}
+        controls
+        playsInline
+      />
+    );
+  }
+
+  return (
+    <div className="overflow-hidden rounded-3xl border border-white/10 bg-black/30">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={step.media_url}
+        alt={step.media_alt || "Imagem da mensagem"}
+        className="h-auto w-full object-cover"
+      />
+    </div>
   );
 }
 

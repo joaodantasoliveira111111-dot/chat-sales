@@ -78,3 +78,32 @@ insert into public.inventory_items (
   'Entregavel demonstrativo para testar o fluxo. Substitua por um acesso autorizado real no painel.',
   'available'
 ) on conflict do nothing;
+
+update public.chat_steps
+set
+  node_id = coalesce(node_id, 'node-' || step_order::text),
+  position_x = case when position_x = 80 then 80 + ((step_order - 1) * 300) else position_x end,
+  position_y = case when position_y = 80 then 80 else position_y end,
+  next_step_id = coalesce(
+    next_step_id,
+    (
+      select next_step.id
+      from public.chat_steps next_step
+      where next_step.product_id = chat_steps.product_id
+        and next_step.step_order = chat_steps.step_order + 1
+      limit 1
+    )
+  )
+where product_id = '00000000-0000-4000-8000-000000000001';
+
+insert into public.admin_settings (key, value)
+values (
+  'payment_gateway',
+  jsonb_build_object(
+    'activeProvider', 'mock',
+    'mode', 'production',
+    'webhookUrl', 'https://acesso-pro.vercel.app/api/payments/webhook',
+    'qrImageApiUrl', 'https://api.qrserver.com/v1/create-qr-code/'
+  )
+)
+on conflict (key) do nothing;
