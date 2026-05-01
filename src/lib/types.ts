@@ -146,6 +146,9 @@ export type PaymentGatewaySettings = {
   mode: PaymentProviderMode;
   webhookUrl: string;
   qrImageApiUrl: string;
+  pushinpayApiKey?: string;
+  amplopayPublicKey?: string;
+  amplopaySecretKey?: string;
 };
 
 export type AdminStats = {

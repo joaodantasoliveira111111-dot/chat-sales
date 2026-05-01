@@ -264,6 +264,9 @@ export async function getPaymentGatewaySettings(): Promise<PaymentGatewaySetting
     qrImageApiUrl:
       process.env.QR_IMAGE_API_URL ||
       "https://api.qrserver.com/v1/create-qr-code/",
+    pushinpayApiKey: process.env.PUSHINPAY_API_KEY || process.env.PAYMENT_API_KEY,
+    amplopayPublicKey: process.env.AMPLOPAY_PUBLIC_KEY,
+    amplopaySecretKey: process.env.AMPLOPAY_SECRET_KEY,
   };
 
   const supabase = supabaseOrNull();

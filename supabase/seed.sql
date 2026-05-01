@@ -102,8 +102,11 @@ values (
   jsonb_build_object(
     'activeProvider', 'mock',
     'mode', 'production',
-    'webhookUrl', 'https://acesso-pro.vercel.app/api/payments/webhook',
-    'qrImageApiUrl', 'https://api.qrserver.com/v1/create-qr-code/'
+    'webhookUrl', 'https://chat-sales.vercel.app/api/payments/webhook',
+    'qrImageApiUrl', 'https://api.qrserver.com/v1/create-qr-code/',
+    'pushinpayApiKey', '',
+    'amplopayPublicKey', '',
+    'amplopaySecretKey', ''
   )
 )
 on conflict (key) do nothing;

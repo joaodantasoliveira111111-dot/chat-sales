@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
+import { getAdminSessionUser } from "@/lib/adminAuth";
 import { getPublicSupabaseKey, hasSupabaseBrowserEnv } from "@/lib/env";
 
 export async function createSupabaseServerClient() {
@@ -32,6 +33,9 @@ export async function createSupabaseServerClient() {
 }
 
 export async function getAdminUser() {
+  const adminSessionUser = await getAdminSessionUser();
+  if (adminSessionUser) return adminSessionUser;
+
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {

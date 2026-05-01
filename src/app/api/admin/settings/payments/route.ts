@@ -11,6 +11,9 @@ const settingsSchema = z.object({
   mode: z.enum(["sandbox", "production"]),
   webhookUrl: z.string().url(),
   qrImageApiUrl: z.string().url(),
+  pushinpayApiKey: z.string().optional(),
+  amplopayPublicKey: z.string().optional(),
+  amplopaySecretKey: z.string().optional(),
 });
 
 export async function GET() {
@@ -19,9 +22,19 @@ export async function GET() {
     return NextResponse.json({
       settings: await getPaymentGatewaySettings(),
       env: {
-        pushinpayApiKey: Boolean(process.env.PUSHINPAY_API_KEY || process.env.PAYMENT_API_KEY),
-        amplopayPublicKey: Boolean(process.env.AMPLOPAY_PUBLIC_KEY),
-        amplopaySecretKey: Boolean(process.env.AMPLOPAY_SECRET_KEY),
+        pushinpayApiKey: Boolean(
+          (await getPaymentGatewaySettings()).pushinpayApiKey ||
+            process.env.PUSHINPAY_API_KEY ||
+            process.env.PAYMENT_API_KEY,
+        ),
+        amplopayPublicKey: Boolean(
+          (await getPaymentGatewaySettings()).amplopayPublicKey ||
+            process.env.AMPLOPAY_PUBLIC_KEY,
+        ),
+        amplopaySecretKey: Boolean(
+          (await getPaymentGatewaySettings()).amplopaySecretKey ||
+            process.env.AMPLOPAY_SECRET_KEY,
+        ),
       },
     });
   } catch (error) {

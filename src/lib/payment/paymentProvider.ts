@@ -30,7 +30,7 @@ export async function getPaymentStatus(paymentId: string) {
     const payload = await requestJson(
       `${getPushinPayBaseUrl(settings)}/transactions/${paymentId}`,
       {
-        headers: pushinPayHeaders(),
+        headers: pushinPayHeaders(settings),
         cache: "no-store",
       },
     );
@@ -41,7 +41,7 @@ export async function getPaymentStatus(paymentId: string) {
     const payload = await requestJson(
       `${getAmploPayBaseUrl(settings)}/gateway/transactions?id=${encodeURIComponent(paymentId)}`,
       {
-        headers: amploPayHeaders(),
+        headers: amploPayHeaders(settings),
         cache: "no-store",
       },
     );
@@ -116,7 +116,7 @@ async function createPushinPayPixPayment(
 ): Promise<PixPayment> {
   const payload = await requestJson(`${getPushinPayBaseUrl(settings)}/pix/cashIn`, {
     method: "POST",
-    headers: pushinPayHeaders(),
+    headers: pushinPayHeaders(settings),
     body: JSON.stringify({
       value: Math.round(Number(order.amount) * 100),
       webhook_url: settings.webhookUrl,
@@ -145,7 +145,7 @@ async function createAmploPayPixPayment(
     .slice(0, 10);
   const payload = await requestJson(`${getAmploPayBaseUrl(settings)}/gateway/pix/receive`, {
     method: "POST",
-    headers: amploPayHeaders(),
+    headers: amploPayHeaders(settings),
     body: JSON.stringify({
       identifier: order.id,
       amount: Number(order.amount),
@@ -184,8 +184,11 @@ async function createAmploPayPixPayment(
   };
 }
 
-function pushinPayHeaders() {
-  const token = process.env.PUSHINPAY_API_KEY || process.env.PAYMENT_API_KEY;
+function pushinPayHeaders(settings: PaymentGatewaySettings) {
+  const token =
+    settings.pushinpayApiKey ||
+    process.env.PUSHINPAY_API_KEY ||
+    process.env.PAYMENT_API_KEY;
   if (!token) throw new Error("PUSHINPAY_API_KEY nao configurada.");
 
   return {
@@ -195,9 +198,9 @@ function pushinPayHeaders() {
   };
 }
 
-function amploPayHeaders() {
-  const publicKey = process.env.AMPLOPAY_PUBLIC_KEY;
-  const secretKey = process.env.AMPLOPAY_SECRET_KEY;
+function amploPayHeaders(settings: PaymentGatewaySettings) {
+  const publicKey = settings.amplopayPublicKey || process.env.AMPLOPAY_PUBLIC_KEY;
+  const secretKey = settings.amplopaySecretKey || process.env.AMPLOPAY_SECRET_KEY;
   if (!publicKey || !secretKey) {
     throw new Error("AMPLOPAY_PUBLIC_KEY e AMPLOPAY_SECRET_KEY nao configuradas.");
   }

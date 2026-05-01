@@ -5,33 +5,32 @@ import { useRouter } from "next/navigation";
 import { LockKeyhole } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { NeonButton } from "@/components/ui/NeonButton";
-import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const supabase = createSupabaseBrowserClient();
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
     setMessage("");
 
-    if (!supabase) {
-      setMessage("Supabase Auth nao configurado. Em modo local, acesse /admin direto.");
-      setLoading(false);
+    const response = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+    const payload = await response.json();
+    setLoading(false);
+
+    if (!response.ok) {
+      setMessage(payload.error ?? "Nao foi possivel entrar.");
       return;
     }
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (error) {
-      setMessage(error.message);
-      return;
-    }
     router.push("/admin");
     router.refresh();
   }
@@ -51,10 +50,9 @@ export default function LoginPage() {
         <form className="space-y-3" onSubmit={submit}>
           <input
             className="min-h-12 w-full rounded-2xl border border-white/10 bg-white/[0.06] px-4 text-white outline-none focus:border-cyan-300/50"
-            placeholder="E-mail"
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            placeholder="Login"
+            value={username}
+            onChange={(event) => setUsername(event.target.value)}
             required
           />
           <input

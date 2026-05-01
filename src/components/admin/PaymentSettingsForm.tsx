@@ -40,6 +40,9 @@ export function PaymentSettingsForm() {
     mode: "production",
     webhookUrl: "http://localhost:3000/api/payments/webhook",
     qrImageApiUrl: "https://api.qrserver.com/v1/create-qr-code/",
+    pushinpayApiKey: "",
+    amplopayPublicKey: "",
+    amplopaySecretKey: "",
   });
   const [env, setEnv] = useState<EnvStatus>({
     pushinpayApiKey: false,
@@ -145,6 +148,33 @@ export function PaymentSettingsForm() {
               setSettings((current) => ({ ...current, qrImageApiUrl }))
             }
           />
+          <div className="grid gap-3 rounded-3xl border border-white/10 bg-white/[0.04] p-4">
+            <p className="text-sm font-semibold text-white">Chaves reais</p>
+            <Input
+              label="PushinPay API Key"
+              type="password"
+              value={settings.pushinpayApiKey ?? ""}
+              onChange={(pushinpayApiKey) =>
+                setSettings((current) => ({ ...current, pushinpayApiKey }))
+              }
+            />
+            <Input
+              label="AmploPay Public Key"
+              type="password"
+              value={settings.amplopayPublicKey ?? ""}
+              onChange={(amplopayPublicKey) =>
+                setSettings((current) => ({ ...current, amplopayPublicKey }))
+              }
+            />
+            <Input
+              label="AmploPay Secret Key"
+              type="password"
+              value={settings.amplopaySecretKey ?? ""}
+              onChange={(amplopaySecretKey) =>
+                setSettings((current) => ({ ...current, amplopaySecretKey }))
+              }
+            />
+          </div>
 
           {message ? <p className="text-sm text-cyan-100">{message}</p> : null}
           <NeonButton>Salvar gateway ativo</NeonButton>
@@ -158,7 +188,9 @@ export function PaymentSettingsForm() {
           </div>
           <div>
             <h2 className="text-lg font-semibold">Credenciais esperadas</h2>
-            <p className="text-sm text-[#A9B4C3]">Configure como env vars na Vercel.</p>
+            <p className="text-sm text-[#A9B4C3]">
+              Salve as chaves reais aqui no painel admin.
+            </p>
           </div>
         </div>
         <EnvRow label="PUSHINPAY_API_KEY" ok={env.pushinpayApiKey} />
@@ -184,9 +216,11 @@ function Input({
   label,
   value,
   onChange,
+  type = "text",
 }: {
   label: string;
   value: string;
+  type?: string;
   onChange: (value: string) => void;
 }) {
   return (
@@ -194,6 +228,7 @@ function Input({
       {label}
       <input
         className="min-h-12 rounded-2xl border border-white/10 bg-[#111820] px-4 text-white outline-none"
+        type={type}
         value={value}
         onChange={(event) => onChange(event.target.value)}
       />
