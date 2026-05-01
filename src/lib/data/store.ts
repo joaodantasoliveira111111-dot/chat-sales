@@ -99,16 +99,21 @@ export async function getPublicProduct(
 }
 
 export async function getAdminStats(): Promise<AdminStats> {
-  const supabase = supabaseOrNull();
+  const supabase = supabaseOrNull() ?? publicSupabaseOrNull();
   if (!supabase) {
     return getMockStats();
   }
 
-  const [{ data: orders }, { data: products }, { data: inventory }] =
-    await Promise.all([
+  const [
+    { data: orders },
+    { data: products },
+    { data: inventory },
+    { data: funnelEvents },
+  ] = await Promise.all([
       supabase.from("orders").select("status, amount"),
       supabase.from("products").select("is_active"),
       supabase.from("inventory_items").select("status"),
+      supabase.from("funnel_events").select("session_id, event_type"),
     ]);
 
   const allOrders = (orders ?? []) as Pick<Order, "status" | "amount">[];
@@ -121,8 +126,27 @@ export async function getAdminStats(): Promise<AdminStats> {
       order.status,
     ),
   );
+  const events = (funnelEvents ?? []) as Array<{
+    session_id: string;
+    event_type: string;
+  }>;
+  const visitors = new Set(
+    events
+      .filter((event) => event.event_type === "view")
+      .map((event) => event.session_id),
+  ).size;
+  const pixGenerated = allOrders.length;
+  const funnelVisitors = Math.max(visitors, pixGenerated);
 
   return {
+    funnelVisitors,
+    pixGenerated,
+    paidConversionRate: pixGenerated
+      ? Math.round((paidOrders.length / pixGenerated) * 100)
+      : 0,
+    pixConversionRate: funnelVisitors
+      ? Math.round((pixGenerated / funnelVisitors) * 100)
+      : 0,
     totalOrders: allOrders.length,
     paidOrders: paidOrders.length,
     pendingOrders: allOrders.filter((order) => order.status === "pending").length,
@@ -137,6 +161,23 @@ export async function getAdminStats(): Promise<AdminStats> {
       ? Math.round((paidOrders.length / finishedOrders.length) * 100)
       : 0,
   };
+}
+
+export async function trackFunnelEvent(input: {
+  sessionId: string;
+  productId: string;
+  eventType: "view" | "step" | "checkout" | "pix_generated" | "paid";
+  stepId?: string | null;
+}) {
+  const supabase = supabaseOrNull() ?? publicSupabaseOrNull();
+  if (!supabase) return;
+
+  await supabase.from("funnel_events").insert({
+    session_id: input.sessionId,
+    product_id: input.productId,
+    event_type: input.eventType,
+    step_id: input.stepId ?? null,
+  });
 }
 
 export async function listProducts() {
@@ -294,10 +335,13 @@ export async function savePaymentGatewaySettings(
 
   const { data, error } = await supabase
     .from("admin_settings")
-    .upsert({
-      key: "payment_gateway",
-      value: sealSettingsValue(settings),
-    })
+    .upsert(
+      {
+        key: "payment_gateway",
+        value: sealSettingsValue(settings),
+      },
+      { onConflict: "key" },
+    )
     .select("value")
     .single();
 

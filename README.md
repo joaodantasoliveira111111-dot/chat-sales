@@ -52,6 +52,28 @@ Use `SUPABASE_SERVICE_ROLE_KEY` apenas no backend/Vercel. Nunca exponha essa cha
 6. Aguarda confirmacao.
 7. Recebe o acesso dentro da conversa.
 
+## Fluxo visual e midias
+
+Em `/admin/chat-steps`, cada mensagem virou um nó visual:
+
+- pode ter só texto
+- pode ter só imagem/video
+- pode ter texto + imagem/video
+- o botão principal pode apontar para outro nó
+- o botão secundário pode apontar para outro nó
+- `position_x` e `position_y` organizam o canvas estilo n8n
+
+Campos novos no banco:
+
+- `media_type`: `none`, `image`, `video`
+- `media_url`
+- `media_alt`
+- `node_id`
+- `position_x`
+- `position_y`
+- `next_step_id`
+- `secondary_step_id`
+
 ## Testar pagamento mock
 
 1. Gere um Pix pela landing.
@@ -83,18 +105,27 @@ O arquivo `src/lib/payment/paymentProvider.ts` centraliza a integracao:
 - `getPaymentStatus(paymentId)`
 - `handleWebhook(payload)`
 
-Configure na Vercel:
+Gateways suportados:
+
+- `mock`
+- `pushinpay`
+- `amplopay`
+
+No painel `/admin/settings/payments` voce escolhe qual gateway fica ativo e salva as chaves reais de PushinPay ou AmploPay. Variaveis de ambiente ainda podem ser usadas como fallback tecnico, mas o fluxo recomendado e cadastrar as credenciais no proprio painel admin:
 
 ```bash
-PAYMENT_PROVIDER=pixup
-PAYMENT_API_URL=
-PAYMENT_API_KEY=
-PAYMENT_SECRET=
+PAYMENT_PROVIDER=mock
+PAYMENT_PROVIDER_MODE=production
 WEBHOOK_SECRET=
 PAYMENT_WEBHOOK_URL=https://seu-dominio.com/api/payments/webhook
+QR_IMAGE_API_URL=https://api.qrserver.com/v1/create-qr-code/
+
+PUSHINPAY_BASE_URL=https://api.pushinpay.com.br/api
+
+AMPLOPAY_BASE_URL=https://app.amplopay.com/api/v1
 ```
 
-Depois ajuste o payload de criacao/consulta conforme PixUp, SuitPay, HorsePay, Mercado Pago ou outro gateway escolhido.
+O QR Code exibido no checkout e gerado por uma API de imagem a partir do Pix copia e cola, evitando depender do `qr_code_base64` retornado pelo gateway.
 
 ## Webhook
 

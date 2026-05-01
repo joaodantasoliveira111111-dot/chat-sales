@@ -63,6 +63,12 @@ export function getMockStats(): AdminStats {
   ).length;
 
   return {
+    funnelVisitors: Math.max(store.orders.length, 1),
+    pixGenerated: store.orders.length,
+    paidConversionRate: store.orders.length
+      ? Math.round((paidOrders.length / store.orders.length) * 100)
+      : 0,
+    pixConversionRate: 100,
     totalOrders: store.orders.length,
     paidOrders: paidOrders.length,
     pendingOrders: store.orders.filter((order) => order.status === "pending")

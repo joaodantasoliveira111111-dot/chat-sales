@@ -152,6 +152,10 @@ export type PaymentGatewaySettings = {
 };
 
 export type AdminStats = {
+  funnelVisitors: number;
+  pixGenerated: number;
+  paidConversionRate: number;
+  pixConversionRate: number;
   totalOrders: number;
   paidOrders: number;
   pendingOrders: number;
