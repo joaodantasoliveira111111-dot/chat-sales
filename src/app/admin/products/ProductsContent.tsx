@@ -25,7 +25,7 @@ const emptyForm = {
   description: '',
   price: '',
   delivery_type: '',
-  status: 'draft' as const,
+  status: 'draft' as 'draft' | 'active' | 'inactive' | 'archived',
   support_text: '',
   default_instructions: '',
 }
