@@ -49,7 +49,7 @@ export default async function AdminDashboard() {
 
   const checklist = {
     hasProduct: (productCount || 0) > 0,
-    hasPage: (publishedPages || 0) > 0 || (await supabase.from('public_pages').select('*', { count: 'exact', head: true }).eq('user_id', user.id)).count > 0,
+    hasPage: (publishedPages || 0) > 0 || ((await supabase.from('public_pages').select('*', { count: 'exact', head: true }).eq('user_id', user.id)).count || 0) > 0,
     hasFlow: (flowCount || 0) > 0,
     hasInventory: (inventoryCount || 0) > 0,
     hasPayment: false, // will check settings
