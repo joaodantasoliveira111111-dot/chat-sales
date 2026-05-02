@@ -97,7 +97,7 @@ export function InventoryContent({
         const { error } = await supabase.from('inventory_items').update(data).eq('id', editItem.id)
         if (error) throw error
         const product = products.find(p => p.id === data.product_id)
-        setItems(items.map(i => i.id === editItem.id ? { ...i, ...data, product: product ? { name: product.name } : null } : i))
+        setItems(items.map(i => i.id === editItem.id ? { ...i, ...data, product: product ? { name: product.name } : null } as any : i))
         toast.success('Item atualizado!')
       } else {
         const { data: newItem, error } = await supabase.from('inventory_items').insert({
