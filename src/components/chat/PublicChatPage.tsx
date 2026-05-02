@@ -388,9 +388,9 @@ export function PublicChatPage({ page, nodes, edges }: PublicChatPageProps) {
 
       {/* Header */}
       {page.show_header && (
-        <header style={{ background: theme.headerBg, color: theme.headerText }}
+        <header
           className="flex-shrink-0 px-4 py-3 flex items-center gap-3 border-b"
-          style={{ background: theme.headerBg, borderColor: 'rgba(255,255,255,0.08)' }}>
+          style={{ background: theme.headerBg, color: theme.headerText, borderColor: 'rgba(255,255,255,0.08)' }}>
           {page.avatar_url && (
             <img src={page.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover" />
           )}
