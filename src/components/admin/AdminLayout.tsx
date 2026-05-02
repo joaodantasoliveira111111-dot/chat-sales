@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import {
   Boxes,
   CreditCard,
+  Palette,
   LayoutDashboard,
   MessageSquareText,
   Package,
@@ -15,7 +16,8 @@ import { getAdminUser } from "@/lib/supabase/server";
 const navItems = [
   { href: "/admin", label: "Dashboard", helper: "metricas e operacao", icon: LayoutDashboard },
   { href: "/admin/products", label: "Produtos", helper: "ofertas e precos", icon: Package },
-  { href: "/admin/chat-steps", label: "Construtor", helper: "fluxos por nos", icon: MessageSquareText },
+  { href: "/admin/flows", label: "Flows", helper: "Typebot/n8n visual", icon: MessageSquareText },
+  { href: "/admin/appearance", label: "Aparencia", helper: "templates e pagina", icon: Palette },
   { href: "/admin/inventory", label: "Estoque", helper: "entregaveis digitais", icon: Boxes },
   { href: "/admin/orders", label: "Pedidos", helper: "pagamentos e entrega", icon: ShoppingCart },
   { href: "/admin/settings/payments", label: "Gateways", helper: "Pix e credenciais", icon: CreditCard },
@@ -36,7 +38,7 @@ export async function AdminLayout({ children }: { children: React.ReactNode }) {
                 <Settings size={20} />
               </div>
               <div>
-                <p className="text-lg font-black tracking-tight">AcessoPro</p>
+                <p className="text-lg font-black tracking-tight">Chatfy</p>
                 <p className="text-xs text-[#A9B4C3]">Painel de controle</p>
               </div>
             </div>
@@ -46,7 +48,7 @@ export async function AdminLayout({ children }: { children: React.ReactNode }) {
                 Operacao digital
               </div>
               <p className="text-xs leading-5 text-[#A9B4C3]">
-                Configure produtos, conversa, Pix e entrega sem tocar no codigo.
+                Crie paginas de venda conversacionais com Pix e entrega automatica.
               </p>
             </div>
           </div>

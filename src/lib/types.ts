@@ -11,8 +11,11 @@ export type Product = {
   description: string | null;
   price: number;
   is_active: boolean;
+  status?: "active" | "inactive" | null;
   delivery_type: ProductDeliveryType;
   image_url: string | null;
+  public_title?: string | null;
+  public_subtitle?: string | null;
   support_text: string | null;
   default_instructions: string | null;
   created_at?: string;
@@ -135,6 +138,96 @@ export type PublicProductPayload = {
   product: Product;
   chatSteps: ChatStep[];
   faqs: Faq[];
+  flow?: Flow | null;
+  flowNodes?: FlowNode[];
+  flowEdges?: FlowEdge[];
+  appearance?: PageAppearanceSettings;
+};
+
+export type VisualTemplateKey =
+  | "dark_premium"
+  | "whatsapp_inspired"
+  | "instagram_dm"
+  | "minimal_chat";
+
+export type PageAppearanceSettings = {
+  publicOfferName: string;
+  publicSubtitle: string;
+  template: VisualTemplateKey;
+  avatarUrl?: string | null;
+  showHeader: boolean;
+  showTopSupport: boolean;
+  showMicroCredibility: boolean;
+  microCredibilityText: string;
+  primaryColor: string;
+  secondaryColor: string;
+  background: string;
+  bubbleStyle: "rounded" | "compact" | "soft";
+  buttonStyle: "gradient" | "solid" | "outline";
+  font: "geist" | "inter" | "system";
+};
+
+export type FlowStatus = "draft" | "published" | "archived";
+
+export type FlowNodeType =
+  | "start"
+  | "text_message"
+  | "button_message"
+  | "media_message"
+  | "input"
+  | "condition"
+  | "faq"
+  | "checkout"
+  | "pix_payment"
+  | "wait_payment"
+  | "delivery"
+  | "support"
+  | "action"
+  | "redirect"
+  | "end";
+
+export type Flow = {
+  id: string;
+  name: string;
+  slug: string;
+  product_id: string;
+  theme_id: VisualTemplateKey;
+  status: FlowStatus;
+  start_node_id: string | null;
+  created_at?: string;
+  updated_at?: string;
+  published_at?: string | null;
+  products?: Pick<Product, "name" | "slug"> | null;
+};
+
+export type FlowNode = {
+  id: string;
+  flow_id: string;
+  type: FlowNodeType;
+  title: string;
+  position_x: number;
+  position_y: number;
+  config: Record<string, unknown>;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type FlowEdge = {
+  id: string;
+  flow_id: string;
+  source_node_id: string;
+  source_handle: string;
+  target_node_id: string;
+  condition: Record<string, unknown> | null;
+  created_at?: string;
+};
+
+export type FlowVersion = {
+  id: string;
+  flow_id: string;
+  version: number;
+  snapshot: Record<string, unknown>;
+  created_at?: string;
 };
 
 export type PaymentProviderKey = "mock" | "pushinpay" | "amplopay";

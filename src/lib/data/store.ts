@@ -11,15 +11,20 @@ import {
   setInventoryStatus,
   upsertById,
 } from "@/lib/data/mockStore";
+import { defaultAppearance } from "@/lib/defaults";
 import type {
   AdminStats,
   ChatStep,
   Delivery,
   DeliveryPayload,
   Faq,
+  Flow,
+  FlowEdge,
+  FlowNode,
   InventoryItem,
   Order,
   OrderStatus,
+  PageAppearanceSettings,
   PaymentGatewaySettings,
   Product,
   PublicProductPayload,
@@ -54,6 +59,11 @@ export async function getPublicProduct(
       store.products.find((item) => item.slug === slug && item.is_active) ??
       store.products[0];
 
+    const flow =
+      store.flows.find(
+        (item) => item.product_id === product.id && item.status === "published",
+      ) ?? null;
+
     return {
       product,
       chatSteps: store.chatSteps
@@ -62,6 +72,14 @@ export async function getPublicProduct(
       faqs: store.faqs
         .filter((faq) => faq.product_id === product.id && faq.is_active)
         .sort((a, b) => a.order - b.order),
+      flow,
+      flowNodes: flow
+        ? store.flowNodes.filter((node) => node.flow_id === flow.id)
+        : [],
+      flowEdges: flow
+        ? store.flowEdges.filter((edge) => edge.flow_id === flow.id)
+        : [],
+      appearance: store.appearanceSettings[product.id] ?? defaultAppearance,
     };
   }
 
@@ -76,7 +94,12 @@ export async function getPublicProduct(
     throw new Error("Produto indisponivel.");
   }
 
-  const [{ data: chatSteps }, { data: faqs }] = await Promise.all([
+  const [
+    { data: chatSteps },
+    { data: faqs },
+    { data: flows },
+    { data: appearanceRow },
+  ] = await Promise.all([
     supabase
       .from("chat_steps")
       .select("*")
@@ -89,12 +112,42 @@ export async function getPublicProduct(
       .eq("product_id", product.id)
       .eq("is_active", true)
       .order("order", { ascending: true }),
+    supabase
+      .from("flows")
+      .select("*")
+      .eq("product_id", product.id)
+      .eq("status", "published")
+      .order("published_at", { ascending: false })
+      .limit(1),
+    supabase
+      .from("admin_settings")
+      .select("value")
+      .eq("key", `appearance_${product.id}`)
+      .maybeSingle(),
   ]);
+  const flow = ((flows ?? [])[0] ?? null) as Flow | null;
+  const [{ data: flowNodes }, { data: flowEdges }] = flow
+    ? await Promise.all([
+        supabase.from("flow_nodes").select("*").eq("flow_id", flow.id),
+        supabase.from("flow_edges").select("*").eq("flow_id", flow.id),
+      ])
+    : [{ data: [] }, { data: [] }];
 
   return {
     product: product as Product,
     chatSteps: (chatSteps ?? []) as ChatStep[],
     faqs: (faqs ?? []) as Faq[],
+    flow,
+    flowNodes: (flowNodes ?? []) as FlowNode[],
+    flowEdges: (flowEdges ?? []) as FlowEdge[],
+    appearance: {
+      ...defaultAppearance,
+      publicOfferName:
+        (product as Product).public_title ?? defaultAppearance.publicOfferName,
+      publicSubtitle:
+        (product as Product).public_subtitle ?? defaultAppearance.publicSubtitle,
+      ...((appearanceRow?.value ?? {}) as Partial<PageAppearanceSettings>),
+    },
   };
 }
 
@@ -217,8 +270,11 @@ export async function saveProduct(input: Partial<Product>) {
     description: input.description ?? null,
     price: Number(input.price ?? 0),
     is_active: input.is_active ?? true,
+    status: input.status ?? (input.is_active === false ? "inactive" : "active"),
     delivery_type: input.delivery_type ?? "digital_credential",
     image_url: input.image_url ?? null,
+    public_title: input.public_title ?? null,
+    public_subtitle: input.public_subtitle ?? null,
     support_text: input.support_text ?? null,
     default_instructions: input.default_instructions ?? null,
     updated_at: now,
@@ -236,6 +292,168 @@ export async function saveProduct(input: Partial<Product>) {
     .single();
   if (error) throw error;
   return data as Product;
+}
+
+export async function listFlows(productId?: string) {
+  const supabase = supabaseOrNull() ?? publicSupabaseOrNull();
+  if (!supabase) {
+    return getMockStore().flows
+      .filter((flow) => !productId || flow.product_id === productId)
+      .map((flow) => ({
+        ...flow,
+        products:
+          getMockStore().products.find((product) => product.id === flow.product_id) ??
+          null,
+      }));
+  }
+
+  let query = supabase
+    .from("flows")
+    .select("*, products(name, slug)")
+    .order("created_at", { ascending: false });
+  if (productId) query = query.eq("product_id", productId);
+  const { data, error } = await query;
+  if (error) throw error;
+  return (data ?? []) as Flow[];
+}
+
+export async function getFlowBundle(flowId: string) {
+  const supabase = supabaseOrNull() ?? publicSupabaseOrNull();
+  if (!supabase) {
+    const store = getMockStore();
+    const flow = store.flows.find((item) => item.id === flowId) ?? null;
+    if (!flow) return null;
+    return {
+      flow,
+      nodes: store.flowNodes.filter((node) => node.flow_id === flowId),
+      edges: store.flowEdges.filter((edge) => edge.flow_id === flowId),
+    };
+  }
+
+  const { data: flow, error } = await supabase
+    .from("flows")
+    .select("*")
+    .eq("id", flowId)
+    .single();
+  if (error || !flow) return null;
+  const [{ data: nodes }, { data: edges }] = await Promise.all([
+    supabase.from("flow_nodes").select("*").eq("flow_id", flowId),
+    supabase.from("flow_edges").select("*").eq("flow_id", flowId),
+  ]);
+  return {
+    flow: flow as Flow,
+    nodes: (nodes ?? []) as FlowNode[],
+    edges: (edges ?? []) as FlowEdge[],
+  };
+}
+
+export async function saveFlow(input: Partial<Flow>) {
+  const supabase = supabaseOrNull() ?? publicSupabaseOrNull();
+  const now = new Date().toISOString();
+  const flow: Flow = {
+    id: input.id ?? createId("flow"),
+    name: input.name ?? "Novo fluxo",
+    slug: input.slug ?? createId("fluxo"),
+    product_id: input.product_id ?? (await listProducts())[0]?.id ?? "missing-product",
+    theme_id: input.theme_id ?? "dark_premium",
+    status: input.status ?? "draft",
+    start_node_id: input.start_node_id ?? null,
+    published_at:
+      input.status === "published"
+        ? input.published_at ?? now
+        : input.published_at ?? null,
+    updated_at: now,
+    created_at: input.created_at ?? now,
+  };
+
+  if (!supabase) {
+    return upsertById(getMockStore().flows, flow);
+  }
+
+  const { data, error } = await supabase
+    .from("flows")
+    .upsert(flow)
+    .select("*")
+    .single();
+  if (error) throw error;
+  return data as Flow;
+}
+
+export async function saveFlowGraph(input: {
+  flow: Flow;
+  nodes: FlowNode[];
+  edges: FlowEdge[];
+}) {
+  const supabase = supabaseOrNull() ?? publicSupabaseOrNull();
+  if (!supabase) {
+    const store = getMockStore();
+    upsertById(store.flows, input.flow);
+    store.flowNodes = store.flowNodes.filter((node) => node.flow_id !== input.flow.id);
+    store.flowEdges = store.flowEdges.filter((edge) => edge.flow_id !== input.flow.id);
+    store.flowNodes.push(...input.nodes);
+    store.flowEdges.push(...input.edges);
+    return input;
+  }
+
+  const flow = await saveFlow(input.flow);
+  await supabase.from("flow_edges").delete().eq("flow_id", flow.id);
+  await supabase.from("flow_nodes").delete().eq("flow_id", flow.id);
+
+  if (input.nodes.length) {
+    const { error } = await supabase.from("flow_nodes").insert(input.nodes);
+    if (error) throw error;
+  }
+  if (flow.start_node_id) {
+    await supabase
+      .from("flows")
+      .update({ start_node_id: flow.start_node_id })
+      .eq("id", flow.id);
+  }
+  if (input.edges.length) {
+    const { error } = await supabase.from("flow_edges").insert(input.edges);
+    if (error) throw error;
+  }
+
+  return { flow, nodes: input.nodes, edges: input.edges };
+}
+
+export async function getAppearanceSettings(productId: string) {
+  const supabase = supabaseOrNull() ?? publicSupabaseOrNull();
+  if (!supabase) {
+    return getMockStore().appearanceSettings[productId] ?? defaultAppearance;
+  }
+
+  const { data } = await supabase
+    .from("admin_settings")
+    .select("value")
+    .eq("key", `appearance_${productId}`)
+    .maybeSingle();
+  return {
+    ...defaultAppearance,
+    ...((data?.value ?? {}) as Partial<PageAppearanceSettings>),
+  };
+}
+
+export async function saveAppearanceSettings(
+  productId: string,
+  settings: PageAppearanceSettings,
+) {
+  const supabase = supabaseOrNull() ?? publicSupabaseOrNull();
+  if (!supabase) {
+    getMockStore().appearanceSettings[productId] = settings;
+    return settings;
+  }
+
+  const { data, error } = await supabase
+    .from("admin_settings")
+    .upsert(
+      { key: `appearance_${productId}`, value: settings },
+      { onConflict: "key" },
+    )
+    .select("value")
+    .single();
+  if (error) throw error;
+  return data.value as PageAppearanceSettings;
 }
 
 export async function listChatSteps(productId?: string) {

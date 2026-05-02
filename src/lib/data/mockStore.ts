@@ -1,6 +1,10 @@
 import {
   defaultChatSteps,
+  defaultAppearance,
   defaultFaqs,
+  defaultFlow,
+  defaultFlowEdges,
+  defaultFlowNodes,
   defaultInventoryItem,
   defaultProduct,
 } from "@/lib/defaults";
@@ -10,6 +14,9 @@ import type {
   Delivery,
   DeliveryPayload,
   Faq,
+  Flow,
+  FlowEdge,
+  FlowNode,
   InventoryItem,
   InventoryStatus,
   Order,
@@ -24,6 +31,10 @@ type MockState = {
   inventoryItems: InventoryItem[];
   orders: Order[];
   deliveries: Delivery[];
+  flows: Flow[];
+  flowNodes: FlowNode[];
+  flowEdges: FlowEdge[];
+  appearanceSettings: Record<string, typeof defaultAppearance>;
 };
 
 const globalForMock = globalThis as typeof globalThis & {
@@ -39,6 +50,10 @@ export function getMockStore() {
       inventoryItems: [defaultInventoryItem],
       orders: [],
       deliveries: [],
+      flows: [defaultFlow],
+      flowNodes: [...defaultFlowNodes],
+      flowEdges: [...defaultFlowEdges],
+      appearanceSettings: { [defaultProduct.id]: defaultAppearance },
     };
   }
 

@@ -1,8 +1,8 @@
-# AcessoPro
+# Chatfy
 
-Microsaas para venda automatizada de produtos digitais legitimos, acessos autorizados, licencas e entregaveis permitidos pelo fornecedor/proprietario.
+Microsaas para criar paginas de venda em formato de conversa, com checkout Pix e entrega automatica de produtos digitais legitimos apos pagamento confirmado.
 
-O MVP inicial vende **CapCut Pro - Acesso Digital** com funil em chat, checkout Pix mock, confirmacao via admin/webhook e entrega automatica no proprio chat.
+O MVP inicial vende **CapCut Pro - Acesso Digital** com fluxo visual, templates de chat, checkout Pix mock, confirmacao via admin/webhook e entrega automatica no proprio chat.
 
 ## Stack
 
@@ -12,6 +12,14 @@ O MVP inicial vende **CapCut Pro - Acesso Digital** com funil em chat, checkout 
 - API Routes do Next.js
 - Vercel
 - Camada generica `src/lib/payment/paymentProvider.ts`
+
+## Novas areas Chatfy
+
+- `/p/[slug]`: pagina publica por produto/fluxo publicado.
+- `/admin/flows`: lista e cria fluxos visuais.
+- `/admin/flows/[id]`: canvas com blocos conectados, drag manual, editor lateral e publicacao.
+- `/admin/appearance`: templates Dark Premium, WhatsApp Inspired, Instagram DM e Minimal Chat.
+- `/admin/settings/payments`: gateway ativo Mock, PushinPay ou AmploPay.
 
 ## Rodar local
 

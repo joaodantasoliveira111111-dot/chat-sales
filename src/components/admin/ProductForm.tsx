@@ -30,6 +30,8 @@ export function ProductForm({ product }: { product?: Product | null }) {
     is_active: product?.is_active ?? true,
     delivery_type: product?.delivery_type ?? "digital_credential",
     image_url: product?.image_url ?? "",
+    public_title: product?.public_title ?? "",
+    public_subtitle: product?.public_subtitle ?? "",
     support_text: product?.support_text ?? "",
     default_instructions: product?.default_instructions ?? "",
   });
@@ -106,6 +108,20 @@ export function ProductForm({ product }: { product?: Product | null }) {
             placeholder="Explique o que o cliente compra em uma frase clara."
             onChange={(value) => update("description", value)}
           />
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            <Input
+              label="Titulo publico da pagina"
+              value={form.public_title}
+              placeholder="CapCut Pro por menos"
+              onChange={(value) => update("public_title", value)}
+            />
+            <Input
+              label="Subtitulo publico"
+              value={form.public_subtitle}
+              placeholder="Acesso digital para quem edita videos no celular..."
+              onChange={(value) => update("public_subtitle", value)}
+            />
+          </div>
         </section>
 
         <section className="rounded-3xl border border-white/10 bg-white/[0.035] p-4 sm:p-5">
