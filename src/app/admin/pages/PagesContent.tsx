@@ -108,7 +108,7 @@ export function PagesContent({
         if (error) throw error
         const product = products.find(p => p.id === data.product_id)
         const flow = flows.find(f => f.id === data.flow_id)
-        setPages(pages.map(p => p.id === editPage.id ? { ...p, ...data, product: product ? { name: product.name } : null, flow: flow ? { name: flow.name } : null } : p))
+        setPages(pages.map(p => p.id === editPage.id ? { ...p, ...data, product: product ? { name: product.name } : undefined, flow: flow ? { name: flow.name } : undefined } as any : p))
         toast.success('Página atualizada!')
       } else {
         const { data: newPage, error } = await supabase.from('public_pages').insert({
@@ -117,7 +117,7 @@ export function PagesContent({
         if (error) throw error
         const product = products.find(p => p.id === data.product_id)
         const flow = flows.find(f => f.id === data.flow_id)
-        setPages([{ ...newPage, product: product ? { name: product.name } : null, flow: flow ? { name: flow.name } : null }, ...pages])
+        setPages([{ ...newPage, product: product ? { name: product.name } : undefined, flow: flow ? { name: flow.name } : undefined } as any, ...pages])
         toast.success('Página criada!')
       }
       setShowForm(false)
