@@ -97,7 +97,7 @@ export function ProductsContent({ products: initialProducts, userId }: ProductsC
       if (editProduct) {
         const { error } = await supabase.from('products').update(data).eq('id', editProduct.id)
         if (error) throw error
-        setProducts(products.map(p => p.id === editProduct.id ? { ...p, ...data } : p))
+        setProducts(products.map(p => p.id === editProduct.id ? { ...p, ...data } as any : p))
         toast.success('Produto atualizado!')
       } else {
         const { data: newProduct, error } = await supabase.from('products').insert({
