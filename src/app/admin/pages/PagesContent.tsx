@@ -27,7 +27,7 @@ const emptyForm = {
   show_microcopy: false,
   microcopy_text: '',
   show_powered_by: false,
-  status: 'draft' as const,
+  status: 'draft' as 'draft' | 'published' | 'archived',
 }
 
 export function PagesContent({
