@@ -15,9 +15,9 @@ export class PushinPayProvider implements PaymentProvider {
   private baseUrl: string
   private token: string
 
-  constructor() {
+  constructor(token?: string) {
     this.baseUrl = process.env.PUSHINPAY_API_URL || 'https://api.pushinpay.com.br/api'
-    this.token = process.env.PUSHINPAY_TOKEN || ''
+    this.token = token || process.env.PUSHINPAY_TOKEN || ''
   }
 
   private get headers() {

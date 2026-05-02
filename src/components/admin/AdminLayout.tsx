@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { cn } from '@/lib/utils'
 import {
   LayoutDashboard,
   Package,
@@ -12,21 +11,20 @@ import {
   Archive,
   ShoppingCart,
   HeadphonesIcon,
-  Settings,
-  ChevronRight,
+  CreditCard,
+  User,
   LogOut,
   MessageSquare,
   Menu,
   X,
-  CreditCard,
-  Palette,
-  User,
+  ChevronRight,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { cn } from '@/lib/utils'
 
-const navItems = [
+const navGroups = [
   {
-    title: 'Principal',
+    label: 'Principal',
     items: [
       { label: 'Dashboard', href: '/admin', icon: LayoutDashboard, exact: true },
       { label: 'Produtos', href: '/admin/products', icon: Package },
@@ -35,7 +33,7 @@ const navItems = [
     ],
   },
   {
-    title: 'Operações',
+    label: 'Operações',
     items: [
       { label: 'Estoque', href: '/admin/inventory', icon: Archive },
       { label: 'Pedidos', href: '/admin/orders', icon: ShoppingCart },
@@ -43,23 +41,22 @@ const navItems = [
     ],
   },
   {
-    title: 'Configurações',
+    label: 'Configurações',
     items: [
       { label: 'Pagamentos', href: '/admin/settings/payments', icon: CreditCard },
-      { label: 'Aparência', href: '/admin/settings/appearance', icon: Palette },
       { label: 'Conta', href: '/admin/settings/account', icon: User },
     ],
   },
 ]
 
-export function Sidebar({ mobile, onClose }: { mobile?: boolean; onClose?: () => void }) {
+function isActive(pathname: string, href: string, exact?: boolean) {
+  if (exact) return pathname === href
+  return pathname.startsWith(href) && (pathname === href || pathname[href.length] === '/')
+}
+
+function SidebarContent({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname()
   const router = useRouter()
-
-  const isActive = (href: string, exact?: boolean) => {
-    if (exact) return pathname === href
-    return pathname.startsWith(href)
-  }
 
   const handleLogout = async () => {
     const supabase = createClient()
@@ -68,68 +65,67 @@ export function Sidebar({ mobile, onClose }: { mobile?: boolean; onClose?: () =>
   }
 
   return (
-    <div className={cn(
-      'flex flex-col h-full',
-      mobile ? 'w-full' : 'w-64'
-    )}>
+    <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="px-5 py-5 flex items-center justify-between">
-        <Link href="/admin" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl gradient-primary flex items-center justify-center shadow-lg shadow-violet-500/30">
-            <MessageSquare size={16} className="text-white" />
-          </div>
-          <span className="text-lg font-bold gradient-text">Chatfy</span>
-        </Link>
-        {mobile && (
-          <button
-            onClick={onClose}
-            className="p-2 rounded-lg hover:bg-white/5 text-slate-400"
-          >
-            <X size={20} />
+      <div className="flex items-center gap-2.5 px-4 py-5 border-b" style={{ borderColor: 'var(--border)' }}>
+        <div
+          className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+          style={{ background: 'linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)' }}
+        >
+          <MessageSquare size={16} className="text-white" />
+        </div>
+        <div>
+          <p className="text-sm font-bold text-white leading-none">Chatfy</p>
+          <p className="text-xs mt-0.5" style={{ color: 'var(--text-subtle)' }}>Admin Panel</p>
+        </div>
+        {onClose && (
+          <button onClick={onClose} className="ml-auto p-1 rounded-lg hover:bg-white/5 transition-colors" style={{ color: 'var(--text-muted)' }}>
+            <X size={16} />
           </button>
         )}
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 pb-3 overflow-y-auto space-y-4">
-        {navItems.map(section => (
-          <div key={section.title}>
-            <p className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-slate-600">
-              {section.title}
-            </p>
-            <div className="space-y-0.5">
-              {section.items.map(item => (
+      <nav className="flex-1 overflow-y-auto py-3 px-2">
+        {navGroups.map((group) => (
+          <div key={group.label}>
+            <p className="sidebar-nav-label">{group.label}</p>
+            {group.items.map((item) => {
+              const active = isActive(pathname, item.href, item.exact)
+              return (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={onClose}
-                  className={cn(
-                    'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
-                    isActive(item.href, item.exact)
-                      ? 'bg-violet-600/20 text-violet-300 border border-violet-500/20'
-                      : 'text-slate-400 hover:text-white hover:bg-white/5'
-                  )}
+                  className={cn('sidebar-nav-item', active && 'active')}
                 >
-                  <item.icon size={16} className={isActive(item.href, item.exact) ? 'text-violet-400' : ''} />
-                  {item.label}
-                  {isActive(item.href, item.exact) && (
-                    <ChevronRight size={14} className="ml-auto text-violet-400" />
-                  )}
+                  <item.icon size={15} />
+                  <span className="flex-1">{item.label}</span>
+                  {active && <ChevronRight size={13} style={{ opacity: 0.6 }} />}
                 </Link>
-              ))}
-            </div>
+              )
+            })}
           </div>
         ))}
       </nav>
 
       {/* Footer */}
-      <div className="px-3 pb-4 border-t border-white/5 pt-4">
+      <div className="px-2 pb-4 pt-2 border-t" style={{ borderColor: 'var(--border)' }}>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
+          className="sidebar-nav-item w-full text-left"
+          style={{ color: 'var(--text-muted)' }}
+          onMouseEnter={e => {
+            ;(e.currentTarget as HTMLElement).style.color = '#F87171'
+            ;(e.currentTarget as HTMLElement).style.background = 'rgba(239,68,68,0.08)'
+          }}
+          onMouseLeave={e => {
+            ;(e.currentTarget as HTMLElement).style.color = ''
+            ;(e.currentTarget as HTMLElement).style.background = ''
+          }}
         >
-          <LogOut size={16} />
-          Sair
+          <LogOut size={15} />
+          Sair da conta
         </button>
       </div>
     </div>
@@ -137,10 +133,10 @@ export function Sidebar({ mobile, onClose }: { mobile?: boolean; onClose?: () =>
 }
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
 
-  const getPageTitle = () => {
+  const pageTitle = (() => {
     if (pathname === '/admin') return 'Dashboard'
     if (pathname.startsWith('/admin/products')) return 'Produtos'
     if (pathname.startsWith('/admin/pages')) return 'Páginas Públicas'
@@ -148,50 +144,50 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     if (pathname.startsWith('/admin/inventory')) return 'Estoque'
     if (pathname.startsWith('/admin/orders')) return 'Pedidos'
     if (pathname.startsWith('/admin/support')) return 'Suporte'
-    if (pathname.startsWith('/admin/settings/payments')) return 'Configurações de Pagamento'
-    if (pathname.startsWith('/admin/settings/appearance')) return 'Aparência'
-    if (pathname.startsWith('/admin/settings')) return 'Configurações'
-    return 'Chatfy'
-  }
+    if (pathname.startsWith('/admin/settings/payments')) return 'Pagamentos'
+    if (pathname.startsWith('/admin/settings/account')) return 'Minha Conta'
+    return 'Admin'
+  })()
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: '#0a0a0f' }}>
+    <div className="admin-wrapper">
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex flex-col border-r border-white/5 flex-shrink-0 overflow-y-auto"
-        style={{ background: '#0d0d15', width: '256px' }}>
-        <Sidebar />
+      <aside className="admin-sidebar hidden lg:flex lg:flex-col">
+        <SidebarContent />
       </aside>
 
-      {/* Mobile Sidebar */}
-      {sidebarOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => setSidebarOpen(false)}
-          />
-          <aside className="relative z-10 flex flex-col h-full w-72 border-r border-white/10"
-            style={{ background: '#0d0d15' }}>
-            <Sidebar mobile onClose={() => setSidebarOpen(false)} />
+      {/* Mobile Sidebar Overlay */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-50 lg:hidden"
+          onClick={() => setMobileOpen(false)}
+          style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
+        >
+          <aside
+            className="absolute left-0 top-0 bottom-0 w-64 flex flex-col admin-sidebar"
+            onClick={e => e.stopPropagation()}
+          >
+            <SidebarContent onClose={() => setMobileOpen(false)} />
           </aside>
         </div>
       )}
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top bar */}
-        <header className="h-14 border-b border-white/5 flex items-center px-4 lg:px-6 flex-shrink-0"
-          style={{ background: '#0d0d15' }}>
+      {/* Main Area */}
+      <div className="admin-main flex flex-col min-h-screen">
+        {/* Topbar */}
+        <div className="admin-topbar">
           <button
-            onClick={() => setSidebarOpen(true)}
-            className="lg:hidden p-2 rounded-lg hover:bg-white/5 text-slate-400 mr-3"
+            onClick={() => setMobileOpen(true)}
+            className="lg:hidden p-2 rounded-lg hover:bg-white/5 transition-colors"
+            style={{ color: 'var(--text-muted)' }}
           >
-            <Menu size={20} />
+            <Menu size={18} />
           </button>
-          <h1 className="text-sm font-semibold text-white">{getPageTitle()}</h1>
-        </header>
+          <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>{pageTitle}</p>
+        </div>
 
-        {/* Page content */}
-        <main className="flex-1 overflow-y-auto">
+        {/* Page Content */}
+        <main className="flex-1">
           {children}
         </main>
       </div>

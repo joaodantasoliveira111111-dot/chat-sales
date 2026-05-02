@@ -17,10 +17,10 @@ export class AmploPayProvider implements PaymentProvider {
   private publicKey: string
   private secretKey: string
 
-  constructor() {
-    this.baseUrl = process.env.AMPLOPAY_API_URL || 'https://app.amplopay.com/api/v1'
-    this.publicKey = process.env.AMPLOPAY_PUBLIC_KEY || ''
-    this.secretKey = process.env.AMPLOPAY_SECRET_KEY || ''
+  constructor(publicKey?: string, secretKey?: string) {
+    this.baseUrl = process.env.AMPLOPAY_API_URL || 'https://api.amplopay.com/v1'
+    this.publicKey = publicKey || process.env.AMPLOPAY_PUBLIC_KEY || ''
+    this.secretKey = secretKey || process.env.AMPLOPAY_SECRET_KEY || ''
   }
 
   private get headers() {

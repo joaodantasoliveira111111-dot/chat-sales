@@ -1,0 +1,130 @@
+import { NextResponse } from 'next/server'
+import { createAdminClient } from '@/lib/supabase/middleware'
+
+export async function GET() {
+  const supabase = createAdminClient()
+
+  const themes = [
+    {
+      id: 'whatsapp',
+      name: 'WhatsApp Classic',
+      description: 'Estilo idêntico ao WhatsApp, ideal para fluxos de venda conversacionais rápidos.',
+      is_system: true,
+      config: {
+        background: '#efeae2',
+        backgroundPattern: 'url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png")',
+        chatContainer: '#efeae2',
+        chatContainerBorder: 'transparent',
+        assistantBubble: '#ffffff',
+        assistantBubbleBorder: 'transparent',
+        assistantText: '#111b21',
+        userBubble: '#d9fdd3',
+        userText: '#111b21',
+        button: '#25D366',
+        buttonText: '#ffffff',
+        buttonHover: '#128C7E',
+        headerBg: '#00a884',
+        headerText: '#ffffff',
+        inputBg: '#ffffff',
+        inputBorder: 'transparent',
+        inputText: '#111b21',
+        scrollbar: '#00a884',
+        typingDot: '#8696a0',
+        borderRadius: '0px',
+        bubbleRadius: '0.5rem',
+        shadow: '0 1px 0.5px rgba(11,20,26,.13)',
+        fontFamily: '"Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif',
+        backdropFilter: 'none',
+        timestamp: '#667781'
+      }
+    },
+    {
+      id: 'instagram',
+      name: 'Instagram DM',
+      description: 'Estilo moderno e escuro inspirado nas DMs do Instagram, focado em alta conversão para público jovem.',
+      is_system: true,
+      config: {
+        background: '#000000',
+        backgroundPattern: 'none',
+        chatContainer: '#000000',
+        chatContainerBorder: 'transparent',
+        assistantBubble: '#262626',
+        assistantBubbleBorder: 'transparent',
+        assistantText: '#f5f5f5',
+        userBubble: 'linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045)',
+        userText: '#ffffff',
+        button: 'linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045)',
+        buttonText: '#ffffff',
+        buttonHover: 'linear-gradient(135deg, #5b287d, #d11818, #d99639)',
+        headerBg: '#000000',
+        headerText: '#f5f5f5',
+        inputBg: '#262626',
+        inputBorder: '1px solid #333333',
+        inputText: '#f5f5f5',
+        scrollbar: '#833ab4',
+        typingDot: '#a8a8a8',
+        borderRadius: '0px',
+        bubbleRadius: '1.25rem',
+        shadow: 'none',
+        fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        backdropFilter: 'none',
+        timestamp: '#a8a8a8'
+      }
+    },
+    {
+      id: 'dark_premium',
+      name: 'Neumorphic Dark Premium',
+      description: 'Tema premium escuro e fluído com efeitos glassmorphism e cores vibrantes. Design focado em infoprodutos high-ticket.',
+      is_system: true,
+      config: {
+        background: '#0D0D14',
+        backgroundPattern: 'none',
+        chatContainer: '#13131F',
+        chatContainerBorder: 'rgba(255, 255, 255, 0.05)',
+        assistantBubble: '#1A1A2E',
+        assistantBubbleBorder: 'rgba(255, 255, 255, 0.08)',
+        assistantText: '#E2E8F0',
+        userBubble: 'linear-gradient(135deg, #7C3AED 0%, #06B6D4 100%)',
+        userText: '#ffffff',
+        button: 'linear-gradient(135deg, #7C3AED 0%, #06B6D4 100%)',
+        buttonText: '#ffffff',
+        buttonHover: 'linear-gradient(135deg, #6D28D9 0%, #0891B2 100%)',
+        headerBg: 'rgba(19, 19, 31, 0.8)',
+        headerText: '#ffffff',
+        inputBg: '#16162A',
+        inputBorder: '1px solid rgba(255, 255, 255, 0.1)',
+        inputText: '#E2E8F0',
+        scrollbar: '#7C3AED',
+        typingDot: '#A78BFA',
+        borderRadius: '24px',
+        bubbleRadius: '18px',
+        shadow: '4px 4px 10px rgba(0,0,0,0.5), -2px -2px 8px rgba(255,255,255,0.03)',
+        fontFamily: '"Inter", sans-serif',
+        backdropFilter: 'blur(12px)',
+        assistantBubbleShadow: 'inset 1px 1px 2px rgba(255,255,255,0.05)',
+        timestamp: '#64748B'
+      }
+    }
+  ]
+
+  let successes = 0
+  let errors = []
+
+  for (const t of themes) {
+    const { error } = await supabase.from('themes').upsert({
+      id: t.id,
+      name: t.name,
+      description: t.description,
+      is_system: t.is_system,
+      config: t.config
+    }, { onConflict: 'id' })
+
+    if (error) {
+      errors.push({ id: t.id, error })
+    } else {
+      successes++
+    }
+  }
+
+  return NextResponse.json({ successes, errors })
+}

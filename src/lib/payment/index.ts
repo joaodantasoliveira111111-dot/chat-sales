@@ -2,26 +2,45 @@ import { PaymentProvider } from './paymentProvider'
 import { MockPaymentProvider } from './providers/mockProvider'
 import { PushinPayProvider } from './providers/pushinPayProvider'
 import { AmploPayProvider } from './providers/amploPayProvider'
+import { createAdminClient } from '@/lib/supabase/middleware'
 
-let _provider: PaymentProvider | null = null
+export async function getPaymentProvider(userId: string): Promise<{ provider: PaymentProvider; providerName: string }> {
+  const supabase = createAdminClient()
 
-export function getPaymentProvider(): PaymentProvider {
-  if (_provider) return _provider
+  // Get active gateway for user
+  const { data: activeData } = await supabase
+    .from('admin_settings')
+    .select('value')
+    .eq('user_id', userId)
+    .eq('key', 'active_gateway')
+    .single()
 
-  const providerName = process.env.PAYMENT_PROVIDER || 'mock'
+  const providerName = (activeData?.value as any)?.provider || 'mock'
+
+  // Get credentials
+  const { data: credsData } = await supabase
+    .from('admin_settings')
+    .select('value')
+    .eq('user_id', userId)
+    .eq('key', `gateway_${providerName}`)
+    .single()
+
+  const credentials = (credsData?.value as Record<string, string>) || {}
+
+  let provider: PaymentProvider
 
   switch (providerName) {
     case 'pushinpay':
-      _provider = new PushinPayProvider()
+      provider = new PushinPayProvider(credentials.token)
       break
     case 'amplopay':
-      _provider = new AmploPayProvider()
+      provider = new AmploPayProvider(credentials.public_key, credentials.secret_key)
       break
     case 'mock':
     default:
-      _provider = new MockPaymentProvider()
+      provider = new MockPaymentProvider()
       break
   }
 
-  return _provider
+  return { provider, providerName }
 }

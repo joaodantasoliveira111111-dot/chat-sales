@@ -1,138 +1,158 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { InputHTMLAttributes, TextareaHTMLAttributes, forwardRef } from 'react'
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+// ---- Input ----
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string
-  error?: string
   hint?: string
+  error?: string
+  prefix?: React.ReactNode
+  suffix?: React.ReactNode
 }
 
-const Input = forwardRef<HTMLInputElement, InputProps>(({
-  className,
-  label,
-  error,
-  hint,
-  ...props
-}, ref) => {
+export function Input({ label, hint, error, prefix, suffix, className, id, ...props }: InputProps) {
+  const inputId = id || label?.toLowerCase().replace(/\s/g, '-')
   return (
-    <div className="flex flex-col gap-1.5">
+    <div>
       {label && (
-        <label className="text-sm font-medium text-slate-300">
+        <label
+          htmlFor={inputId}
+          style={{
+            display: 'block',
+            fontSize: '0.75rem',
+            fontWeight: 600,
+            color: 'var(--text-muted)',
+            marginBottom: '0.375rem',
+            letterSpacing: '0.01em',
+          }}
+        >
           {label}
-          {props.required && <span className="text-red-400 ml-1">*</span>}
+          {props.required && <span style={{ color: '#F87171', marginLeft: '0.2rem' }}>*</span>}
         </label>
       )}
-      <input
-        ref={ref}
-        className={cn(
-          'w-full px-3.5 py-2.5 rounded-xl text-sm',
-          'bg-white/5 border border-white/10',
-          'text-white placeholder:text-slate-500',
-          'focus:outline-none focus:border-violet-500/60 focus:bg-white/8',
-          'transition-all duration-200',
-          'disabled:opacity-50 disabled:cursor-not-allowed',
-          error && 'border-red-500/60 focus:border-red-500',
-          className
+      <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+        {prefix && (
+          <div style={{
+            position: 'absolute', left: '0.75rem',
+            color: 'var(--text-subtle)',
+            pointerEvents: 'none',
+            display: 'flex', alignItems: 'center',
+          }}>
+            {prefix}
+          </div>
         )}
-        {...props}
-      />
-      {error && <p className="text-xs text-red-400">{error}</p>}
-      {hint && !error && <p className="text-xs text-slate-500">{hint}</p>}
+        <input
+          id={inputId}
+          {...props}
+          className={cn('neu-input', className)}
+          style={{
+            paddingLeft: prefix ? '2.25rem' : undefined,
+            paddingRight: suffix ? '2.25rem' : undefined,
+            borderColor: error ? 'rgba(239,68,68,0.5)' : undefined,
+            ...(props.style || {}),
+          }}
+        />
+        {suffix && (
+          <div style={{
+            position: 'absolute', right: '0.75rem',
+            color: 'var(--text-subtle)',
+            pointerEvents: 'none',
+            display: 'flex', alignItems: 'center',
+          }}>
+            {suffix}
+          </div>
+        )}
+      </div>
+      {error && <p style={{ fontSize: '0.72rem', color: '#F87171', marginTop: '0.3rem' }}>{error}</p>}
+      {hint && !error && <p style={{ fontSize: '0.72rem', color: 'var(--text-subtle)', marginTop: '0.3rem' }}>{hint}</p>}
     </div>
   )
-})
-
-Input.displayName = 'Input'
-
-interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
-  label?: string
-  error?: string
-  hint?: string
 }
 
-const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(({
-  className,
-  label,
-  error,
-  hint,
-  ...props
-}, ref) => {
+// ---- Textarea ----
+interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  label?: string
+  hint?: string
+  error?: string
+}
+
+export function Textarea({ label, hint, error, className, id, ...props }: TextareaProps) {
+  const inputId = id || label?.toLowerCase().replace(/\s/g, '-')
   return (
-    <div className="flex flex-col gap-1.5">
+    <div>
       {label && (
-        <label className="text-sm font-medium text-slate-300">
+        <label
+          htmlFor={inputId}
+          style={{
+            display: 'block',
+            fontSize: '0.75rem',
+            fontWeight: 600,
+            color: 'var(--text-muted)',
+            marginBottom: '0.375rem',
+          }}
+        >
           {label}
-          {props.required && <span className="text-red-400 ml-1">*</span>}
+          {props.required && <span style={{ color: '#F87171', marginLeft: '0.2rem' }}>*</span>}
         </label>
       )}
       <textarea
-        ref={ref}
-        className={cn(
-          'w-full px-3.5 py-2.5 rounded-xl text-sm resize-none',
-          'bg-white/5 border border-white/10',
-          'text-white placeholder:text-slate-500',
-          'focus:outline-none focus:border-violet-500/60 focus:bg-white/8',
-          'transition-all duration-200',
-          'disabled:opacity-50 disabled:cursor-not-allowed',
-          error && 'border-red-500/60 focus:border-red-500',
-          className
-        )}
+        id={inputId}
         {...props}
+        className={cn('neu-input', className)}
+        style={{
+          resize: 'vertical',
+          minHeight: '80px',
+          borderColor: error ? 'rgba(239,68,68,0.5)' : undefined,
+          ...(props.style || {}),
+        }}
       />
-      {error && <p className="text-xs text-red-400">{error}</p>}
-      {hint && !error && <p className="text-xs text-slate-500">{hint}</p>}
+      {error && <p style={{ fontSize: '0.72rem', color: '#F87171', marginTop: '0.3rem' }}>{error}</p>}
+      {hint && !error && <p style={{ fontSize: '0.72rem', color: 'var(--text-subtle)', marginTop: '0.3rem' }}>{hint}</p>}
     </div>
   )
-})
-
-Textarea.displayName = 'Textarea'
-
-interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
-  label?: string
-  error?: string
-  hint?: string
 }
 
-const Select = forwardRef<HTMLSelectElement, SelectProps>(({
-  className,
-  label,
-  error,
-  hint,
-  children,
-  ...props
-}, ref) => {
+// ---- Select ----
+interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+  label?: string
+  hint?: string
+  error?: string
+  children: React.ReactNode
+}
+
+export function Select({ label, hint, error, className, id, children, ...props }: SelectProps) {
+  const inputId = id || label?.toLowerCase().replace(/\s/g, '-')
   return (
-    <div className="flex flex-col gap-1.5">
+    <div>
       {label && (
-        <label className="text-sm font-medium text-slate-300">
+        <label
+          htmlFor={inputId}
+          style={{
+            display: 'block',
+            fontSize: '0.75rem',
+            fontWeight: 600,
+            color: 'var(--text-muted)',
+            marginBottom: '0.375rem',
+          }}
+        >
           {label}
-          {props.required && <span className="text-red-400 ml-1">*</span>}
         </label>
       )}
       <select
-        ref={ref}
-        className={cn(
-          'w-full px-3.5 py-2.5 rounded-xl text-sm appearance-none',
-          'bg-[#111118] border border-white/10',
-          'text-white',
-          'focus:outline-none focus:border-violet-500/60',
-          'transition-all duration-200',
-          'disabled:opacity-50 disabled:cursor-not-allowed',
-          error && 'border-red-500/60',
-          className
-        )}
+        id={inputId}
         {...props}
+        className={cn('neu-input', className)}
+        style={{
+          cursor: 'pointer',
+          borderColor: error ? 'rgba(239,68,68,0.5)' : undefined,
+          ...(props.style || {}),
+        }}
       >
         {children}
       </select>
-      {error && <p className="text-xs text-red-400">{error}</p>}
-      {hint && !error && <p className="text-xs text-slate-500">{hint}</p>}
+      {error && <p style={{ fontSize: '0.72rem', color: '#F87171', marginTop: '0.3rem' }}>{error}</p>}
+      {hint && !error && <p style={{ fontSize: '0.72rem', color: 'var(--text-subtle)', marginTop: '0.3rem' }}>{hint}</p>}
     </div>
   )
-})
-
-Select.displayName = 'Select'
-
-export { Input, Textarea, Select }
+}

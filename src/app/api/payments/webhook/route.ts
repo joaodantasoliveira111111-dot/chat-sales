@@ -6,14 +6,20 @@ import { trackEvent } from '@/lib/analytics/trackEvent'
 
 export async function POST(request: NextRequest) {
   try {
+    const userId = request.nextUrl.searchParams.get('u')
+    if (!userId) {
+      return NextResponse.json({ error: 'Missing user id in webhook URL' }, { status: 400 })
+    }
+
     const body = await request.json()
     const headers = Object.fromEntries(request.headers.entries())
     const supabase = createAdminClient()
-    const provider = getPaymentProvider()
+    const { provider, providerName } = await getPaymentProvider(userId)
 
     // Save raw webhook event
     await supabase.from('payment_events').insert({
-      provider: process.env.PAYMENT_PROVIDER || 'mock',
+      user_id: userId,
+      provider: providerName,
       event_type: body.event || body.status || 'unknown',
       payload: body,
     })
@@ -52,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     // Update payment_events with order_id
     await supabase.from('payment_events').update({ order_id: order.id, user_id: order.user_id })
-      .eq('provider', process.env.PAYMENT_PROVIDER || 'mock')
+      .eq('provider', providerName)
       .is('order_id', null)
       .order('received_at', { ascending: false })
       .limit(1)

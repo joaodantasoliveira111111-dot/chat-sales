@@ -2,8 +2,7 @@
 
 import { useState } from 'react'
 import { Order } from '@/types'
-import { Badge } from '@/components/ui/Cards'
-import { GlassCard } from '@/components/ui/Cards'
+import { Badge, Card, EmptyState } from '@/components/ui/Cards'
 import { Button } from '@/components/ui/Button'
 import { Modal } from '@/components/ui/Modal'
 import { useToast } from '@/components/ui/Toast'
@@ -50,28 +49,30 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <div style={{ padding: '1.5rem', maxWidth: '1100px', margin: '0 auto' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
         <div>
-          <h1 className="text-2xl font-bold text-white">Pedidos</h1>
-          <p className="text-slate-400 text-sm mt-1">{orders.length} pedido(s)</p>
+          <h1 style={{ fontSize: '1.375rem', fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.02em' }}>Pedidos</h1>
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>{orders.length} pedido(s)</p>
         </div>
       </div>
 
-      <div className="flex gap-3 flex-wrap">
-        <div className="relative flex-1 min-w-48">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+      <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
+        <div style={{ position: 'relative', flex: '1', minWidth: '200px' }}>
+          <Search size={14} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-subtle)', pointerEvents: 'none' }} />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar por email, nome ou ID..."
-            className="w-full pl-9 pr-4 py-2 text-sm rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-500 focus:outline-none focus:border-violet-500/60"
+            className="neu-input"
+            style={{ paddingLeft: '2.25rem' }}
           />
         </div>
         <select
           value={statusFilter}
           onChange={e => setStatusFilter(e.target.value)}
-          className="px-3 py-2 text-sm rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none"
+          className="neu-input"
+          style={{ width: 'auto', minWidth: '150px' }}
         >
           <option value="all">Todos</option>
           <option value="pending">Pendentes</option>
@@ -84,40 +85,48 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
       </div>
 
       {filtered.length === 0 ? (
-        <GlassCard className="text-center py-16">
-          <ShoppingCart size={48} className="mx-auto text-slate-600 mb-4" />
-          <p className="text-slate-400">{orders.length === 0 ? 'Nenhum pedido ainda' : 'Nenhum resultado'}</p>
-        </GlassCard>
+        <Card>
+          <EmptyState
+            icon={<ShoppingCart size={24} />}
+            title={orders.length === 0 ? 'Nenhum pedido ainda' : 'Nenhum resultado'}
+            description={orders.length === 0 ? 'Quando seus clientes comprarem, os pedidos aparecerão aqui.' : 'Tente ajustar os filtros.'}
+          />
+        </Card>
       ) : (
-        <div className="space-y-2">
+        <div style={{ display: 'grid', gap: '0.75rem' }}>
           {filtered.map(order => (
-            <GlassCard key={order.id} className="flex items-center gap-4 cursor-pointer hover:border-white/20 transition-all" onClick={() => setSelectedOrder(order)}>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <p className="text-sm font-semibold text-white">{order.customer_name}</p>
-                  <Badge status={order.status} />
-                  {order.delivery && <span className="text-xs text-green-400">✓ Entregue</span>}
+            <Card key={order.id} hover onClick={() => setSelectedOrder(order)}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                    <span style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text)' }}>{order.customer_name}</span>
+                    <Badge status={order.status} />
+                    {order.delivery && <span style={{ fontSize: '0.7rem', color: '#34D399', fontWeight: 600 }}>✓ Entregue</span>}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', fontSize: '0.75rem', color: 'var(--text-subtle)' }}>
+                    <span>{order.customer_email}</span>
+                    <span>📦 {order.product?.name}</span>
+                    <span>{formatDate(order.created_at)}</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-4 text-xs text-slate-500">
-                  <span>{order.customer_email}</span>
-                  <span>{order.product?.name}</span>
-                  <span>{formatDate(order.created_at)}</span>
+                <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                  <p style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--primary-light)' }}>{formatCurrency(order.amount)}</p>
+                  {order.status === 'pending' && (
+                    <button
+                      onClick={e => { e.stopPropagation(); simulatePayment(order.id) }}
+                      disabled={simulating === order.id}
+                      style={{
+                        fontSize: '0.7rem', color: '#67E8F9', background: 'transparent', border: 'none',
+                        cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', marginTop: '0.25rem',
+                      }}
+                    >
+                      <Zap size={11} />
+                      {simulating === order.id ? 'Simulando...' : 'Simular'}
+                    </button>
+                  )}
                 </div>
               </div>
-              <div className="text-right flex-shrink-0">
-                <p className="text-sm font-bold text-violet-400">{formatCurrency(order.amount)}</p>
-                {order.status === 'pending' && (
-                  <button
-                    onClick={e => { e.stopPropagation(); simulatePayment(order.id) }}
-                    disabled={simulating === order.id}
-                    className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1 mt-1"
-                  >
-                    <Zap size={11} />
-                    {simulating === order.id ? 'Simulando...' : 'Simular pagamento'}
-                  </button>
-                )}
-              </div>
-            </GlassCard>
+            </Card>
           ))}
         </div>
       )}
@@ -130,8 +139,8 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
         size="lg"
       >
         {selectedOrder && (
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
               <InfoField label="ID" value={selectedOrder.id.slice(0, 8) + '...'} />
               <InfoField label="Status" value={<Badge status={selectedOrder.status} />} />
               <InfoField label="Cliente" value={selectedOrder.customer_name} />
@@ -144,28 +153,30 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
 
             {selectedOrder.pix_code && (
               <div>
-                <p className="text-xs text-slate-500 mb-1">Código PIX</p>
-                <p className="text-xs text-slate-400 break-all bg-white/3 p-2 rounded-lg">{selectedOrder.pix_code.slice(0, 100)}...</p>
+                <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.375rem' }}>Código PIX</p>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', background: 'var(--bg-base)', padding: '0.75rem', borderRadius: '10px', border: '1px solid var(--border)', wordBreak: 'break-all' }}>
+                  {selectedOrder.pix_code.slice(0, 100)}...
+                </p>
               </div>
             )}
 
             {selectedOrder.delivery && (
-              <div className="p-3 rounded-xl bg-green-400/5 border border-green-400/20">
-                <div className="flex items-center gap-2">
-                  <CheckCircle size={16} className="text-green-400" />
-                  <p className="text-sm text-green-400 font-medium">Entrega realizada</p>
+              <div style={{ padding: '0.75rem', borderRadius: '10px', background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <CheckCircle size={16} style={{ color: '#34D399' }} />
+                  <p style={{ fontSize: '0.85rem', fontWeight: 600, color: '#34D399' }}>Entrega realizada</p>
                 </div>
-                <p className="text-xs text-slate-500 mt-1">{formatDate(selectedOrder.delivery.delivered_at)}</p>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>{formatDate(selectedOrder.delivery.delivered_at)}</p>
               </div>
             )}
 
             {selectedOrder.status === 'pending' && (
-              <div className="pt-2 border-t border-white/10">
-                <p className="text-xs text-slate-500 mb-2">🧪 Modo Mock - Simular pagamento aprovado</p>
+              <div style={{ paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>🧪 Modo Mock - Simular pagamento aprovado</p>
                 <Button
                   onClick={() => simulatePayment(selectedOrder.id)}
                   loading={simulating === selectedOrder.id}
-                  className="w-full"
+                  fullWidth
                 >
                   <Zap size={16} />
                   Simular Pagamento Aprovado
@@ -182,8 +193,8 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
 function InfoField({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div>
-      <p className="text-xs text-slate-500 mb-1">{label}</p>
-      <div className="text-sm text-white">{value}</div>
+      <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>{label}</p>
+      <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text)' }}>{value}</div>
     </div>
   )
 }

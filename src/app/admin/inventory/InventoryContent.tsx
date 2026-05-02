@@ -4,7 +4,7 @@ import { useState, useRef } from 'react'
 import { InventoryItem } from '@/types'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
-import { GlassCard, Badge } from '@/components/ui/Cards'
+import { Card, Badge, EmptyState } from '@/components/ui/Cards'
 import { Modal, ConfirmDialog } from '@/components/ui/Modal'
 import { Input, Textarea, Select } from '@/components/ui/Input'
 import { useToast } from '@/components/ui/Toast'
@@ -197,15 +197,15 @@ export function InventoryContent({
   const deliveredCount = items.filter(i => i.status === 'delivered').length
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-3">
+    <div style={{ padding: '1.5rem', maxWidth: '1100px', margin: '0 auto' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 className="text-2xl font-bold text-white">Estoque</h1>
-          <p className="text-slate-400 text-sm mt-1">
+          <h1 style={{ fontSize: '1.375rem', fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.02em' }}>Estoque</h1>
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
             {availableCount} disponível · {deliveredCount} entregue · {items.length} total
           </p>
         </div>
-        <div className="flex gap-2">
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
           <Button variant="secondary" size="sm" onClick={exportCSV}>
             <Download size={14} />
             Exportar CSV
@@ -214,93 +214,99 @@ export function InventoryContent({
             <Upload size={14} />
             Importar CSV
           </Button>
-          <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleCSVImport} />
-          <Button onClick={openCreate}>
-            <Plus size={16} />
+          <input ref={fileInputRef} type="file" accept=".csv" style={{ display: 'none' }} onChange={handleCSVImport} />
+          <Button onClick={openCreate} size="sm">
+            <Plus size={14} />
             Adicionar item
           </Button>
         </div>
       </div>
 
-      <div className="flex gap-3 flex-wrap">
-        <div className="relative flex-1 min-w-48">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+      <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
+        <div style={{ position: 'relative', flex: '1', minWidth: '200px' }}>
+          <Search size={14} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-subtle)', pointerEvents: 'none' }} />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar..."
-            className="w-full pl-9 pr-4 py-2 text-sm rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-500 focus:outline-none"
+            className="neu-input"
+            style={{ paddingLeft: '2.25rem' }}
           />
         </div>
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
-          className="px-3 py-2 text-sm rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none">
+        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="neu-input" style={{ width: 'auto', minWidth: '150px' }}>
           <option value="all">Todos os status</option>
           <option value="available">Disponível</option>
           <option value="reserved">Reservado</option>
           <option value="delivered">Entregue</option>
           <option value="disabled">Desativado</option>
         </select>
-        <select value={productFilter} onChange={e => setProductFilter(e.target.value)}
-          className="px-3 py-2 text-sm rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none">
+        <select value={productFilter} onChange={e => setProductFilter(e.target.value)} className="neu-input" style={{ width: 'auto', minWidth: '150px' }}>
           <option value="all">Todos os produtos</option>
           {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
         </select>
       </div>
 
       {filtered.length === 0 ? (
-        <GlassCard className="text-center py-16">
-          <Archive size={48} className="mx-auto text-slate-600 mb-4" />
-          <p className="text-slate-400 font-medium mb-2">
-            {items.length === 0 ? 'Estoque vazio' : 'Nenhum item encontrado'}
-          </p>
-          {items.length === 0 && (
-            <>
-              <p className="text-slate-500 text-sm mb-6">
-                Adicione credenciais, links, arquivos ou outros entregáveis digitais.
-              </p>
-              <Button onClick={openCreate}><Plus size={16} />Adicionar primeiro item</Button>
-            </>
-          )}
-        </GlassCard>
+        <Card>
+          <EmptyState
+            icon={<Archive size={24} />}
+            title={items.length === 0 ? 'Estoque vazio' : 'Nenhum item encontrado'}
+            description={items.length === 0 ? 'Adicione credenciais, links, arquivos ou outros entregáveis digitais.' : 'Nenhum item corresponde à sua busca.'}
+            action={items.length === 0 && <Button onClick={openCreate} size="sm"><Plus size={14} />Adicionar primeiro item</Button>}
+          />
+        </Card>
       ) : (
-        <div className="space-y-2">
+        <div style={{ display: 'grid', gap: '0.75rem' }}>
           {filtered.map(item => (
-            <GlassCard key={item.id} className="flex items-center gap-4">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <p className="text-sm font-semibold text-white">{item.title || getStatusLabel(item.delivery_type)}</p>
-                  <Badge status={item.status} />
-                  <span className="text-xs text-slate-500">{item.product?.name}</span>
+            <Card key={item.id} hover>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text)' }}>{item.title || getStatusLabel(item.delivery_type)}</span>
+                    <Badge status={item.status} />
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)' }}>{item.product?.name}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    {item.access_email && <span>📧 {item.access_email}</span>}
+                    {item.license_key && <span>🔑 {item.license_key.slice(0, 15)}...</span>}
+                    {item.access_url && <span>🔗 Link</span>}
+                    <span>{formatDate(item.created_at)}</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-4 mt-1 text-xs text-slate-600">
-                  {item.access_email && <span>📧 {item.access_email}</span>}
-                  {item.license_key && <span>🔑 {item.license_key.slice(0, 15)}...</span>}
-                  {item.access_url && <span>🔗 Link</span>}
-                  <span>{formatDate(item.created_at)}</span>
-                </div>
+                {item.status === 'available' && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <button onClick={() => openEdit(item)} title="Editar" style={{
+                      padding: '0.5rem', borderRadius: '8px', background: 'transparent',
+                      border: 'none', color: 'var(--text-subtle)', cursor: 'pointer', display: 'flex', transition: 'all 0.15s',
+                    }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.color = 'var(--text)' }} onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-subtle)' }}>
+                      <Edit size={15} />
+                    </button>
+                    <button onClick={() => setDeleteItem(item)} title="Remover" style={{
+                      padding: '0.5rem', borderRadius: '8px', background: 'transparent',
+                      border: 'none', color: 'var(--text-subtle)', cursor: 'pointer', display: 'flex', transition: 'all 0.15s',
+                    }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.1)'; e.currentTarget.style.color = '#F87171' }} onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-subtle)' }}>
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
+                )}
               </div>
-              {item.status === 'available' && (
-                <div className="flex items-center gap-2">
-                  <button onClick={() => openEdit(item)} className="p-2 rounded-lg hover:bg-white/5 text-slate-400 hover:text-white transition-colors">
-                    <Edit size={15} />
-                  </button>
-                  <button onClick={() => setDeleteItem(item)} className="p-2 rounded-lg hover:bg-red-500/10 text-slate-400 hover:text-red-400 transition-colors">
-                    <Trash2 size={15} />
-                  </button>
-                </div>
-              )}
-            </GlassCard>
+            </Card>
           ))}
         </div>
       )}
 
-      <Modal isOpen={showForm} onClose={() => setShowForm(false)} title={editItem ? 'Editar item' : 'Novo item de estoque'} size="lg">
-        <div className="space-y-4">
+      <Modal isOpen={showForm} onClose={() => setShowForm(false)} title={editItem ? 'Editar item' : 'Novo item de estoque'} size="lg" footer={
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <Button variant="secondary" onClick={() => setShowForm(false)} fullWidth>Cancelar</Button>
+          <Button onClick={handleSave} loading={saving} fullWidth>{editItem ? 'Salvar alterações' : 'Adicionar ao estoque'}</Button>
+        </div>
+      }>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <Select label="Produto" value={form.product_id} onChange={e => setForm(f => ({ ...f, product_id: e.target.value }))} required>
             <option value="">Selecionar produto...</option>
             {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
           </Select>
-          <div className="grid grid-cols-2 gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <Input label="Título (opcional)" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="Ex: Conta Premium" />
             <Select label="Tipo de entrega" value={form.delivery_type} onChange={e => setForm(f => ({ ...f, delivery_type: e.target.value }))}>
               <option value="digital_credential">Credencial Digital</option>
@@ -310,7 +316,7 @@ export function InventoryContent({
               <option value="custom_text">Texto Personalizado</option>
             </Select>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <Input label="E-mail de acesso" type="email" value={form.access_email} onChange={e => setForm(f => ({ ...f, access_email: e.target.value }))} placeholder="conta@exemplo.com" />
             <Input label="Senha de acesso" type="password" value={form.access_password} onChange={e => setForm(f => ({ ...f, access_password: e.target.value }))} placeholder="•••••••" />
           </div>
@@ -318,10 +324,6 @@ export function InventoryContent({
           <Input label="Chave de licença" value={form.license_key} onChange={e => setForm(f => ({ ...f, license_key: e.target.value }))} placeholder="XXXX-XXXX-XXXX-XXXX" />
           <Textarea label="Conteúdo personalizado" value={form.custom_content} onChange={e => setForm(f => ({ ...f, custom_content: e.target.value }))} placeholder="Conteúdo a entregar..." rows={3} />
           <Textarea label="Instruções extras" value={form.extra_instructions} onChange={e => setForm(f => ({ ...f, extra_instructions: e.target.value }))} placeholder="Como usar o produto..." rows={2} />
-          <div className="flex gap-3 pt-2">
-            <Button variant="ghost" onClick={() => setShowForm(false)} className="flex-1">Cancelar</Button>
-            <Button onClick={handleSave} loading={saving} className="flex-1">{editItem ? 'Salvar' : 'Adicionar ao estoque'}</Button>
-          </div>
         </div>
       </Modal>
 

@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     const webhookUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/payments/webhook`
 
     // Create PIX payment
-    const provider = getPaymentProvider()
+    const { provider, providerName } = await getPaymentProvider(userId)
     const pixResult = await provider.createPixPayment({
       orderId,
       amount: product.price,
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
         amount: product.price,
         currency: product.currency || 'BRL',
         status: 'pending',
-        payment_provider: process.env.PAYMENT_PROVIDER || 'mock',
+        payment_provider: providerName,
         gateway_payment_id: pixResult.gatewayPaymentId,
         pix_code: pixResult.pixCode,
         pix_qr_code_url: pixResult.pixQrCodeUrl || null,

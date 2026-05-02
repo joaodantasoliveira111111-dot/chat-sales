@@ -6,14 +6,13 @@ import Link from 'next/link'
 import { Flow } from '@/types'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
-import { GlassCard, Badge } from '@/components/ui/Cards'
+import { Card, Badge, EmptyState } from '@/components/ui/Cards'
 import { Modal, ConfirmDialog } from '@/components/ui/Modal'
 import { Input, Select } from '@/components/ui/Input'
 import { useToast } from '@/components/ui/Toast'
-import { slugify } from '@/lib/utils'
-import { Plus, Workflow, Edit, Trash2, ExternalLink, Zap } from 'lucide-react'
+import { slugify, formatDate } from '@/lib/utils'
+import { Plus, Workflow, Edit, Trash2 } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
-import { formatDate } from '@/lib/utils'
 
 export function FlowsContent({
   flows: initialFlows,
@@ -34,7 +33,7 @@ export function FlowsContent({
   const [deleting, setDeleting] = useState(false)
 
   const handleCreate = async () => {
-    if (!form.name) return toast.error('Nome é obrigatório')
+    if (!form.name.trim()) return toast.error('Nome é obrigatório')
     setCreating(true)
     try {
       const supabase = createClient()
@@ -42,7 +41,7 @@ export function FlowsContent({
       const { data, error } = await supabase.from('flows').insert({
         id,
         user_id: userId,
-        name: form.name,
+        name: form.name.trim(),
         slug: slugify(form.name),
         product_id: form.product_id || null,
         status: 'draft',
@@ -75,67 +74,89 @@ export function FlowsContent({
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <div style={{ padding: '1.5rem', maxWidth: '1100px', margin: '0 auto' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 className="text-2xl font-bold text-white">Fluxos</h1>
-          <p className="text-slate-400 text-sm mt-1">{flows.length} fluxo(s) criado(s)</p>
+          <h1 style={{ fontSize: '1.375rem', fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.02em' }}>Fluxos</h1>
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>{flows.length} fluxo(s) criado(s)</p>
         </div>
-        <Button onClick={() => setShowCreate(true)}>
-          <Plus size={16} />
+        <Button onClick={() => setShowCreate(true)} size="md">
+          <Plus size={15} />
           Novo Fluxo
         </Button>
       </div>
 
       {flows.length === 0 ? (
-        <GlassCard className="text-center py-16">
-          <Workflow size={48} className="mx-auto text-slate-600 mb-4" />
-          <p className="text-slate-400 font-medium mb-2">Nenhum fluxo criado</p>
-          <p className="text-slate-500 text-sm mb-6">Crie fluxos conversacionais para suas páginas de venda.</p>
-          <Button onClick={() => setShowCreate(true)}>
-            <Plus size={16} />
-            Criar primeiro fluxo
-          </Button>
-        </GlassCard>
+        <Card>
+          <EmptyState
+            icon={<Workflow size={24} />}
+            title="Nenhum fluxo criado"
+            description="Crie fluxos conversacionais inteligentes para atender e vender para seus clientes automaticamente."
+            action={
+              <Button onClick={() => setShowCreate(true)} size="sm">
+                <Plus size={14} />
+                Criar primeiro fluxo
+              </Button>
+            }
+          />
+        </Card>
       ) : (
-        <div className="grid gap-3">
+        <div style={{ display: 'grid', gap: '0.75rem' }}>
           {flows.map(flow => (
-            <GlassCard key={flow.id} className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-violet-500/15 flex items-center justify-center flex-shrink-0">
-                <Workflow size={18} className="text-violet-400" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-semibold text-white">{flow.name}</p>
-                  <Badge status={flow.status} />
+            <Card key={flow.id} hover>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{
+                  width: '44px', height: '44px', borderRadius: '12px', flexShrink: 0,
+                  background: 'rgba(124,58,237,0.12)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <Workflow size={20} style={{ color: 'var(--primary-light)' }} />
                 </div>
-                <div className="flex items-center gap-3 mt-1">
-                  {flow.product && <p className="text-xs text-slate-500">{flow.product.name}</p>}
-                  <p className="text-xs text-slate-600">v{flow.version}</p>
-                  <p className="text-xs text-slate-600">{formatDate(flow.updated_at)}</p>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.2rem' }}>
+                    <span style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text)' }}>{flow.name}</span>
+                    <Badge status={flow.status} />
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                    {flow.product && <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>📦 {flow.product.name}</span>}
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-subtle)', fontWeight: 600 }}>v{flow.version}</span>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-subtle)' }}>{formatDate(flow.updated_at)}</span>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Link href={`/admin/flows/${flow.id}`} style={{ textDecoration: 'none' }}>
+                    <Button variant="secondary" size="sm">
+                      <Edit size={14} />
+                      Editar
+                    </Button>
+                  </Link>
+                  <button
+                    onClick={() => setDeleteFlow(flow)}
+                    title="Excluir"
+                    style={{
+                      padding: '0.5rem', borderRadius: '8px', background: 'transparent',
+                      border: 'none', color: 'var(--text-subtle)', cursor: 'pointer',
+                      display: 'flex', transition: 'all 0.15s',
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.1)'; e.currentTarget.style.color = '#F87171' }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-subtle)' }}
+                  >
+                    <Trash2 size={15} />
+                  </button>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Link href={`/admin/flows/${flow.id}`}>
-                  <Button variant="secondary" size="sm">
-                    <Edit size={14} />
-                    Editar
-                  </Button>
-                </Link>
-                <button
-                  onClick={() => setDeleteFlow(flow)}
-                  className="p-2 rounded-lg hover:bg-red-500/10 text-slate-400 hover:text-red-400 transition-colors"
-                >
-                  <Trash2 size={15} />
-                </button>
-              </div>
-            </GlassCard>
+            </Card>
           ))}
         </div>
       )}
 
-      <Modal isOpen={showCreate} onClose={() => setShowCreate(false)} title="Novo Fluxo" size="sm">
-        <div className="space-y-4">
+      <Modal isOpen={showCreate} onClose={() => setShowCreate(false)} title="Novo Fluxo" size="sm" footer={
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <Button variant="secondary" onClick={() => setShowCreate(false)} fullWidth>Cancelar</Button>
+          <Button onClick={handleCreate} loading={creating} fullWidth>Criar fluxo</Button>
+        </div>
+      }>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <Input
             label="Nome do fluxo"
             value={form.name}
@@ -145,18 +166,15 @@ export function FlowsContent({
           />
           {products.length > 0 && (
             <Select
-              label="Produto (opcional)"
+              label="Produto vinculado (opcional)"
               value={form.product_id}
               onChange={e => setForm(f => ({ ...f, product_id: e.target.value }))}
+              hint="Você pode vincular um produto agora ou depois nas configurações da página."
             >
-              <option value="">Sem produto vinculado</option>
+              <option value="">Nenhum produto</option>
               {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
             </Select>
           )}
-          <div className="flex gap-3 pt-2">
-            <Button variant="ghost" onClick={() => setShowCreate(false)} className="flex-1">Cancelar</Button>
-            <Button onClick={handleCreate} loading={creating} className="flex-1">Criar e abrir editor</Button>
-          </div>
         </div>
       </Modal>
 
@@ -166,7 +184,7 @@ export function FlowsContent({
         onConfirm={handleDelete}
         loading={deleting}
         title="Excluir fluxo"
-        description={`Excluir "${deleteFlow?.name}"? Todos os nós e conexões serão removidos.`}
+        description={`Tem certeza que deseja excluir "${deleteFlow?.name}"? Todas as conexões e configurações serão permanentemente removidas.`}
         confirmLabel="Excluir"
         variant="danger"
       />
