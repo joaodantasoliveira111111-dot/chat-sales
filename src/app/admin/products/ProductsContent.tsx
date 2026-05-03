@@ -48,10 +48,10 @@ const deliveryTypeOptions = [
   { value: 'manual', label: 'Entrega Manual' },
 ]
 
-const statusVariantMap: Record<string, 'success' | 'warning' | 'error' | 'info' | 'default'> = {
+const statusVariantMap: Record<string, 'success' | 'warning' | 'danger' | 'info' | 'default'> = {
   active: 'success',
   draft: 'warning',
-  inactive: 'error',
+  inactive: 'danger',
   archived: 'default',
 }
 
@@ -223,13 +223,12 @@ export function ProductsContent({ products: initialProducts, userId }: ProductsC
         <Card>
           <CardContent className="p-8">
             <EmptyState
-              icon={Package}
+              icon={<Package className="w-12 h-12 text-slate-300" />}
               title={products.length === 0 ? 'Nenhum produto ainda' : 'Nenhum resultado'}
               description={products.length === 0 ? 'Crie seu primeiro produto digital para começar a vender.' : 'Tente ajustar os filtros de busca.'}
-              action={products.length === 0 ? {
-                label: 'Criar primeiro produto',
-                onClick: openCreate,
-              } : undefined}
+              action={products.length === 0 ? (
+                <Button onClick={openCreate}>Criar primeiro produto</Button>
+              ) : undefined}
             />
           </CardContent>
         </Card>
@@ -315,7 +314,7 @@ export function ProductsContent({ products: initialProducts, userId }: ProductsC
             <Button variant="secondary" onClick={() => setShowForm(false)}>
               Cancelar
             </Button>
-            <Button onClick={handleSave} loading={saving}>
+            <Button onClick={handleSave} isLoading={saving}>
               {editProduct ? 'Salvar alterações' : 'Criar produto'}
             </Button>
           </div>
@@ -444,7 +443,7 @@ export function ProductsContent({ products: initialProducts, userId }: ProductsC
             <Button
               variant="danger"
               onClick={handleDelete}
-              loading={deleting}
+              isLoading={deleting}
             >
               Excluir permanentemente
             </Button>

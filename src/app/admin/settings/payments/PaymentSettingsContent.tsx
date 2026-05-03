@@ -332,7 +332,7 @@ export function PaymentSettingsContent({
       </Card>
 
       {/* Save button */}
-      <Button onClick={handleSave} loading={saving} size="lg" fullWidth leftIcon={<Save size={18} />}>
+      <Button onClick={handleSave} isLoading={saving} size="lg" fullWidth leftIcon={<Save size={18} />}>
         Salvar configurações
       </Button>
     </div>

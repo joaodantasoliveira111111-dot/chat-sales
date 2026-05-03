@@ -116,7 +116,7 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              loading={loading}
+              isLoading={loading}
               size="lg"
               fullWidth
               rightIcon={<ArrowRight size={18} />}

@@ -92,7 +92,7 @@ export function TrackingSettingsContent({ initialSettings, events }: Props) {
 
         <div className="grid gap-4 md:grid-cols-2 mt-5">
           <Input label="Meta Pixel ID" value={settings.pixel_id} onChange={e => setSettings(s => ({ ...s, pixel_id: e.target.value }))} placeholder="1234567890" />
-          <Input label="Access Token da Conversions API" type="password" value={settings.access_token} onChange={e => setSettings(s => ({ ...s, access_token: e.target.value }))} placeholder={initialSettings?.access_token_encrypted ? 'Token já configurado' : 'EAAB...'} hint="Deixe vazio para manter o token atual." />
+          <Input label="Access Token da Conversions API" type="password" value={settings.access_token} onChange={e => setSettings(s => ({ ...s, access_token: e.target.value }))} placeholder={initialSettings?.access_token_encrypted ? 'Token já configurado' : 'EAAB...'} helperText="Deixe vazio para manter o token atual." />
           <Input label="Dataset ID" value={settings.dataset_id} onChange={e => setSettings(s => ({ ...s, dataset_id: e.target.value }))} placeholder="Opcional" />
           <Input label="Test Event Code" value={settings.test_event_code} onChange={e => setSettings(s => ({ ...s, test_event_code: e.target.value }))} placeholder="TEST12345" />
           <Input label="Domínio verificado" value={settings.verified_domain} onChange={e => setSettings(s => ({ ...s, verified_domain: e.target.value }))} placeholder="seudominio.com" />
@@ -100,8 +100,8 @@ export function TrackingSettingsContent({ initialSettings, events }: Props) {
         </div>
 
         <div className="flex flex-wrap gap-3 mt-6">
-          <Button onClick={save} loading={saving}><CheckCircle size={16} /> Salvar configuração</Button>
-          <Button variant="secondary" onClick={test} loading={testing}><Send size={16} /> Testar integração</Button>
+          <Button onClick={save} isLoading={saving}><CheckCircle size={16} /> Salvar configuração</Button>
+          <Button variant="secondary" onClick={test} isLoading={testing}><Send size={16} /> Testar integração</Button>
         </div>
       </Card>
 

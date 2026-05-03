@@ -43,11 +43,11 @@ const statusOptions = [
   { value: 'disabled', label: 'Desativado' },
 ]
 
-const statusVariantMap: Record<string, 'success' | 'warning' | 'error' | 'info' | 'default'> = {
+const statusVariantMap: Record<string, 'success' | 'warning' | 'danger' | 'info' | 'default'> = {
   available: 'success',
   reserved: 'warning',
   delivered: 'success',
-  disabled: 'error',
+  disabled: 'danger',
 }
 
 const statusLabelMap: Record<string, string> = {
@@ -323,13 +323,12 @@ export function InventoryContent({
         <Card>
           <CardContent className="p-8">
             <EmptyState
-              icon={Archive}
+              icon={<Archive className="w-12 h-12 text-slate-300" />}
               title={items.length === 0 ? 'Estoque vazio' : 'Nenhum item encontrado'}
               description={items.length === 0 ? 'Adicione credenciais, links, arquivos ou outros entregáveis digitais.' : 'Nenhum item corresponde à sua busca.'}
-              action={items.length === 0 ? {
-                label: 'Adicionar primeiro item',
-                onClick: openCreate,
-              } : undefined}
+              action={items.length === 0 ? (
+                <Button onClick={openCreate}>Adicionar primeiro item</Button>
+              ) : undefined}
             />
           </CardContent>
         </Card>
@@ -420,7 +419,7 @@ export function InventoryContent({
             <Button variant="secondary" onClick={() => setShowForm(false)}>
               Cancelar
             </Button>
-            <Button onClick={handleSave} loading={saving}>
+            <Button onClick={handleSave} isLoading={saving}>
               {editItem ? 'Salvar alterações' : 'Adicionar ao estoque'}
             </Button>
           </div>
@@ -535,7 +534,7 @@ export function InventoryContent({
             <Button
               variant="danger"
               onClick={handleDelete}
-              loading={deleting}
+              isLoading={deleting}
             >
               Remover
             </Button>

@@ -6,9 +6,10 @@ import { forwardRef, HTMLAttributes } from 'react'
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'elevated' | 'outlined'
   hoverable?: boolean
+  hover?: boolean
 }
 
-const Card = forwardRef<HTMLDivElement, CardProps>(
+export const Card = forwardRef<HTMLDivElement, CardProps>(
   ({ className, variant = 'default', hoverable = false, children, ...props }, ref) => {
     const variantStyles = {
       default: 'bg-white border border-slate-200 shadow-sm',

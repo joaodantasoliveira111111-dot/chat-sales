@@ -11,6 +11,7 @@ import { Card, CardContent } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Modal } from '@/components/ui/Modal'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import { Toast, useToast } from '@/components/ui/Toast'
@@ -239,7 +240,7 @@ export function FlowsContent({
       <Modal isOpen={showCreate} onClose={() => setShowCreate(false)} title="Novo fluxo de venda X1" size="lg" footer={
         <div style={{ display: 'flex', gap: '0.75rem' }}>
           <Button variant="secondary" onClick={() => setShowCreate(false)} fullWidth>Cancelar</Button>
-          <Button onClick={handleCreate} loading={creating} fullWidth>Montar fluxo</Button>
+          <Button onClick={handleCreate} isLoading={creating} fullWidth>Montar fluxo</Button>
         </div>
       }>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -286,32 +287,39 @@ export function FlowsContent({
             <Select
               label="Produto vinculado"
               value={form.product_id}
-              onChange={e => setForm(f => ({ ...f, product_id: e.target.value }))}
+              onChange={value => setForm(f => ({ ...f, product_id: value }))}
               hint="O template usa {{product.name}}, {{product.price}} e configura o Pix com esse produto."
-            >
-              <option value="">Nenhum produto</option>
-              {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-            </Select>
+              options={[
+                { value: '', label: 'Nenhum produto' },
+                ...products.map(p => ({ value: p.id, label: p.name }))
+              ]}
+            />
           )}
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
-            <Select label="Template visual" value={form.visual_template} onChange={e => setForm(f => ({ ...f, visual_template: e.target.value }))}>
-              <option value="whatsapp">WhatsApp</option>
-              <option value="instagram">Instagram</option>
-            </Select>
+            <Select
+              label="Template visual"
+              value={form.visual_template}
+              onChange={value => setForm(f => ({ ...f, visual_template: value }))}
+              options={[
+                { value: 'whatsapp', label: 'WhatsApp' },
+                { value: 'instagram', label: 'Instagram' }
+              ]}
+            />
             <Select
               label="Tipo de entrega"
               value={form.delivery_type || getSalesTemplate(form.template_id).suggestedDeliveryType}
-              onChange={e => setForm(f => ({ ...f, delivery_type: e.target.value }))}
-            >
-              <option value="account_credentials">Conta com login e senha</option>
-              <option value="digital_file">Arquivo/material digital</option>
-              <option value="community_link">Link de comunidade</option>
-              <option value="course">Curso</option>
-              <option value="external_link">Link externo</option>
-              <option value="custom_message">Mensagem personalizada</option>
-              <option value="manual_access">Entrega manual/agendamento</option>
-            </Select>
+              onChange={value => setForm(f => ({ ...f, delivery_type: value }))}
+              options={[
+                { value: 'account_credentials', label: 'Conta com login e senha' },
+                { value: 'digital_file', label: 'Arquivo/material digital' },
+                { value: 'community_link', label: 'Link de comunidade' },
+                { value: 'course', label: 'Curso' },
+                { value: 'external_link', label: 'Link externo' },
+                { value: 'custom_message', label: 'Mensagem personalizada' },
+                { value: 'manual_access', label: 'Entrega manual/agendamento' }
+              ]}
+            />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
@@ -321,10 +329,15 @@ export function FlowsContent({
               onChange={e => setForm(f => ({ ...f, support_whatsapp: e.target.value }))}
               placeholder="{{system.support_whatsapp}}"
             />
-            <Select label="Gateway" value={form.gateway} onChange={e => setForm(f => ({ ...f, gateway: e.target.value }))}>
-              <option value="default">Gateway padrao</option>
-              <option value="pix">Pix</option>
-            </Select>
+            <Select
+              label="Gateway"
+              value={form.gateway}
+              onChange={value => setForm(f => ({ ...f, gateway: value }))}
+              options={[
+                { value: 'default', label: 'Gateway padrao' },
+                { value: 'pix', label: 'Pix' }
+              ]}
+            />
           </div>
 
           <div style={{ border: '1px solid rgba(34,211,238,0.22)', background: 'rgba(34,211,238,0.06)', color: 'var(--text-muted)', borderRadius: '14px', padding: '0.85rem', fontSize: '0.76rem', lineHeight: 1.55 }}>
@@ -337,7 +350,7 @@ export function FlowsContent({
         isOpen={!!deleteFlow}
         onClose={() => setDeleteFlow(null)}
         onConfirm={handleDelete}
-        loading={deleting}
+        isLoading={deleting}
         title="Excluir fluxo"
         description={`Tem certeza que deseja excluir "${deleteFlow?.name}"? Todas as conexoes e configuracoes serao permanentemente removidas.`}
         confirmLabel="Excluir"

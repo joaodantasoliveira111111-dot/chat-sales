@@ -311,7 +311,7 @@ export function FlowBuilderClient({
             variant="secondary"
             size="sm"
             onClick={saveFlow}
-            loading={saving}
+            isLoading={saving}
           >
             <Save size={14} />
             Salvar
@@ -319,7 +319,7 @@ export function FlowBuilderClient({
           <Button
             size="sm"
             onClick={publishFlow}
-            loading={publishing}
+            isLoading={publishing}
           >
             <Rocket size={14} />
             Publicar

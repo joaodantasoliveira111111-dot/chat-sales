@@ -27,7 +27,7 @@ export function SupportContent({ requests: initialRequests }: { requests: Suppor
     { value: 'closed', label: 'Fechados' },
   ]
 
-  const statusVariantMap: Record<string, 'success' | 'warning' | 'error' | 'info' | 'default'> = {
+  const statusVariantMap: Record<string, 'success' | 'warning' | 'danger' | 'info' | 'default'> = {
     open: 'warning',
     in_progress: 'info',
     resolved: 'success',
@@ -110,7 +110,7 @@ export function SupportContent({ requests: initialRequests }: { requests: Suppor
         <Card>
           <CardContent className="p-8">
             <EmptyState
-              icon={HeadphonesIcon}
+              icon={<HeadphonesIcon className="w-12 h-12 text-slate-300" />}
               title={requests.length === 0 ? 'Nenhuma solicitação de suporte' : 'Nenhum resultado'}
               description={requests.length === 0 ? 'As solicitações de suporte dos seus clientes aparecerão aqui.' : 'Tente ajustar os filtros.'}
             />

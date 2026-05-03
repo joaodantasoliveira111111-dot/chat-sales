@@ -43,7 +43,7 @@ const statusOptions = [
   { value: 'archived', label: 'Arquivado' },
 ]
 
-const statusVariantMap: Record<string, 'success' | 'warning' | 'error' | 'info' | 'default'> = {
+const statusVariantMap: Record<string, 'success' | 'warning' | 'danger' | 'info' | 'default'> = {
   published: 'success',
   draft: 'warning',
   archived: 'default',
@@ -126,7 +126,7 @@ export function PagesContent({
         primary_color: form.primary_color,
         secondary_color: form.secondary_color,
         show_header: form.show_header,
-        show_support_button: page.show_support_button,
+        show_support_button: editPage?.show_support_button || false,
         show_microcopy: form.show_microcopy,
         microcopy_text: form.microcopy_text || null,
         show_powered_by: form.show_powered_by,
@@ -248,13 +248,12 @@ export function PagesContent({
         <Card>
           <CardContent className="p-8">
             <EmptyState
-              icon={Globe}
+              icon={<Globe className="w-12 h-12 text-slate-300" />}
               title="Nenhuma página criada"
               description="Crie uma página pública com um design otimizado para vender seu produto ou capturar leads."
-              action={{
-                label: 'Criar primeira página',
-                onClick: openCreate,
-              }}
+              action={
+                <Button onClick={openCreate}>Criar primeira página</Button>
+              }
             />
           </CardContent>
         </Card>
@@ -364,7 +363,7 @@ export function PagesContent({
             <Button variant="secondary" onClick={() => setShowForm(false)}>
               Cancelar
             </Button>
-            <Button onClick={handleSave} loading={saving}>
+            <Button onClick={handleSave} isLoading={saving}>
               {editPage ? 'Salvar alterações' : 'Criar página'}
             </Button>
           </div>
@@ -523,7 +522,7 @@ export function PagesContent({
             <Button
               variant="danger"
               onClick={handleDelete}
-              loading={deleting}
+              isLoading={deleting}
             >
               Excluir página
             </Button>

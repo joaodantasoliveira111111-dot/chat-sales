@@ -4,6 +4,7 @@ import { Node } from 'reactflow'
 import { useState } from 'react'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
+import Textarea from '@/components/ui/Textarea'
 import { Toast, useToast } from '@/components/ui/Toast'
 import { createClient } from '@/lib/supabase/client'
 import { Trash2, X, Plus, Upload } from 'lucide-react'
@@ -288,13 +289,14 @@ function InputEditor({ config, onChange }: { config: any; onChange: (u: any) => 
       <Select
         label="Tipo de input"
         value={config.input_type || 'text'}
-        onChange={e => onChange({ input_type: e.target.value })}
-      >
-        <option value="text">Texto</option>
-        <option value="email">E-mail</option>
-        <option value="phone">Telefone</option>
-        <option value="number">Número</option>
-      </Select>
+        onChange={value => onChange({ input_type: value })}
+        options={[
+          { value: 'text', label: 'Texto' },
+          { value: 'email', label: 'E-mail' },
+          { value: 'phone', label: 'Telefone' },
+          { value: 'number', label: 'Número' },
+        ]}
+      />
     </div>
   )
 }
@@ -394,13 +396,14 @@ function MediaNodeEditor({
       <Select
         label="Tipo de midia"
         value={mediaType}
-        onChange={e => onChange({ media_type: e.target.value })}
-      >
-        <option value="image">Imagem</option>
-        <option value="video">Video</option>
-        <option value="audio">Audio</option>
-        <option value="document">PDF / documento</option>
-      </Select>
+        onChange={value => onChange({ media_type: value })}
+        options={[
+          { value: 'image', label: 'Imagem' },
+          { value: 'video', label: 'Video' },
+          { value: 'audio', label: 'Audio' },
+          { value: 'document', label: 'PDF / documento' },
+        ]}
+      />
 
       <Input
         label="URL externa ou arquivo enviado"
@@ -532,10 +535,7 @@ function ProductPlanEditor({ config, onChange, products }: { config: any; onChan
       {plans.map((plan: any, idx: number) => (
         <div key={plan.id} className="space-y-2 rounded-xl border border-white/8 bg-white/3 p-3">
           <Input label="Nome do plano" value={plan.plan_name || ''} onChange={e => updatePlans(plans.map((p: any, i: number) => i === idx ? { ...p, plan_name: e.target.value, label: e.target.value } : p))} />
-          <Select label="Produto vinculado" value={plan.product_id || ''} onChange={e => updatePlans(plans.map((p: any, i: number) => i === idx ? { ...p, product_id: e.target.value } : p))}>
-            <option value="">Sem produto vinculado</option>
-            {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-          </Select>
+          <Select label="Produto vinculado" value={plan.product_id || ''} onChange={value => updatePlans(plans.map((p: any, i: number) => i === idx ? { ...p, product_id: value } : p))} options={[{ value: '', label: 'Sem produto vinculado' }, ...products.map(p => ({ value: p.id, label: p.name }))]} />
           <Input label="Preco" type="number" value={String(plan.price || '')} onChange={e => updatePlans(plans.map((p: any, i: number) => i === idx ? { ...p, price: Number(e.target.value) } : p))} />
           <Input label="Texto do botao" value={plan.button_text || ''} onChange={e => updatePlans(plans.map((p: any, i: number) => i === idx ? { ...p, button_text: e.target.value } : p))} />
           <button onClick={() => updatePlans(plans.filter((_: any, i: number) => i !== idx))} className="text-xs text-red-400">Remover plano</button>
@@ -556,13 +556,12 @@ function CheckoutEditor({ config, onChange, products }: { config: any; onChange:
         <Select
           label="Produto"
           value={config.product_id || ''}
-          onChange={e => onChange({ product_id: e.target.value })}
-        >
-          <option value="">Usar produto da página</option>
-          {products.map(p => (
-            <option key={p.id} value={p.id}>{p.name}</option>
-          ))}
-        </Select>
+          onChange={value => onChange({ product_id: value })}
+          options={[
+            { value: '', label: 'Usar produto da página' },
+            ...products.map(p => ({ value: p.id, label: p.name }))
+          ]}
+        />
       )}
       <Input
         label="Título"
@@ -683,27 +682,26 @@ function AdvancedDeliveryEditor({ config, onChange, products }: { config: any; o
 
   return (
     <div className="space-y-4">
-      <Select label="Tipo de entrega" value={deliveryType} onChange={e => onChange({ delivery_type: e.target.value })}>
-        {deliveryTypes.map(type => <option key={type.value} value={type.value}>{type.label}</option>)}
-      </Select>
+      <Select label="Tipo de entrega" value={deliveryType} onChange={value => onChange({ delivery_type: value })} options={deliveryTypes} />
 
       <Select
         label={deliveryType === 'account_credentials' ? 'Produto/estoque vinculado' : 'Produto vinculado'}
         value={config.inventory_product_id || config.product_id || ''}
-        onChange={e => onChange({ inventory_product_id: e.target.value, product_id: e.target.value })}
+        onChange={value => onChange({ inventory_product_id: value, product_id: value })}
         hint={deliveryType === 'account_credentials' ? 'A conta será puxada dos itens disponíveis deste produto.' : 'Usado para variáveis e registro da entrega.'}
-      >
-        <option value="">Usar produto da página/pedido</option>
-        {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-      </Select>
+        options={[
+          { value: '', label: 'Usar produto da página/pedido' },
+          ...products.map(p => ({ value: p.id, label: p.name }))
+        ]}
+      />
 
       {deliveryType === 'account_credentials' && (
         <>
-          <Select label="Status da conta após entrega" value={config.inventory_status_after_delivery || 'delivered'} onChange={e => onChange({ inventory_status_after_delivery: e.target.value })}>
-            <option value="sold">sold</option>
-            <option value="delivered">delivered</option>
-            <option value="used">used</option>
-          </Select>
+          <Select label="Status da conta após entrega" value={config.inventory_status_after_delivery || 'delivered'} onChange={value => onChange({ inventory_status_after_delivery: value })} options={[
+            { value: 'sold', label: 'sold' },
+            { value: 'delivered', label: 'delivered' },
+            { value: 'used', label: 'used' },
+          ]} />
           <Textarea label="Mensagem caso não tenha estoque" value={config.out_of_stock_message || ''} onChange={e => onChange({ out_of_stock_message: e.target.value })} rows={3} />
         </>
       )}
@@ -858,12 +856,13 @@ function NotificationEditor({ config, onChange }: { config: any; onChange: (u: a
       <Select
         label="Canal"
         value={config.notification_channel || 'internal'}
-        onChange={e => onChange({ notification_channel: e.target.value })}
-      >
-        <option value="internal">Interno</option>
-        <option value="webhook">Webhook</option>
-        <option value="email">E-mail</option>
-      </Select>
+        onChange={value => onChange({ notification_channel: value })}
+        options={[
+          { value: 'internal', label: 'Interno' },
+          { value: 'webhook', label: 'Webhook' },
+          { value: 'email', label: 'E-mail' },
+        ]}
+      />
       <Textarea
         label="Mensagem"
         value={config.notification_message || ''}

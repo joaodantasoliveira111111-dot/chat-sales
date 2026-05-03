@@ -27,13 +27,13 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
     { value: 'paid_pending_stock', label: 'Sem estoque' },
   ]
 
-  const statusVariantMap: Record<string, 'success' | 'warning' | 'error' | 'info' | 'default'> = {
+  const statusVariantMap: Record<string, 'success' | 'warning' | 'danger' | 'info' | 'default'> = {
     paid: 'success',
     delivered: 'success',
     pending: 'warning',
-    expired: 'error',
-    cancelled: 'error',
-    paid_pending_stock: 'error',
+    expired: 'danger',
+    cancelled: 'danger',
+    paid_pending_stock: 'danger',
   }
 
   const statusLabelMap: Record<string, string> = {
@@ -126,7 +126,7 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
         <Card>
           <CardContent className="p-8">
             <EmptyState
-              icon={ShoppingCart}
+              icon={<ShoppingCart className="w-12 h-12 text-slate-300" />}
               title={orders.length === 0 ? 'Nenhum pedido ainda' : 'Nenhum resultado'}
               description={orders.length === 0 ? 'Quando seus clientes comprarem, os pedidos aparecerão aqui.' : 'Tente ajustar os filtros.'}
             />
@@ -283,7 +283,7 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
                     {selectedOrder.pix_code}
                   </div>
                   <button
-                    onClick={() => handleCopyPix(selectedOrder.pix_code)}
+                    onClick={() => selectedOrder.pix_code && handleCopyPix(selectedOrder.pix_code)}
                     className="absolute top-2 right-2 p-1.5 bg-white rounded-md border border-slate-200 hover:bg-slate-50 transition-colors"
                     title="Copiar código PIX"
                   >
@@ -314,7 +314,7 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
                 </p>
                 <Button
                   onClick={() => simulatePayment(selectedOrder.id)}
-                  loading={simulating === selectedOrder.id}
+                  isLoading={simulating === selectedOrder.id}
                   fullWidth
                   leftIcon={<Zap size={18} />}
                 >

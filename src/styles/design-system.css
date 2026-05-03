@@ -229,7 +229,7 @@ body {
 .mb-4 { margin-bottom: var(--space-4); }
 .mb-6 { margin-bottom: var(--space-6); }
 .mt-2 { margin-top: var(--space-2); }
-.mt-4 { margin-top:(var(--space-4); }
+.mt-4 { margin-top: var(--space-4); }
 
 /* Typography */
 .text-xs { font-size: var(--text-xs); }
