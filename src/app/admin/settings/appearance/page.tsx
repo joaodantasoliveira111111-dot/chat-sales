@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { AdminLayout } from '@/components/admin/AdminLayout'
-import { GlassCard } from '@/components/ui/Cards'
+import { Card, CardContent } from '@/components/ui/Card'
 
 export default async function AppearanceSettingsPage() {
   const supabase = await createClient()

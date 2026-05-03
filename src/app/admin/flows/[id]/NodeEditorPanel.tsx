@@ -2,9 +2,9 @@
 
 import { Node } from 'reactflow'
 import { useState } from 'react'
-import { Input, Textarea, Select } from '@/components/ui/Input'
-import { Button } from '@/components/ui/Button'
-import { useToast } from '@/components/ui/Toast'
+import Input from '@/components/ui/Input'
+import Select from '@/components/ui/Select'
+import { Toast, useToast } from '@/components/ui/Toast'
 import { createClient } from '@/lib/supabase/client'
 import { Trash2, X, Plus, Upload } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
