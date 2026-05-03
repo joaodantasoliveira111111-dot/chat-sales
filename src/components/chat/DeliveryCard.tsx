@@ -17,7 +17,6 @@ export function DeliveryCard({
   config,
   theme,
   orderId,
-  sessionId,
   onFetchDelivery,
   existingPayload,
 }: DeliveryCardProps) {
@@ -42,7 +41,7 @@ export function DeliveryCard({
       else setError('Entrega não disponível ainda')
       setLoading(false)
     })
-  }, [orderId])
+  }, [orderId, existingPayload, onFetchDelivery])
 
   const handleCopy = async (text: string, key: string) => {
     await copyToClipboard(text)
@@ -51,11 +50,11 @@ export function DeliveryCard({
   }
 
   const template = String(config.delivery_template || '')
-  const displayText = payload && template ? interpolateTemplate(template, payload as any) : null
+  const displayText = payload?.rendered_message || (payload && template ? interpolateTemplate(template, payload) : null)
 
   if (loading) {
     return (
-      <div className="animate-fade-in p-5 rounded-2xl text-center" style={{ background: theme.assistantBubble }}>
+      <div className="chat-inline-card animate-fade-in p-5 rounded-2xl text-center" style={{ background: theme.assistantBubble }}>
         <div className="flex justify-center gap-1.5">
           {[0, 1, 2].map(i => (
             <span key={i} className="typing-dot" style={{ color: theme.typingDot, animationDelay: `${i * 0.2}s` }} />
@@ -68,66 +67,49 @@ export function DeliveryCard({
 
   if (error || !payload) {
     return (
-      <div className="animate-fade-in p-4 rounded-2xl" style={{ background: theme.assistantBubble }}>
+      <div className="chat-inline-card animate-fade-in p-4 rounded-2xl" style={{ background: theme.assistantBubble }}>
         <p className="text-sm" style={{ color: theme.assistantText }}>{error || 'Entrega não disponível'}</p>
       </div>
     )
   }
 
   return (
-    <div className="animate-fade-in space-y-3">
-      {/* Delivery template message */}
+    <div className="chat-inline-card animate-fade-in space-y-3 min-w-0">
       {displayText && (
         <div className="p-4 rounded-2xl whitespace-pre-wrap text-sm" style={{ background: theme.assistantBubble, color: theme.assistantText }}>
           {displayText}
         </div>
       )}
 
-      {/* Delivery content cards */}
-      <div className="p-4 rounded-2xl space-y-3" style={{ background: theme.assistantBubble }}>
-        <p className="text-sm font-bold" style={{ color: theme.assistantText }}>🎉 Seu acesso está pronto!</p>
+      <div className="p-4 rounded-2xl space-y-3 min-w-0" style={{ background: theme.assistantBubble }}>
+        <p className="text-sm font-bold" style={{ color: theme.assistantText }}>{"\u2728"} Seu acesso está pronto!</p>
 
         {payload.access_email && (
-          <DeliveryField
-            label="E-mail de acesso"
-            value={payload.access_email}
-            onCopy={() => handleCopy(payload.access_email!, 'email')}
-            copied={copied === 'email'}
-            theme={theme}
-          />
+          <DeliveryField label="Login / e-mail" value={payload.access_email} onCopy={() => handleCopy(payload.access_email!, 'email')} copied={copied === 'email'} theme={theme} />
         )}
 
         {payload.access_password && (
-          <DeliveryField
-            label="Senha"
-            value={payload.access_password}
-            onCopy={() => handleCopy(payload.access_password!, 'password')}
-            copied={copied === 'password'}
-            theme={theme}
-            isPassword
-          />
-        )}
-
-        {payload.access_url && (
-          <DeliveryField
-            label="Link de acesso"
-            value={payload.access_url}
-            onCopy={() => handleCopy(payload.access_url!, 'url')}
-            copied={copied === 'url'}
-            theme={theme}
-            isLink
-          />
+          <DeliveryField label="Senha" value={payload.access_password} onCopy={() => handleCopy(payload.access_password!, 'password')} copied={copied === 'password'} theme={theme} isPassword />
         )}
 
         {payload.license_key && (
-          <DeliveryField
-            label="Chave de licença"
-            value={payload.license_key}
-            onCopy={() => handleCopy(payload.license_key!, 'key')}
-            copied={copied === 'key'}
-            theme={theme}
-            mono
-          />
+          <DeliveryField label="Chave de licença" value={payload.license_key} onCopy={() => handleCopy(payload.license_key!, 'key')} copied={copied === 'key'} theme={theme} mono />
+        )}
+
+        {payload.access_url && !payload.button_url && (
+          <DeliveryField label="Link de acesso" value={payload.access_url} onCopy={() => handleCopy(payload.access_url!, 'url')} copied={copied === 'url'} theme={theme} isLink />
+        )}
+
+        {payload.button_url && payload.button_text && (
+          <a
+            href={payload.button_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex w-auto max-w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold transition-all"
+            style={{ background: theme.button, color: theme.buttonText }}
+          >
+            {payload.button_text}
+          </a>
         )}
 
         {payload.custom_content && (
@@ -169,9 +151,9 @@ function DeliveryField({
   return (
     <div>
       <p className="text-xs opacity-60 mb-1" style={{ color: theme.assistantText }}>{label}</p>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 min-w-0">
         <code
-          className="flex-1 text-sm px-3 py-2 rounded-lg break-all"
+          className="flex-1 min-w-0 text-sm px-3 py-2 rounded-lg break-all"
           style={{
             background: 'rgba(0,0,0,0.2)',
             color: theme.assistantText,
@@ -186,7 +168,7 @@ function DeliveryField({
             className="text-xs px-2 py-2 rounded-lg opacity-70 hover:opacity-100"
             style={{ color: theme.assistantText, background: 'rgba(0,0,0,0.2)' }}
           >
-            {showPassword ? '🙈' : '👁'}
+            {showPassword ? 'Ocultar' : 'Ver'}
           </button>
         )}
         {isLink ? (
@@ -205,7 +187,7 @@ function DeliveryField({
             className="text-xs px-3 py-2 rounded-lg font-semibold transition-all"
             style={{ background: copied ? '#10B981' : theme.button, color: theme.buttonText }}
           >
-            {copied ? '✓' : '📋'}
+            {copied ? '\u2713' : 'Copiar'}
           </button>
         )}
       </div>

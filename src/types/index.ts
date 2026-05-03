@@ -15,7 +15,21 @@ export interface Profile {
 
 // ---- Products ----
 export type ProductStatus = 'draft' | 'active' | 'inactive' | 'archived'
-export type DeliveryType = 'digital_credential' | 'file' | 'link' | 'custom_text' | 'license_key' | 'manual'
+export type DeliveryType =
+  | 'digital_credential'
+  | 'account_credentials'
+  | 'community_link'
+  | 'exclusive_content'
+  | 'course'
+  | 'file'
+  | 'digital_file'
+  | 'link'
+  | 'external_link'
+  | 'custom_text'
+  | 'custom_message'
+  | 'license_key'
+  | 'manual'
+  | 'manual_access'
 
 export interface Product {
   id: string
@@ -94,19 +108,35 @@ export interface Flow {
 // ---- Flow Nodes ----
 export type NodeType =
   | 'start'
+  | 'message'
   | 'text_message'
+  | 'quick_reply'
   | 'button_message'
   | 'media_message'
+  | 'audio_message'
+  | 'video_message'
+  | 'image_message'
+  | 'file_message'
+  | 'media_gallery'
+  | 'capture_input'
   | 'input'
   | 'condition'
   | 'faq'
+  | 'product_plan'
   | 'checkout'
+  | 'payment'
   | 'pix_payment'
   | 'wait_payment'
   | 'delivery'
+  | 'delay'
+  | 'objection'
+  | 'social_proof'
+  | 'update_lead'
+  | 'notification'
   | 'support'
   | 'action'
   | 'redirect'
+  | 'error_fallback'
   | 'end'
 
 export interface FlowNodeConfig {
@@ -121,8 +151,15 @@ export interface FlowNodeConfig {
   // button_message
   buttons?: FlowButton[]
   // media_message
-  media_type?: 'image' | 'video' | 'audio'
+  media_type?: 'image' | 'video' | 'audio' | 'document' | 'file'
   media_url?: string
+  thumbnail_url?: string
+  file_name?: string
+  mime_type?: string
+  size?: number
+  duration?: number
+  media_asset_id?: string
+  media_items?: FlowMediaItem[]
   caption?: string
   // input
   label?: string
@@ -134,6 +171,17 @@ export interface FlowNodeConfig {
   // condition
   conditions?: FlowCondition[]
   default_target_node_id?: string
+  // product/plan selection
+  plans?: FlowPlanOption[]
+  // objection/social proof
+  objections?: FlowObjection[]
+  proof_items?: FlowMediaItem[]
+  proof_metric?: string
+  // lead/system updates
+  update_field?: string
+  update_value?: string
+  notification_channel?: 'email' | 'webhook' | 'internal'
+  notification_message?: string
   // faq
   faqs?: { question: string; answer: string }[]
   final_button_text?: string
@@ -159,7 +207,29 @@ export interface FlowNodeConfig {
   paid_target_node_id?: string
   pending_target_node_id?: string
   // delivery
+  delivery_type?: DeliveryType
+  inventory_product_id?: string
+  pre_delivery_message?: string
   delivery_template?: string
+  out_of_stock_message?: string
+  inventory_status_after_delivery?: 'sold' | 'delivered' | 'used'
+  community_name?: string
+  community_link?: string
+  content_title?: string
+  content_description?: string
+  access_link?: string
+  additional_instructions?: string
+  course_name?: string
+  platform?: string
+  login?: string
+  password?: string
+  material_name?: string
+  file_link?: string
+  external_url?: string
+  manual_message?: string
+  release_deadline?: string
+  support_contact?: string
+  out_of_stock_target_node_id?: string
   support_button_text?: string
   support_target_node_id?: string
   buy_again_button_text?: string
@@ -186,6 +256,54 @@ export interface FlowButton {
   action_type: 'go_to_node' | 'open_checkout' | 'open_faq' | 'open_support' | 'external_link' | 'restart_flow'
   target_node_id?: string
   external_url?: string | null
+}
+
+export interface FlowMediaItem {
+  id: string
+  type: 'image' | 'video' | 'audio' | 'document' | 'file'
+  url: string
+  file_name?: string
+  caption?: string
+  thumbnail_url?: string
+  mime_type?: string
+  size?: number
+  duration?: number
+}
+
+export interface FlowPlanOption {
+  id: string
+  label: string
+  product_id?: string
+  plan_name?: string
+  price?: number
+  description?: string
+  button_text?: string
+  target_node_id?: string
+}
+
+export interface FlowObjection {
+  id: string
+  label: string
+  response: string
+  target_node_id?: string
+}
+
+export interface MediaAsset {
+  id: string
+  user_id: string
+  product_id: string | null
+  flow_id: string | null
+  node_id: string | null
+  type: 'image' | 'video' | 'audio' | 'document' | 'file'
+  file_name: string
+  file_url: string
+  mime_type: string | null
+  size: number | null
+  duration: number | null
+  thumbnail_url: string | null
+  metadata: Record<string, unknown>
+  created_at: string
+  updated_at: string
 }
 
 export interface FlowCondition {
@@ -255,7 +373,7 @@ export interface PublicPage {
 }
 
 // ---- Inventory ----
-export type InventoryStatus = 'available' | 'reserved' | 'delivered' | 'disabled' | 'replaced'
+export type InventoryStatus = 'available' | 'reserved' | 'delivered' | 'sold' | 'used' | 'blocked' | 'disabled' | 'replaced'
 
 export interface InventoryItem {
   id: string
@@ -263,15 +381,20 @@ export interface InventoryItem {
   product_id: string
   title: string | null
   delivery_type: DeliveryType
+  type?: string | null
   access_email: string | null
   access_password: string | null
+  email?: string | null
+  password?: string | null
   access_url: string | null
   file_url: string | null
   license_key: string | null
   custom_content: string | null
   extra_instructions: string | null
+  extra_data?: Record<string, unknown> | null
   status: InventoryStatus
   assigned_order_id: string | null
+  assigned_lead_id?: string | null
   delivered_at: string | null
   created_at: string
   updated_at: string
@@ -286,6 +409,8 @@ export type OrderStatus =
   | 'cancelled'
   | 'refunded'
   | 'paid_pending_stock'
+  | 'pending_delivery'
+  | 'manual_pending'
   | 'failed'
 
 export interface Order {
@@ -322,12 +447,43 @@ export interface DeliveryPayload {
   customer_name?: string
   access_email?: string
   access_password?: string
+  account?: {
+    login?: string
+    password?: string
+    email?: string
+    extra_info?: string
+  }
+  lead?: {
+    name?: string
+    email?: string
+    phone?: string
+  }
+  order?: {
+    id?: string
+    amount?: number
+  }
+  product?: {
+    name?: string
+    price?: number
+  }
+  payment?: {
+    status?: string
+  }
+  delivery?: {
+    link?: string
+    button_text?: string
+  }
+  rendered_message?: string
+  button_text?: string
+  button_url?: string
   access_url?: string
   license_key?: string
   custom_content?: string
   extra_instructions?: string
   order_id?: string
   delivery_type?: DeliveryType
+  status?: string
+  error_message?: string
   [key: string]: unknown
 }
 
@@ -337,9 +493,13 @@ export interface Delivery {
   order_id: string
   product_id: string | null
   inventory_item_id: string | null
+  delivery_type?: DeliveryType | null
   delivery_payload: DeliveryPayload
-  delivered_at: string
+  status?: 'pending' | 'delivered' | 'failed' | 'manual_pending'
+  error_message?: string | null
+  delivered_at: string | null
   created_at: string
+  updated_at?: string
 }
 
 // ---- Payment Events ----
@@ -373,11 +533,17 @@ export interface SupportRequest {
 // ---- Analytics ----
 export type AnalyticsEventName =
   | 'PageView'
-  | 'StartChat'
-  | 'ClickButton'
+  | 'ViewContent'
+  | 'ChatOpened'
+  | 'FlowStarted'
+  | 'ViewNode'
+  | 'QuickReplyClicked'
+  | 'Lead'
+  | 'PlanSelected'
   | 'ViewCheckout'
   | 'InitiateCheckout'
-  | 'GeneratePix'
+  | 'AddPaymentInfo'
+  | 'PixCopied'
   | 'PaymentPending'
   | 'Purchase'
   | 'DeliveryCompleted'
@@ -446,7 +612,7 @@ export interface FlowSessionState {
 
 export interface ChatMessage {
   id: string
-  type: 'assistant' | 'user' | 'system' | 'typing' | 'buttons' | 'checkout' | 'pix' | 'delivery' | 'faq' | 'input'
+  type: 'assistant' | 'user' | 'system' | 'typing' | 'buttons' | 'checkout' | 'pix' | 'delivery' | 'faq' | 'input' | 'media' | 'product_plan'
   content?: string
   buttons?: FlowButton[]
   timestamp: number

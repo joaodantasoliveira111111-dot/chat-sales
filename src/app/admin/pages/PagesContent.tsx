@@ -1,17 +1,18 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { PublicPage } from '@/types'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
-import { Card, Badge, EmptyState } from '@/components/ui/Cards'
-import { Modal, ConfirmDialog } from '@/components/ui/Modal'
-import { Input, Textarea, Select } from '@/components/ui/Input'
-import { useToast } from '@/components/ui/Toast'
+import { Card, CardContent } from '@/components/ui/Card'
+import { Badge } from '@/components/ui/Badge'
+import { Modal } from '@/components/ui/Modal'
+import Input from '@/components/ui/Input'
+import Select from '@/components/ui/Select'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { slugify, copyToClipboard } from '@/lib/utils'
-import { Plus, Globe, Edit, Trash2, ExternalLink, Eye, Copy, Palette } from 'lucide-react'
-import { v4 as uuidv4 } from 'uuid'
-import Link from 'next/link'
+import { Plus, Globe, Edit, Trash2, ExternalLink, Copy, Palette, CheckCircle } from 'lucide-react'
 
 const emptyForm = {
   product_id: '',
@@ -19,6 +20,7 @@ const emptyForm = {
   slug: '',
   public_title: '',
   public_subtitle: '',
+  avatar_url: '',
   theme_id: 'dark_premium',
   primary_color: '#8B5CF6',
   secondary_color: '#06B6D4',
@@ -30,6 +32,23 @@ const emptyForm = {
   status: 'draft' as 'draft' | 'published' | 'archived',
 }
 
+type PageWithRelations = PublicPage & {
+  product?: { name: string } | null
+  flow?: { name: string } | null
+}
+
+const statusOptions = [
+  { value: 'draft', label: 'Rascunho' },
+  { value: 'published', label: 'Publicado' },
+  { value: 'archived', label: 'Arquivado' },
+]
+
+const statusVariantMap: Record<string, 'success' | 'warning' | 'error' | 'info' | 'default'> = {
+  published: 'success',
+  draft: 'warning',
+  archived: 'default',
+}
+
 export function PagesContent({
   pages: initialPages,
   products,
@@ -38,14 +57,14 @@ export function PagesContent({
   userId,
   appUrl,
 }: {
-  pages: (PublicPage & { product?: { name: string } | null; flow?: { name: string } | null })[]
+  pages: PageWithRelations[]
   products: { id: string; name: string }[]
   flows: { id: string; name: string }[]
   themes: { id: string; name: string; description: string | null }[]
   userId: string
   appUrl: string
 }) {
-  const toast = useToast()
+  const router = useRouter()
   const [pages, setPages] = useState(initialPages)
   const [showForm, setShowForm] = useState(false)
   const [editPage, setEditPage] = useState<typeof initialPages[0] | null>(null)
@@ -53,10 +72,13 @@ export function PagesContent({
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [formError, setFormError] = useState<string | null>(null)
+  const [copiedSlug, setCopiedSlug] = useState<string | null>(null)
 
   const openCreate = () => {
     setEditPage(null)
     setForm(emptyForm)
+    setFormError(null)
     setShowForm(true)
   }
 
@@ -68,6 +90,7 @@ export function PagesContent({
       slug: page.slug,
       public_title: page.public_title,
       public_subtitle: page.public_subtitle || '',
+      avatar_url: page.avatar_url || '',
       theme_id: page.theme_id,
       primary_color: page.primary_color,
       secondary_color: page.secondary_color,
@@ -78,11 +101,17 @@ export function PagesContent({
       show_powered_by: page.show_powered_by,
       status: page.status,
     })
+    setFormError(null)
     setShowForm(true)
   }
 
   const handleSave = async () => {
-    if (!form.public_title || !form.slug) return toast.error('Título e slug são obrigatórios')
+    setFormError(null)
+    if (!form.public_title.trim() || !form.slug.trim()) {
+      const message = 'Título e slug são obrigatórios'
+      setFormError(message)
+      return
+    }
     setSaving(true)
     try {
       const supabase = createClient()
@@ -92,11 +121,12 @@ export function PagesContent({
         slug: form.slug,
         public_title: form.public_title,
         public_subtitle: form.public_subtitle || null,
+        avatar_url: form.avatar_url || null,
         theme_id: form.theme_id,
         primary_color: form.primary_color,
         secondary_color: form.secondary_color,
         show_header: form.show_header,
-        show_support_button: form.show_support_button,
+        show_support_button: page.show_support_button,
         show_microcopy: form.show_microcopy,
         microcopy_text: form.microcopy_text || null,
         show_powered_by: form.show_powered_by,
@@ -104,25 +134,53 @@ export function PagesContent({
       }
 
       if (editPage) {
-        const { error } = await supabase.from('public_pages').update(data).eq('id', editPage.id)
+        const { data: updatedPage, error } = await supabase
+          .from('public_pages')
+          .update(data)
+          .eq('id', editPage.id)
+          .eq('user_id', userId)
+          .select('*')
+          .single()
         if (error) throw error
         const product = products.find(p => p.id === data.product_id)
         const flow = flows.find(f => f.id === data.flow_id)
-        setPages(pages.map(p => p.id === editPage.id ? { ...p, ...data, product: product ? { name: product.name } : undefined, flow: flow ? { name: flow.name } : undefined } as any : p))
-        toast.success('Página atualizada!')
+        const updatedWithRelations = {
+          ...updatedPage,
+          product: product ? { name: product.name } : null,
+          flow: flow ? { name: flow.name } : null,
+        } as PageWithRelations
+        setPages(prev => prev.map(p => p.id === editPage.id ? updatedWithRelations : p))
       } else {
-        const { data: newPage, error } = await supabase.from('public_pages').insert({
-          id: uuidv4(), user_id: userId, ...data, background_config: {}, bubble_style: 'rounded', button_style: 'filled',
-        }).select().single()
+        const { data: newPage, error } = await supabase
+          .from('public_pages')
+          .insert({
+            user_id: userId,
+            ...data,
+            background_config: {},
+            bubble_style: 'rounded',
+            button_style: 'filled',
+          })
+          .select('*')
+          .single()
         if (error) throw error
         const product = products.find(p => p.id === data.product_id)
         const flow = flows.find(f => f.id === data.flow_id)
-        setPages([{ ...newPage, product: product ? { name: product.name } : undefined, flow: flow ? { name: flow.name } : undefined } as any, ...pages])
-        toast.success('Página criada!')
+        const newWithRelations = {
+          ...newPage,
+          product: product ? { name: product.name } : null,
+          flow: flow ? { name: flow.name } : null,
+        } as PageWithRelations
+        setPages(prev => [newWithRelations, ...prev])
       }
       setShowForm(false)
-    } catch (err: any) {
-      toast.error(err.message?.includes('slug') ? 'Esse slug já está em uso' : 'Erro ao salvar')
+      router.refresh()
+    } catch (err: unknown) {
+      console.error('[pages] erro ao salvar página pública', err)
+      const message = err instanceof Error ? err.message : ''
+      const friendlyMessage = message.includes('slug')
+        ? 'Esse slug já está em uso'
+        : `Erro ao salvar${message ? `: ${message}` : ''}`
+      setFormError(friendlyMessage)
     } finally {
       setSaving(false)
     }
@@ -133,167 +191,344 @@ export function PagesContent({
     setDeleting(true)
     try {
       const supabase = createClient()
-      await supabase.from('public_pages').delete().eq('id', deletePage.id)
-      setPages(pages.filter(p => p.id !== deletePage.id))
-      toast.success('Página removida')
+      const { error } = await supabase
+        .from('public_pages')
+        .delete()
+        .eq('id', deletePage.id)
+        .eq('user_id', userId)
+      if (error) throw error
+      setPages(prev => prev.filter(p => p.id !== deletePage.id))
       setDeletePage(null)
     } catch {
-      toast.error('Erro ao remover')
+      // Handle error silently
     } finally {
       setDeleting(false)
     }
   }
 
-  const getPageUrl = (slug: string) => `${appUrl}/p/${slug}`
+  const getPageUrl = (slug: string) => `${appUrl.replace(/\/+$/, '')}/p/${slug}`
+
+  const handleCopyUrl = async (slug: string) => {
+    await copyToClipboard(getPageUrl(slug))
+    setCopiedSlug(slug)
+    setTimeout(() => setCopiedSlug(null), 2000)
+  }
+
+  const productOptions = [
+    { value: '', label: 'Nenhum produto' },
+    ...products.map(p => ({ value: p.id, label: p.name })),
+  ]
+
+  const flowOptions = [
+    { value: '', label: 'Nenhum fluxo' },
+    ...flows.map(f => ({ value: f.id, label: f.name })),
+  ]
+
+  const themeOptions = themes.map(t => ({ value: t.id, label: t.name }))
 
   return (
-    <div style={{ padding: '1.5rem', maxWidth: '1100px', margin: '0 auto' }}>
+    <div className="space-y-6">
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 style={{ fontSize: '1.375rem', fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.02em' }}>Páginas Públicas</h1>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>{pages.length} página(s) criada(s)</p>
+          <h1 className="text-2xl font-bold text-slate-900">
+            Páginas Públicas
+          </h1>
+          <p className="text-sm text-slate-600 mt-1">
+            {pages.length} página{pages.length !== 1 ? 's' : ''} criada{pages.length !== 1 ? 's' : ''}
+          </p>
         </div>
-        <Button onClick={openCreate} size="md">
-          <Plus size={15} /> Nova Página
+        <Button onClick={openCreate} size="md" leftIcon={<Plus size={18} />}>
+          Nova Página
         </Button>
       </div>
 
+      {/* Pages List */}
       {pages.length === 0 ? (
         <Card>
-          <EmptyState
-            icon={<Globe size={24} />}
-            title="Nenhuma página criada"
-            description="Crie uma página pública com um design otimizado para vender seu produto ou capturar leads."
-            action={<Button onClick={openCreate} size="sm"><Plus size={14} />Criar primeira página</Button>}
-          />
+          <CardContent className="p-8">
+            <EmptyState
+              icon={Globe}
+              title="Nenhuma página criada"
+              description="Crie uma página pública com um design otimizado para vender seu produto ou capturar leads."
+              action={{
+                label: 'Criar primeira página',
+                onClick: openCreate,
+              }}
+            />
+          </CardContent>
         </Card>
       ) : (
-        <div style={{ display: 'grid', gap: '0.75rem' }}>
+        <div className="space-y-3">
           {pages.map(page => (
-            <Card key={page.id} hover>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{
-                  width: '44px', height: '44px', borderRadius: '12px', flexShrink: 0,
-                  background: 'rgba(6,182,212,0.12)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  <Globe size={20} style={{ color: '#06B6D4' }} />
-                </div>
-                
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.2rem' }}>
-                    <span style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text)' }}>{page.public_title}</span>
-                    <Badge status={page.status} />
+            <Card key={page.id} hoverable>
+              <CardContent className="p-4">
+                <div className="flex items-start gap-4">
+                  {/* Icon */}
+                  <div className="w-12 h-12 rounded-xl flex-shrink-0 bg-cyan-100 flex items-center justify-center">
+                    <Globe size={24} className="text-cyan-600" />
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', fontFamily: 'monospace' }}>/p/{page.slug}</span>
-                    {page.product && <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>📦 {page.product.name}</span>}
-                    {page.flow && <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>⚡ {page.flow.name}</span>}
-                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>🎨 {page.theme_id}</span>
-                  </div>
-                </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  {page.status === 'published' && (
-                    <a href={getPageUrl(page.slug)} target="_blank" rel="noopener noreferrer" title="Ver Página" style={{
-                      padding: '0.5rem', borderRadius: '8px', color: 'var(--text-subtle)', display: 'flex',
-                      transition: 'all 0.15s', textDecoration: 'none',
-                    }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.color = 'var(--text)' }} onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-subtle)' }}>
-                      <ExternalLink size={15} />
-                    </a>
-                  )}
-                  <button onClick={() => openEdit(page)} title="Editar" style={{
-                    padding: '0.5rem', borderRadius: '8px', background: 'transparent',
-                    border: 'none', color: 'var(--text-subtle)', cursor: 'pointer', display: 'flex', transition: 'all 0.15s',
-                  }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.color = 'var(--text)' }} onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-subtle)' }}>
-                    <Edit size={15} />
-                  </button>
-                  <button onClick={() => setDeletePage(page)} title="Excluir" style={{
-                    padding: '0.5rem', borderRadius: '8px', background: 'transparent',
-                    border: 'none', color: 'var(--text-subtle)', cursor: 'pointer', display: 'flex', transition: 'all 0.15s',
-                  }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.1)'; e.currentTarget.style.color = '#F87171' }} onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-subtle)' }}>
-                    <Trash2 size={15} />
-                  </button>
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h3 className="font-semibold text-slate-900">{page.public_title}</h3>
+                      <Badge variant={statusVariantMap[page.status] || 'default'} size="sm">
+                        {page.status === 'published' ? 'Publicado' : 
+                         page.status === 'draft' ? 'Rascunho' : 'Arquivado'}
+                      </Badge>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3 text-sm mb-2">
+                      <span className="text-slate-500 font-mono">/p/{page.slug}</span>
+                      {page.product && (
+                        <span className="text-slate-600">
+                          <span className="text-slate-400">Produto:</span> {page.product.name}
+                        </span>
+                      )}
+                      {page.flow && (
+                        <span className="text-slate-600">
+                          <span className="text-slate-400">Fluxo:</span> {page.flow.name}
+                        </span>
+                      )}
+                      <span className="text-slate-600">
+                        <span className="text-slate-400">Tema:</span> {page.theme_id}
+                      </span>
+                    </div>
+
+                    {/* URL Display */}
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-lg">
+                      <span className="text-xs text-slate-600 font-mono">
+                        {getPageUrl(page.slug)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-1">
+                    {page.status === 'published' && (
+                      <a
+                        href={getPageUrl(page.slug)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                        title="Ver página"
+                      >
+                        <ExternalLink size={18} />
+                      </a>
+                    )}
+                    
+                    <button
+                      onClick={() => handleCopyUrl(page.slug)}
+                      className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                      title="Copiar link"
+                    >
+                      {copiedSlug === page.slug ? (
+                        <CheckCircle size={18} className="text-green-600" />
+                      ) : (
+                        <Copy size={18} />
+                      )}
+                    </button>
+                    
+                    <button
+                      onClick={() => openEdit(page)}
+                      className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                      title="Editar"
+                    >
+                      <Edit size={18} />
+                    </button>
+                    
+                    <button
+                      onClick={() => setDeletePage(page)}
+                      className="p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                      title="Excluir"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
                 </div>
-              </div>
+              </CardContent>
             </Card>
           ))}
         </div>
       )}
 
-      <Modal isOpen={showForm} onClose={() => setShowForm(false)} title={editPage ? 'Editar Página' : 'Nova Página Pública'} size="lg" footer={
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <Button variant="secondary" onClick={() => setShowForm(false)} fullWidth>Cancelar</Button>
-          <Button onClick={handleSave} loading={saving} fullWidth>{editPage ? 'Salvar alterações' : 'Criar página'}</Button>
-        </div>
-      }>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <Input label="Título público" value={form.public_title} onChange={e => setForm(f => ({ ...f, public_title: e.target.value, slug: editPage ? f.slug : slugify(e.target.value) }))} placeholder="Ex: Oferta Especial" required />
-          <Input label="Slug (URL)" value={form.slug} onChange={e => setForm(f => ({ ...f, slug: slugify(e.target.value) }))} placeholder="oferta-especial" hint="URL final: chatfy.com/p/oferta-especial" required />
-          <Textarea label="Subtítulo" value={form.public_subtitle} onChange={e => setForm(f => ({ ...f, public_subtitle: e.target.value }))} placeholder="Tagline da oferta" rows={2} />
+      {/* Create/Edit Modal */}
+      <Modal
+        isOpen={showForm}
+        onClose={() => setShowForm(false)}
+        title={editPage ? 'Editar Página' : 'Nova Página Pública'}
+        size="lg"
+        footer={
+          <div className="flex gap-3">
+            <Button variant="secondary" onClick={() => setShowForm(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleSave} loading={saving}>
+              {editPage ? 'Salvar alterações' : 'Criar página'}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          {formError && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+              {formError}
+            </div>
+          )}
           
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-            <Select label="Produto" value={form.product_id} onChange={e => setForm(f => ({ ...f, product_id: e.target.value }))}>
-              <option value="">Nenhum produto</option>
-              {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-            </Select>
-            <Select label="Fluxo conversacional" value={form.flow_id} onChange={e => setForm(f => ({ ...f, flow_id: e.target.value }))}>
-              <option value="">Nenhum fluxo</option>
-              {flows.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
-            </Select>
+          <Input
+            label="Título público"
+            value={form.public_title}
+            onChange={e => setForm(f => ({ ...f, public_title: e.target.value, slug: editPage ? f.slug : slugify(e.target.value) }))}
+            placeholder="Ex: Oferta Especial"
+            required
+            fullWidth
+          />
+
+          <Input
+            label="Slug (URL)"
+            value={form.slug}
+            onChange={e => setForm(f => ({ ...f, slug: slugify(e.target.value) }))}
+            placeholder="oferta-especial"
+            helperText="URL final: chatfy.com/p/oferta-especial"
+            required
+            fullWidth
+          />
+
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-slate-700">
+              Subtítulo
+            </label>
+            <textarea
+              value={form.public_subtitle}
+              onChange={e => setForm(f => ({ ...f, public_subtitle: e.target.value }))}
+              placeholder="Tagline da oferta"
+              rows={2}
+              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+            />
           </div>
 
-          <Card elevated>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-              <Palette size={16} style={{ color: 'var(--primary-light)' }} />
-              <p style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text)' }}>Design e Template</p>
-            </div>
+          <Input
+            label="Imagem do perfil"
+            value={form.avatar_url}
+            onChange={e => setForm(f => ({ ...f, avatar_url: e.target.value }))}
+            placeholder="https://exemplo.com/avatar.jpg"
+            helperText="Aparece como avatar circular no topo e nas mensagens do bot."
+            fullWidth
+          />
+
+          <div className="grid grid-cols-2 gap-4">
+            <Select
+              label="Produto"
+              value={form.product_id}
+              onChange={value => setForm(f => ({ ...f, product_id: value }))}
+              options={productOptions}
+              fullWidth
+            />
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <Select label="Template visual" value={form.theme_id} onChange={e => setForm(f => ({ ...f, theme_id: e.target.value }))}>
-                {themes.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-                {!themes.some(t => t.id === 'whatsapp') && <option value="whatsapp">WhatsApp Classic (Pendente Sincronização)</option>}
-                {!themes.some(t => t.id === 'instagram') && <option value="instagram">Instagram DM (Pendente Sincronização)</option>}
-                {!themes.some(t => t.id === 'dark_premium') && <option value="dark_premium">Dark Premium (Pendente Sincronização)</option>}
-              </Select>
+            <Select
+              label="Fluxo conversacional"
+              value={form.flow_id}
+              onChange={value => setForm(f => ({ ...f, flow_id: value }))}
+              options={flowOptions}
+              fullWidth
+            />
+          </div>
+
+          {/* Design Section */}
+          <Card variant="outlined">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-4">
+                <Palette size={18} className="text-primary-600" />
+                <h3 className="font-semibold text-slate-900">Design e Template</h3>
+              </div>
               
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.375rem' }}>Cor primária</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <input type="color" value={form.primary_color} onChange={e => setForm(f => ({ ...f, primary_color: e.target.value }))} style={{ width: '36px', height: '36px', borderRadius: '8px', cursor: 'pointer', border: '1px solid var(--border)', background: 'transparent' }} />
-                    <input value={form.primary_color} onChange={e => setForm(f => ({ ...f, primary_color: e.target.value }))} className="neu-input" style={{ flex: 1 }} />
+              <div className="space-y-4">
+                <Select
+                  label="Template visual"
+                  value={form.theme_id}
+                  onChange={value => setForm(f => ({ ...f, theme_id: value }))}
+                  options={themeOptions}
+                  fullWidth
+                />
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-slate-700">
+                      Cor primária
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={form.primary_color}
+                        onChange={e => setForm(f => ({ ...f, primary_color: e.target.value }))}
+                        className="w-10 h-10 rounded-lg cursor-pointer border border-slate-300"
+                      />
+                      <input
+                        type="text"
+                        value={form.primary_color}
+                        onChange={e => setForm(f => ({ ...f, primary_color: e.target.value }))}
+                        className="flex-1 h-10 px-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      />
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.375rem' }}>Cor secundária</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <input type="color" value={form.secondary_color} onChange={e => setForm(f => ({ ...f, secondary_color: e.target.value }))} style={{ width: '36px', height: '36px', borderRadius: '8px', cursor: 'pointer', border: '1px solid var(--border)', background: 'transparent' }} />
-                    <input value={form.secondary_color} onChange={e => setForm(f => ({ ...f, secondary_color: e.target.value }))} className="neu-input" style={{ flex: 1 }} />
+                  
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-slate-700">
+                      Cor secundária
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={form.secondary_color}
+                        onChange={e => setForm(f => ({ ...f, secondary_color: e.target.value }))}
+                        className="w-10 h-10 rounded-lg cursor-pointer border border-slate-300"
+                      />
+                      <input
+                        type="text"
+                        value={form.secondary_color}
+                        onChange={e => setForm(f => ({ ...f, secondary_color: e.target.value }))}
+                        className="flex-1 h-10 px-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </CardContent>
           </Card>
 
-          <Select label="Status" value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value as any }))}>
-            <option value="draft">Rascunho</option>
-            <option value="published">Publicado</option>
-            <option value="archived">Arquivado</option>
-          </Select>
+          <Select
+            label="Status"
+            value={form.status}
+            onChange={value => setForm(f => ({ ...f, status: value as any }))}
+            options={statusOptions}
+            fullWidth
+          />
         </div>
       </Modal>
 
-      <ConfirmDialog
+      {/* Delete Confirm Modal */}
+      <Modal
         isOpen={!!deletePage}
         onClose={() => setDeletePage(null)}
-        onConfirm={handleDelete}
-        loading={deleting}
         title="Excluir página"
         description={`Tem certeza que deseja excluir "${deletePage?.public_title}"? Esta ação não pode ser desfeita e o link deixará de funcionar.`}
-        confirmLabel="Excluir página"
-        variant="danger"
+        size="sm"
+        footer={
+          <div className="flex gap-3">
+            <Button variant="secondary" onClick={() => setDeletePage(null)}>
+              Cancelar
+            </Button>
+            <Button
+              variant="danger"
+              onClick={handleDelete}
+              loading={deleting}
+            >
+              Excluir página
+            </Button>
+          </div>
+        }
       />
     </div>
   )

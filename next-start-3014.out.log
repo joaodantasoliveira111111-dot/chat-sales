@@ -1,0 +1,22 @@
+
+> chatfy@0.1.0 dev
+> next dev -p 3014
+
+▲ Next.js 16.2.4 (Turbopack)
+- Local:         http://localhost:3014
+- Network:       http://169.254.135.52:3014
+- Environments: .env.local
+✓ Ready in 646ms
+- Experiments (use with caution):
+  · serverActions
+
+ GET / 307 in 514ms (next.js: 145ms, proxy.ts: 215ms, application-code: 154ms)
+ GET /admin/login?redirectTo=%2Fadmin 200 in 191ms (next.js: 54ms, proxy.ts: 5ms, application-code: 133ms)
+ GET / 307 in 148ms (next.js: 12ms, proxy.ts: 12ms, application-code: 123ms)
+ GET /admin/login?redirectTo=%2Fadmin 200 in 166ms (next.js: 10ms, proxy.ts: 8ms, application-code: 149ms)
+ GET / 307 in 647ms (next.js: 10ms, proxy.ts: 12ms, application-code: 625ms)
+ GET /admin/login?redirectTo=%2Fadmin 200 in 128ms (next.js: 10ms, proxy.ts: 7ms, application-code: 111ms)
+ GET / 307 in 78ms (next.js: 6ms, proxy.ts: 7ms, application-code: 65ms)
+ GET /admin/login?redirectTo=%2Fadmin 200 in 64ms (next.js: 5ms, proxy.ts: 7ms, application-code: 52ms)
+✓ Finished filesystem cache database compaction in 11.8s
+[?25h

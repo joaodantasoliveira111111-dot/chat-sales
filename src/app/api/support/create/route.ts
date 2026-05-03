@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/middleware'
 import { z } from 'zod'
 import { v4 as uuidv4 } from 'uuid'
+import { isMissingServiceRoleError, missingServiceRoleResponse } from '@/lib/supabase/admin-error'
 
 const schema = z.object({
   order_id: z.string().uuid().optional(),
@@ -39,6 +40,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ id: data.id, created: true })
   } catch (err) {
+    if (isMissingServiceRoleError(err)) return missingServiceRoleResponse()
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }

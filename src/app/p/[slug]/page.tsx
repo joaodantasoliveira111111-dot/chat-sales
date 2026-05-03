@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/middleware'
+import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { PublicChatPage } from '@/components/chat/PublicChatPage'
@@ -9,14 +9,14 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  const supabase = createAdminClient()
+  const supabase = await createClient()
   
   const { data: page } = await supabase
     .from('public_pages')
     .select('public_title, public_subtitle')
     .eq('slug', slug)
     .eq('status', 'published')
-    .single()
+    .maybeSingle()
 
   if (!page) {
     return { title: 'Página não encontrada' }
@@ -30,21 +30,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function PublicPage({ params }: PageProps) {
   const { slug } = await params
-  const supabase = createAdminClient()
+  const supabase = await createClient()
 
-  const { data: page } = await supabase
+  const { data: page, error } = await supabase
     .from('public_pages')
     .select(`
       *,
       product:products(*),
-      flow:flows(*),
+      flow:flows!public_pages_flow_id_fkey(*),
       theme:themes(*)
     `)
     .eq('slug', slug)
     .eq('status', 'published')
-    .single()
+    .maybeSingle()
 
-  if (!page) notFound()
+  if (error || !page) notFound()
 
   // Get flow nodes and edges if flow is published
   let nodes = []
@@ -59,11 +59,18 @@ export default async function PublicPage({ params }: PageProps) {
     edges = edgesRes.data || []
   }
 
+  const { data: metaSettings } = await supabase
+    .from('meta_tracking_settings')
+    .select('is_enabled,pixel_id,browser_tracking_enabled,server_tracking_enabled,advanced_matching_enabled,deduplication_enabled')
+    .eq('user_id', page.user_id)
+    .maybeSingle()
+
   return (
     <PublicChatPage
       page={page}
       nodes={nodes}
       edges={edges}
+      metaSettings={metaSettings}
     />
   )
 }

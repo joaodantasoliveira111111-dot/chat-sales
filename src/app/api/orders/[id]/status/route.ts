@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/middleware'
+import { isMissingServiceRoleError, missingServiceRoleResponse } from '@/lib/supabase/admin-error'
 
 export async function GET(
   request: NextRequest,
@@ -46,6 +47,7 @@ export async function GET(
     })
   } catch (err) {
     console.error('Order status error:', err)
+    if (isMissingServiceRoleError(err)) return missingServiceRoleResponse()
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }

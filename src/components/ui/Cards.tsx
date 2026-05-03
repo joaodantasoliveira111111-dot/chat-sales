@@ -39,13 +39,14 @@ export function Badge({ status, label, className }: BadgeProps) {
 interface CardProps {
   children: React.ReactNode
   className?: string
+  style?: React.CSSProperties
   onClick?: () => void
   hover?: boolean
   elevated?: boolean
   as?: 'div' | 'section' | 'article'
 }
 
-export function Card({ children, className, onClick, hover, elevated, as: Tag = 'div' }: CardProps) {
+export function Card({ children, className, style, onClick, hover, elevated, as: Tag = 'div' }: CardProps) {
   return (
     <Tag
       onClick={onClick}
@@ -54,7 +55,7 @@ export function Card({ children, className, onClick, hover, elevated, as: Tag = 
         hover && 'cursor-pointer',
         className
       )}
-      style={{ padding: '1.25rem' }}
+      style={{ padding: '1.25rem', ...style }}
     >
       {children}
     </Tag>
@@ -62,8 +63,12 @@ export function Card({ children, className, onClick, hover, elevated, as: Tag = 
 }
 
 // Keep old name for backward compat
-export function GlassCard({ children, className, onClick, hover }: CardProps) {
-  return <Card children={children} className={className} onClick={onClick} hover={hover} />
+export function GlassCard({ children, className, style, onClick, hover }: CardProps) {
+  return (
+    <Card className={className} style={style} onClick={onClick} hover={hover}>
+      {children}
+    </Card>
+  )
 }
 
 // ---- Metric Card ----
@@ -77,57 +82,49 @@ interface MetricCardProps {
 }
 
 const METRIC_COLORS = {
-  violet: { border: 'rgba(124,58,237,0.3)', icon: 'rgba(124,58,237,0.15)', text: '#A78BFA', bg: 'rgba(124,58,237,0.07)' },
-  cyan:   { border: 'rgba(6,182,212,0.3)',  icon: 'rgba(6,182,212,0.15)',  text: '#67E8F9', bg: 'rgba(6,182,212,0.07)' },
-  green:  { border: 'rgba(16,185,129,0.3)', icon: 'rgba(16,185,129,0.15)', text: '#34D399', bg: 'rgba(16,185,129,0.07)' },
-  orange: { border: 'rgba(249,115,22,0.3)', icon: 'rgba(249,115,22,0.15)', text: '#FB923C', bg: 'rgba(249,115,22,0.07)' },
-  red:    { border: 'rgba(239,68,68,0.3)',  icon: 'rgba(239,68,68,0.15)',  text: '#F87171', bg: 'rgba(239,68,68,0.07)' },
-  blue:   { border: 'rgba(59,130,246,0.3)', icon: 'rgba(59,130,246,0.15)', text: '#60A5FA', bg: 'rgba(59,130,246,0.07)' },
+  violet: { border: 'rgba(99,91,255,0.18)', icon: 'rgba(99,91,255,0.1)', text: '#635BFF', bg: 'linear-gradient(145deg, rgba(255,255,255,0.92), rgba(239,249,255,0.78))' },
+  cyan:   { border: 'rgba(0,184,255,0.2)', icon: 'rgba(0,184,255,0.12)', text: '#008FEF', bg: 'linear-gradient(145deg, rgba(255,255,255,0.94), rgba(221,243,255,0.82))' },
+  green:  { border: 'rgba(22,199,132,0.22)', icon: 'rgba(22,199,132,0.12)', text: '#16C784', bg: 'linear-gradient(145deg, rgba(255,255,255,0.94), rgba(235,255,247,0.82))' },
+  orange: { border: 'rgba(245,158,11,0.22)', icon: 'rgba(245,158,11,0.12)', text: '#D97706', bg: 'linear-gradient(145deg, rgba(255,255,255,0.94), rgba(255,248,232,0.82))' },
+  red:    { border: 'rgba(239,68,68,0.2)', icon: 'rgba(239,68,68,0.1)', text: '#EF4444', bg: 'linear-gradient(145deg, rgba(255,255,255,0.94), rgba(255,241,242,0.82))' },
+  blue:   { border: 'rgba(0,143,239,0.22)', icon: 'rgba(0,143,239,0.12)', text: '#006DCC', bg: 'linear-gradient(145deg, rgba(255,255,255,0.96), rgba(239,249,255,0.82))' },
 }
 
 export function MetricCard({ title, value, subtitle, icon, color = 'violet', trend }: MetricCardProps) {
   const c = METRIC_COLORS[color]
   return (
     <div
-      className="neu-card transition-all duration-200 hover:scale-[1.01]"
+      className="metric-card"
       style={{
-        padding: '1.25rem',
         borderColor: c.border,
         background: c.bg,
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem' }}>
+      <div className="metric-card-topline">
         <div
+          className="metric-card-icon"
           style={{
-            padding: '0.625rem',
-            borderRadius: '10px',
             background: c.icon,
             color: c.text,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
           }}
         >
           {icon}
         </div>
         {trend && (
           <span
+            className="metric-card-trend"
             style={{
-              fontSize: '0.7rem',
-              fontWeight: 600,
-              padding: '0.2rem 0.5rem',
-              borderRadius: '99px',
-              color: trend.value >= 0 ? '#34D399' : '#F87171',
-              background: trend.value >= 0 ? 'rgba(52,211,153,0.1)' : 'rgba(248,113,113,0.1)',
+              color: trend.value >= 0 ? '#16C784' : '#EF4444',
+              background: trend.value >= 0 ? 'rgba(22,199,132,0.1)' : 'rgba(239,68,68,0.1)',
             }}
           >
             {trend.value >= 0 ? '+' : ''}{trend.value}%
           </span>
         )}
       </div>
-      <p style={{ fontSize: '1.625rem', fontWeight: 800, color: '#fff', lineHeight: 1, marginBottom: '0.375rem' }}>{value}</p>
-      <p style={{ fontSize: '0.78rem', fontWeight: 500, color: 'var(--text-muted)' }}>{title}</p>
-      {subtitle && <p style={{ fontSize: '0.7rem', color: 'var(--text-subtle)', marginTop: '0.2rem' }}>{subtitle}</p>}
+      <p className="metric-card-value">{value}</p>
+      <p className="metric-card-title">{title}</p>
+      {subtitle && <p className="metric-card-subtitle">{subtitle}</p>}
     </div>
   )
 }
@@ -142,27 +139,12 @@ interface EmptyStateProps {
 
 export function EmptyState({ icon, title, description, action }: EmptyStateProps) {
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '4rem 2rem',
-      textAlign: 'center',
-    }}>
-      <div style={{
-        width: '56px', height: '56px',
-        borderRadius: '16px',
-        background: 'rgba(255,255,255,0.04)',
-        border: '1px solid var(--border)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        color: 'var(--text-subtle)',
-        marginBottom: '1rem',
-      }}>
+    <div className="empty-state">
+      <div className="empty-state-icon">
         {icon}
       </div>
-      <p style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text)', marginBottom: '0.35rem' }}>{title}</p>
-      {description && <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', maxWidth: '280px', lineHeight: 1.5, marginBottom: '1.25rem' }}>{description}</p>}
+      <p className="empty-state-title">{title}</p>
+      {description && <p className="empty-state-description">{description}</p>}
       {action}
     </div>
   )

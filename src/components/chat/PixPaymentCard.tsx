@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { ThemeConfig, PublicPage } from '@/types'
-import { copyToClipboard, formatCurrency, sleep } from '@/lib/utils'
-import Image from 'next/image'
+import { copyToClipboard, formatCurrency, renderTemplateVariables } from '@/lib/utils'
+import { getMetaBrowserContext, trackMetaBrowserEvent } from '@/lib/meta/browser'
+import { generateMetaEventId, toMetaEventName } from '@/lib/meta/events'
 
 interface PixPaymentCardProps {
   config: Record<string, unknown>
@@ -33,6 +34,46 @@ export function PixPaymentCard({
   const [copied, setCopied] = useState(false)
   const [status, setStatus] = useState<'pending' | 'paid' | 'expired'>('pending')
   const [error, setError] = useState<string | null>(null)
+  const [trackedOrderId, setTrackedOrderId] = useState<string | null>(null)
+
+  const trackPaymentEvent = useCallback((event: string, data: Record<string, unknown> = {}) => {
+    const context = {
+      event,
+      page_id: page.id,
+      product_id: page.product_id || String(config.product_id || ''),
+      flow_id: page.flow_id,
+      user_id: page.user_id,
+      order_id: orderId || data.order_id,
+      session_id: sessionId,
+      ...data,
+    }
+    const metaEventName = toMetaEventName(event)
+    const eventId = trackMetaBrowserEvent(metaEventName, context, {
+      ...data,
+      content_ids: page.product_id ? [page.product_id] : undefined,
+      content_name: page.product?.name || page.public_title,
+      value: data.amount || page.product?.price,
+      currency: page.product?.currency || 'BRL',
+      payment_method: 'pix',
+    }) || generateMetaEventId(metaEventName, context)
+    fetch('/api/analytics/event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        event,
+        page_id: page.id,
+        product_id: page.product_id || String(config.product_id || ''),
+        flow_id: page.flow_id,
+        user_id: page.user_id,
+        order_id: orderId || undefined,
+        session_id: sessionId,
+        event_id: eventId,
+        source: 'both',
+        ...getMetaBrowserContext(),
+        ...data,
+      }),
+    }).catch(() => {})
+  }, [page.id, page.product_id, page.flow_id, page.user_id, config.product_id, orderId, sessionId])
 
   // Create order if needed
   useEffect(() => {
@@ -41,7 +82,7 @@ export function PixPaymentCard({
       fetch(`/api/orders/${orderId}/status?session_id=${sessionId}`)
         .then(r => r.json())
         .then(data => {
-          setStatus(data.status === 'paid' || data.status === 'delivered' ? 'paid' : 'pending')
+          setStatus(isPaidLikeStatus(data.status) ? 'paid' : 'pending')
           setAmount(data.amount)
           setLoading(false)
         })
@@ -66,9 +107,9 @@ export function PixPaymentCard({
             product_id: productId,
             page_id: page.id,
             session_id: sessionId,
-            customer_name: String(variables.name || variables.customer_name || 'Cliente'),
-            customer_email: String(variables.email || variables.customer_email || ''),
-            customer_whatsapp: String(variables.whatsapp || variables.customer_whatsapp || ''),
+            customer_name: String(getVariable(variables, 'lead.name') || variables.name || variables.customer_name || 'Cliente'),
+            customer_email: String(getVariable(variables, 'lead.email') || variables.email || variables.customer_email || ''),
+            customer_whatsapp: String(getVariable(variables, 'lead.phone') || variables.whatsapp || variables.customer_whatsapp || ''),
           }),
         })
 
@@ -81,10 +122,23 @@ export function PixPaymentCard({
 
         const data = await res.json()
         setOrderId(data.order_id)
+        setTrackedOrderId(data.order_id)
         setPixCode(data.pix_code)
         setPixQrUrl(data.pix_qr_code_url)
         setPixQrBase64(data.pix_qr_code_base64)
         setAmount(data.amount)
+        trackPaymentEvent('InitiateCheckout', {
+          order_id: data.order_id,
+          amount: data.amount,
+        })
+        trackPaymentEvent('AddPaymentInfo', {
+          order_id: data.order_id,
+          amount: data.amount,
+        })
+        trackPaymentEvent('PaymentPending', {
+          order_id: data.order_id,
+          amount: data.amount,
+        })
         setLoading(false)
       } catch {
         setError('Erro ao gerar PIX. Tente novamente.')
@@ -103,8 +157,9 @@ export function PixPaymentCard({
       const res = await fetch(`/api/orders/${orderId}/status?session_id=${sessionId}`)
       const data = await res.json()
 
-      if (data.status === 'paid' || data.status === 'delivered') {
+      if (isPaidLikeStatus(data.status)) {
         setStatus('paid')
+        trackPaymentEvent('Purchase', { order_id: orderId })
         onPaymentSuccess(orderId)
       } else if (data.status === 'expired') {
         setStatus('expired')
@@ -122,14 +177,30 @@ export function PixPaymentCard({
     if (!pixCode) return
     await copyToClipboard(pixCode)
     setCopied(true)
+    trackPaymentEvent('PixCopied', { order_id: orderId || trackedOrderId })
     setTimeout(() => setCopied(false), 3000)
   }
 
   const qrImageSrc = pixQrBase64 || pixQrUrl
+  const renderPaymentText = (value: unknown) => renderTemplateVariables(String(value || ''), {
+    ...variables,
+    product: {
+      id: page.product?.id || page.product_id || config.product_id,
+      name: page.product?.name || variables['product.name'] || page.public_title,
+      price: page.product?.price || variables['product.price'],
+    },
+    order: { id: orderId, amount, status },
+    payment: { status, pix_code: pixCode, qr_code: qrImageSrc },
+    'order.id': orderId,
+    'order.amount': amount,
+    'payment.status': status,
+    'payment.pix_code': pixCode,
+    'payment.qr_code': qrImageSrc,
+  })
 
   if (loading) {
     return (
-      <div className="animate-fade-in p-6 rounded-2xl text-center" style={{ background: theme.assistantBubble }}>
+      <div className="chat-inline-card pix-payment-card animate-fade-in p-6 rounded-2xl text-center" style={{ background: theme.assistantBubble }}>
         <div className="flex justify-center gap-1.5">
           {[0, 1, 2].map(i => (
             <span key={i} className="typing-dot" style={{ color: theme.typingDot, animationDelay: `${i * 0.2}s` }} />
@@ -142,7 +213,7 @@ export function PixPaymentCard({
 
   if (error) {
     return (
-      <div className="animate-fade-in p-4 rounded-2xl" style={{ background: theme.assistantBubble }}>
+      <div className="chat-inline-card pix-payment-card animate-fade-in p-4 rounded-2xl" style={{ background: theme.assistantBubble }}>
         <p className="text-sm text-red-400">{error}</p>
       </div>
     )
@@ -150,7 +221,7 @@ export function PixPaymentCard({
 
   if (status === 'paid') {
     return (
-      <div className="animate-fade-in p-5 rounded-2xl text-center" style={{ background: theme.assistantBubble }}>
+      <div className="chat-inline-card pix-payment-card animate-fade-in p-5 rounded-2xl text-center" style={{ background: theme.assistantBubble }}>
         <div className="text-4xl mb-2">✅</div>
         <p className="text-sm font-bold" style={{ color: theme.assistantText }}>Pagamento confirmado!</p>
         <p className="text-xs opacity-70 mt-1" style={{ color: theme.assistantText }}>Aguarde enquanto preparamos sua entrega...</p>
@@ -160,14 +231,14 @@ export function PixPaymentCard({
 
   if (status === 'expired') {
     return (
-      <div className="animate-fade-in p-4 rounded-2xl" style={{ background: theme.assistantBubble }}>
+      <div className="chat-inline-card pix-payment-card animate-fade-in p-4 rounded-2xl" style={{ background: theme.assistantBubble }}>
         <p className="text-sm" style={{ color: theme.assistantText }}>⏰ PIX expirado. Solicite um novo.</p>
       </div>
     )
   }
 
   return (
-    <div className="animate-fade-in p-4 rounded-2xl space-y-4" style={{ background: theme.assistantBubble }}>
+    <div className="chat-inline-card pix-payment-card animate-fade-in p-4 rounded-2xl space-y-4 min-w-0" style={{ background: theme.assistantBubble }}>
       <div className="text-center">
         <p className="text-sm font-bold mb-1" style={{ color: theme.assistantText }}>
           Pague via PIX
@@ -178,7 +249,7 @@ export function PixPaymentCard({
           </p>
         )}
         <p className="text-xs opacity-60 mt-1" style={{ color: theme.assistantText }}>
-          {String(config.pending_text || 'Escaneie o QR Code ou copie o código abaixo')}
+          {renderPaymentText(config.pending_text || 'Escaneie o QR Code ou copie o código abaixo')}
         </p>
       </div>
 
@@ -191,7 +262,7 @@ export function PixPaymentCard({
               alt="QR Code PIX"
               width={180}
               height={180}
-              className="block"
+              className="block max-w-full h-auto"
             />
           </div>
         </div>
@@ -215,7 +286,7 @@ export function PixPaymentCard({
               borderRadius: '12px',
             }}
           >
-            {copied ? '✓ Código copiado!' : String(config.copy_button_text || '📋 Copiar código PIX')}
+            {copied ? 'Código copiado!' : renderPaymentText(config.copy_button_text || 'Copiar código Pix')}
           </button>
         </div>
       )}
@@ -230,4 +301,18 @@ export function PixPaymentCard({
       </div>
     </div>
   )
+}
+
+function isPaidLikeStatus(status: string) {
+  return ['paid', 'delivered', 'manual_pending', 'paid_pending_stock', 'pending_delivery'].includes(status)
+}
+
+function getVariable(variables: Record<string, unknown>, key: string) {
+  if (key in variables) return variables[key]
+  return key.split('.').reduce((value: unknown, part) => {
+    if (value && typeof value === 'object' && part in value) {
+      return (value as Record<string, unknown>)[part]
+    }
+    return undefined
+  }, variables)
 }

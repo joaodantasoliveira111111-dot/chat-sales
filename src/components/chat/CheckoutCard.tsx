@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { ThemeConfig, PublicPage } from '@/types'
-import { formatCurrency } from '@/lib/utils'
 
 interface CheckoutCardProps {
   config: Record<string, unknown>
@@ -12,7 +11,7 @@ interface CheckoutCardProps {
   onSubmit: (data: { name: string; email: string; whatsapp?: string }) => void
 }
 
-export function CheckoutCard({ config, theme, page, variables, onSubmit }: CheckoutCardProps) {
+export function CheckoutCard({ config, theme, variables, onSubmit }: CheckoutCardProps) {
   const [name, setName] = useState(String(variables.name || variables.customer_name || ''))
   const [email, setEmail] = useState(String(variables.email || variables.customer_email || ''))
   const [whatsapp, setWhatsapp] = useState(String(variables.whatsapp || variables.customer_whatsapp || ''))
@@ -50,7 +49,7 @@ export function CheckoutCard({ config, theme, page, variables, onSubmit }: Check
   }
 
   return (
-    <div className="animate-fade-in p-4 rounded-2xl" style={{ background: theme.assistantBubble }}>
+    <div className="animate-fade-in p-4 rounded-2xl w-full max-w-full min-w-0" style={{ background: theme.assistantBubble }}>
       <p className="text-sm font-bold mb-1" style={{ color: theme.assistantText }}>{summaryTitle}</p>
       {summaryText && <p className="text-xs mb-3 opacity-70" style={{ color: theme.assistantText }}>{summaryText}</p>}
 

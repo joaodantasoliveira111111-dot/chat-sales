@@ -1,142 +1,127 @@
 'use client'
 
-import { X, AlertTriangle } from 'lucide-react'
-import { Button } from './Button'
+import { cn } from '@/lib/utils'
+import { X } from 'lucide-react'
+import { useEffect, useRef } from 'react'
 
-interface ModalProps {
+export interface ModalProps {
   isOpen: boolean
   onClose: () => void
   title?: string
+  description?: string
   children: React.ReactNode
-  size?: 'sm' | 'md' | 'lg' | 'xl'
   footer?: React.ReactNode
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
+  showCloseButton?: boolean
 }
 
-const SIZES = {
-  sm: '380px',
-  md: '520px',
-  lg: '680px',
-  xl: '860px',
+const sizeStyles = {
+  sm: 'max-w-md',
+  md: 'max-w-lg',
+  lg: 'max-w-2xl',
+  xl: 'max-w-4xl',
+  full: 'max-w-7xl',
 }
 
-export function Modal({ isOpen, onClose, title, children, size = 'md', footer }: ModalProps) {
+export function Modal({
+  isOpen,
+  onClose,
+  title,
+  description,
+  children,
+  footer,
+  size = 'md',
+  showCloseButton = true,
+}: ModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape)
+      document.body.style.overflow = 'hidden'
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape)
+      document.body.style.overflow = 'unset'
+    }
+  }, [isOpen, onClose])
+
   if (!isOpen) return null
 
   return (
-    <div
-      className="neu-modal-overlay"
-      style={{
-        position: 'fixed', inset: 0, zIndex: 100,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: '1rem',
-      }}
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Backdrop */}
       <div
-        className="neu-modal animate-fade-in-scale"
-        style={{ width: '100%', maxWidth: SIZES[size], maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}
-        onClick={e => e.stopPropagation()}
+        className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      {/* Modal */}
+      <div
+        ref={modalRef}
+        className={cn(
+          'relative w-full bg-white rounded-2xl shadow-2xl',
+          'max-h-[90vh] flex flex-col',
+          'animate-fade-in',
+          sizeStyles[size]
+        )}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={title ? 'modal-title' : undefined}
+        aria-describedby={description ? 'modal-description' : undefined}
       >
         {/* Header */}
-        {title && (
-          <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '1.25rem 1.5rem',
-            borderBottom: '1px solid var(--border)',
-            flexShrink: 0,
-          }}>
-            <p style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text)' }}>{title}</p>
-            <button
-              onClick={onClose}
-              style={{
-                padding: '0.375rem',
-                borderRadius: '8px',
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--text-muted)',
-                cursor: 'pointer',
-                display: 'flex', alignItems: 'center',
-                transition: 'all 0.15s',
-              }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.07)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-            >
-              <X size={16} />
-            </button>
+        {(title || showCloseButton) && (
+          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+            <div className="flex-1">
+              {title && (
+                <h2
+                  id="modal-title"
+                  className="text-lg font-semibold text-slate-900"
+                >
+                  {title}
+                </h2>
+              )}
+              {description && (
+                <p
+                  id="modal-description"
+                  className="mt-1 text-sm text-slate-500"
+                >
+                  {description}
+                </p>
+              )}
+            </div>
+            {showCloseButton && (
+              <button
+                onClick={onClose}
+                className="ml-4 flex-shrink-0 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+                aria-label="Fechar modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
           </div>
         )}
 
-        {/* Body */}
-        <div style={{ overflowY: 'auto', padding: '1.5rem', flex: 1 }}>
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto px-6 py-4">
           {children}
         </div>
 
         {/* Footer */}
         {footer && (
-          <div style={{
-            padding: '1rem 1.5rem',
-            borderTop: '1px solid var(--border)',
-            flexShrink: 0,
-          }}>
+          <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200 bg-slate-50">
             {footer}
           </div>
         )}
-      </div>
-    </div>
-  )
-}
-
-// ---- Confirm Dialog ----
-interface ConfirmDialogProps {
-  isOpen: boolean
-  onClose: () => void
-  onConfirm: () => void
-  title: string
-  description: string
-  confirmLabel?: string
-  variant?: 'danger' | 'primary'
-  loading?: boolean
-}
-
-export function ConfirmDialog({
-  isOpen, onClose, onConfirm, title, description,
-  confirmLabel = 'Confirmar', variant = 'primary', loading,
-}: ConfirmDialogProps) {
-  if (!isOpen) return null
-
-  return (
-    <div
-      className="neu-modal-overlay"
-      style={{
-        position: 'fixed', inset: 0, zIndex: 110,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: '1rem',
-      }}
-      onClick={onClose}
-    >
-      <div
-        className="neu-modal animate-fade-in-scale"
-        style={{ width: '100%', maxWidth: '420px' }}
-        onClick={e => e.stopPropagation()}
-      >
-        <div style={{ padding: '1.5rem', textAlign: 'center' }}>
-          <div style={{
-            width: '48px', height: '48px', borderRadius: '14px',
-            background: variant === 'danger' ? 'rgba(239,68,68,0.12)' : 'rgba(124,58,237,0.12)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 1rem',
-          }}>
-            <AlertTriangle size={22} style={{ color: variant === 'danger' ? '#F87171' : 'var(--primary-light)' }} />
-          </div>
-          <p style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text)', marginBottom: '0.5rem' }}>{title}</p>
-          <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)', lineHeight: 1.55, marginBottom: '1.5rem' }}>{description}</p>
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
-            <Button variant="secondary" onClick={onClose} fullWidth>Cancelar</Button>
-            <Button variant={variant === 'danger' ? 'danger' : 'primary'} onClick={onConfirm} loading={loading} fullWidth>
-              {confirmLabel}
-            </Button>
-          </div>
-        </div>
       </div>
     </div>
   )

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/middleware'
 import { deliverDigitalItem } from '@/lib/delivery/deliverDigitalItem'
+import { isMissingServiceRoleError, missingServiceRoleResponse } from '@/lib/supabase/admin-error'
 
 // Admin: simulate payment approval (mock mode)
 export async function POST(
@@ -53,6 +54,7 @@ export async function POST(
     })
   } catch (err) {
     console.error('Manual delivery error:', err)
+    if (isMissingServiceRoleError(err)) return missingServiceRoleResponse()
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }

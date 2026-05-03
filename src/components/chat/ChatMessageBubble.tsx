@@ -11,7 +11,7 @@ interface ChatMessageBubbleProps {
 
 export function ChatMessageBubble({ message, theme, avatarUrl, isUser }: ChatMessageBubbleProps) {
   return (
-    <div className={`flex items-end gap-2 animate-fade-in ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+    <div className={`flex items-end gap-2 animate-fade-in min-w-0 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
       {!isUser && (
         <div className="w-7 h-7 rounded-full flex-shrink-0 overflow-hidden mb-1">
           {avatarUrl ? (
@@ -24,7 +24,7 @@ export function ChatMessageBubble({ message, theme, avatarUrl, isUser }: ChatMes
         </div>
       )}
       <div
-        className="max-w-[80%] px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap"
+        className="max-w-[80%] min-w-0 px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap break-words"
         style={{
           background: isUser ? theme.userBubble : theme.assistantBubble,
           color: isUser ? theme.userText : theme.assistantText,

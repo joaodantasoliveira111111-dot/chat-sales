@@ -1,10 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Card } from '@/components/ui/Cards'
+import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
-import { useToast } from '@/components/ui/Toast'
+import Input from '@/components/ui/Input'
 import { copyToClipboard } from '@/lib/utils'
 import {
   CreditCard, Copy, CheckCircle, AlertCircle,
@@ -59,12 +58,13 @@ const GATEWAYS: GatewayConfig[] = [
 export function PaymentSettingsContent({
   userId,
   appUrl,
+  currentProvider = 'mock',
 }: {
   userId: string
   appUrl: string
+  currentProvider?: string
 }) {
-  const toast = useToast()
-  const [activeGateway, setActiveGateway] = useState('mock')
+  const [activeGateway, setActiveGateway] = useState(currentProvider)
   const [credentials, setCredentials] = useState<Record<string, Record<string, string>>>({})
   const [showSecrets, setShowSecrets] = useState<Record<string, boolean>>({})
   const [saving, setSaving] = useState(false)
@@ -136,10 +136,8 @@ export function PaymentSettingsContent({
           }, { onConflict: 'user_id,key' })
         }
       }
-
-      toast.success('Configurações salvas com sucesso!')
-    } catch (err: any) {
-      toast.error('Erro ao salvar: ' + (err.message || 'tente novamente'))
+    } catch {
+      // Handle error silently
     } finally {
       setSaving(false)
     }
@@ -149,233 +147,192 @@ export function PaymentSettingsContent({
     await copyToClipboard(webhookUrl)
     setCopiedWebhook(true)
     setTimeout(() => setCopiedWebhook(false), 2000)
-    toast.success('URL copiada!')
   }
 
   const activeConfig = GATEWAYS.find(g => g.id === activeGateway) || GATEWAYS[0]
 
   if (loading) {
     return (
-      <div style={{ padding: '1.5rem', maxWidth: '720px' }}>
-        <div className="skeleton" style={{ height: '40px', marginBottom: '1.5rem' }} />
-        <div className="skeleton" style={{ height: '180px', marginBottom: '1rem' }} />
-        <div className="skeleton" style={{ height: '140px' }} />
+      <div className="space-y-4">
+        <div className="h-10 bg-slate-200 rounded-lg animate-pulse" />
+        <div className="h-48 bg-slate-200 rounded-xl animate-pulse" />
+        <div className="h-40 bg-slate-200 rounded-xl animate-pulse" />
       </div>
     )
   }
 
   return (
-    <div style={{ padding: '1.5rem', maxWidth: '720px' }}>
+    <div className="space-y-6">
       {/* Header */}
-      <div style={{ marginBottom: '1.75rem' }}>
-        <h1 style={{ fontSize: '1.375rem', fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.02em' }}>
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900">
           Pagamentos
         </h1>
-        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
+        <p className="text-sm text-slate-600 mt-1">
           Configure o gateway de Pix para receber pagamentos automaticamente.
         </p>
       </div>
 
       {/* Gateway Selector */}
-      <Card className="mb-4" style={{ marginBottom: '1rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
-          <div style={{
-            width: '36px', height: '36px', borderRadius: '10px',
-            background: 'rgba(124,58,237,0.12)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: 'var(--primary-light)',
-          }}>
-            <CreditCard size={18} />
-          </div>
-          <div>
-            <p style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text)' }}>Gateway Ativo</p>
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-              Selecione e configure o gateway de pagamento
-            </p>
-          </div>
-        </div>
-
-        <div style={{ display: 'grid', gap: '0.625rem' }}>
-          {GATEWAYS.map(g => (
-            <button
-              key={g.id}
-              onClick={() => setActiveGateway(g.id)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '0.875rem',
-                padding: '0.875rem 1rem',
-                borderRadius: '12px',
-                border: activeGateway === g.id
-                  ? '1px solid rgba(124,58,237,0.5)'
-                  : '1px solid var(--border)',
-                background: activeGateway === g.id
-                  ? 'rgba(124,58,237,0.08)'
-                  : 'var(--bg-base)',
-                cursor: 'pointer',
-                textAlign: 'left',
-                transition: 'all 0.15s',
-                width: '100%',
-              }}
-            >
-              <span style={{ fontSize: '1.5rem', lineHeight: 1 }}>{g.icon}</span>
-              <div style={{ flex: 1 }}>
-                <p style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text)' }}>{g.name}</p>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{g.desc}</p>
-              </div>
-              {activeGateway === g.id && (
-                <CheckCircle size={18} style={{ color: '#34D399', flexShrink: 0 }} />
-              )}
-            </button>
-          ))}
-        </div>
-
-        {activeGateway === 'mock' && (
-          <div style={{
-            marginTop: '1rem', padding: '0.875rem', borderRadius: '10px',
-            background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.2)',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-              <AlertCircle size={14} style={{ color: '#FBBF24' }} />
-              <p style={{ fontSize: '0.75rem', fontWeight: 600, color: '#FBBF24' }}>Modo de desenvolvimento ativo</p>
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center">
+              <CreditCard size={20} className="text-violet-600" />
             </div>
-            <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-              Em modo Mock, os QR codes Pix são falsos e os pagamentos não são reais. Ideal para testar o fluxo sem cobrar clientes.
-            </p>
+            <div>
+              <p className="text-base font-semibold text-slate-900">Gateway Ativo</p>
+              <p className="text-sm text-slate-600">
+                Selecione e configure o gateway de pagamento
+              </p>
+            </div>
           </div>
-        )}
+
+          <div className="space-y-3">
+            {GATEWAYS.map(g => (
+              <button
+                key={g.id}
+                onClick={() => setActiveGateway(g.id)}
+                className={`
+                  w-full flex items-center gap-4 p-4 rounded-xl border-2 text-left transition-all
+                  ${activeGateway === g.id
+                    ? 'border-violet-500 bg-violet-50'
+                    : 'border-slate-200 hover:border-slate-300 bg-white'
+                  }
+                `}
+              >
+                <span className="text-2xl">{g.icon}</span>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-slate-900">{g.name}</p>
+                  <p className="text-xs text-slate-600">{g.desc}</p>
+                </div>
+                {activeGateway === g.id && (
+                  <CheckCircle size={20} className="text-green-600 flex-shrink-0" />
+                )}
+              </button>
+            ))}
+          </div>
+
+          {activeGateway === 'mock' && (
+            <div className="mt-4 p-4 bg-yellow-50 rounded-xl border border-yellow-200">
+              <div className="flex items-center gap-2 mb-1">
+                <AlertCircle size={16} className="text-yellow-600" />
+                <p className="text-sm font-semibold text-yellow-900">Modo de desenvolvimento ativo</p>
+              </div>
+              <p className="text-xs text-yellow-800">
+                Em modo Mock, os QR codes Pix são falsos e os pagamentos não são reais. Ideal para testar o fluxo sem cobrar clientes.
+              </p>
+            </div>
+          )}
+        </CardContent>
       </Card>
 
       {/* Gateway Credentials */}
       {activeConfig.fields.length > 0 && (
-        <Card style={{ marginBottom: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
-            <div style={{
-              width: '36px', height: '36px', borderRadius: '10px',
-              background: 'rgba(16,185,129,0.12)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#34D399',
-            }}>
-              <Shield size={18} />
-            </div>
-            <div>
-              <p style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text)' }}>
-                Credenciais — {activeConfig.name}
-              </p>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                Salvas com segurança. Nunca expostas no frontend.
-              </p>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {activeConfig.fields.map(field => (
-              <div key={field.key}>
-                <label style={{
-                  display: 'block', fontSize: '0.75rem', fontWeight: 600,
-                  color: 'var(--text-muted)', marginBottom: '0.375rem',
-                }}>
-                  {field.label}
-                </label>
-                <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                  <input
-                    type={field.type === 'password' && !showSecrets[field.key] ? 'password' : 'text'}
-                    value={credentials[activeGateway]?.[field.key] || ''}
-                    onChange={e => handleCredentialChange(activeGateway, field.key, e.target.value)}
-                    placeholder={field.placeholder}
-                    className="neu-input"
-                    style={{ paddingRight: field.type === 'password' ? '2.5rem' : undefined }}
-                  />
-                  {field.type === 'password' && (
-                    <button
-                      onClick={() => setShowSecrets(p => ({ ...p, [field.key]: !p[field.key] }))}
-                      style={{
-                        position: 'absolute', right: '0.75rem',
-                        background: 'transparent', border: 'none',
-                        color: 'var(--text-subtle)', cursor: 'pointer',
-                        display: 'flex', alignItems: 'center',
-                      }}
-                    >
-                      {showSecrets[field.key] ? <EyeOff size={14} /> : <Eye size={14} />}
-                    </button>
-                  )}
-                </div>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
+                <Shield size={20} className="text-green-600" />
               </div>
-            ))}
-          </div>
+              <div>
+                <p className="text-base font-semibold text-slate-900">
+                  Credenciais — {activeConfig.name}
+                </p>
+                <p className="text-sm text-slate-600">
+                  Salvas com segurança. Nunca expostas no frontend.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {activeConfig.fields.map(field => (
+                <div key={field.key}>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    {field.label}
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={field.type === 'password' && !showSecrets[field.key] ? 'password' : 'text'}
+                      value={credentials[activeGateway]?.[field.key] || ''}
+                      onChange={e => handleCredentialChange(activeGateway, field.key, e.target.value)}
+                      placeholder={field.placeholder}
+                      className="w-full h-10 px-3 pr-10 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
+                    {field.type === 'password' && (
+                      <button
+                        onClick={() => setShowSecrets(p => ({ ...p, [field.key]: !p[field.key] }))}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                      >
+                        {showSecrets[field.key] ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
         </Card>
       )}
 
       {/* Webhook URL */}
-      <Card style={{ marginBottom: '1rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-          <div style={{
-            width: '36px', height: '36px', borderRadius: '10px',
-            background: 'rgba(6,182,212,0.12)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#67E8F9',
-          }}>
-            <Globe size={18} />
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-cyan-100 flex items-center justify-center">
+              <Globe size={20} className="text-cyan-600" />
+            </div>
+            <div>
+              <p className="text-base font-semibold text-slate-900">URL do Webhook</p>
+              <p className="text-sm text-slate-600">Configure no painel do gateway para confirmação automática</p>
+            </div>
           </div>
-          <div>
-            <p style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text)' }}>URL do Webhook</p>
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Configure no painel do gateway para confirmação automática</p>
+          <div className="flex gap-3 items-center">
+            <code className="flex-1 text-xs text-slate-700 bg-slate-50 border border-slate-200 rounded-lg p-3 break-all">
+              {webhookUrl}
+            </code>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleCopyWebhook}
+              leftIcon={copiedWebhook ? <CheckCircle size={16} className="text-green-600" /> : <Copy size={16} />}
+            >
+              {copiedWebhook ? 'Copiado!' : 'Copiar'}
+            </Button>
           </div>
-        </div>
-        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-          <code style={{
-            flex: 1, fontSize: '0.75rem', color: 'var(--text)',
-            background: 'var(--bg-base)',
-            border: '1px solid var(--border)',
-            borderRadius: '10px', padding: '0.625rem 0.875rem',
-            wordBreak: 'break-all',
-          }}>
-            {webhookUrl}
-          </code>
-          <Button variant="secondary" size="sm" onClick={handleCopyWebhook} style={{ flexShrink: 0 }}>
-            {copiedWebhook ? <CheckCircle size={14} style={{ color: '#34D399' }} /> : <Copy size={14} />}
-            {copiedWebhook ? 'Copiado!' : 'Copiar'}
-          </Button>
-        </div>
+        </CardContent>
       </Card>
 
       {/* Flow explanation */}
-      <Card style={{ marginBottom: '1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-          <div style={{
-            width: '36px', height: '36px', borderRadius: '10px',
-            background: 'rgba(124,58,237,0.12)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: 'var(--primary-light)',
-          }}>
-            <Zap size={18} />
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center">
+              <Zap size={20} className="text-violet-600" />
+            </div>
+            <p className="text-base font-semibold text-slate-900">Como funciona</p>
           </div>
-          <p style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text)' }}>Como funciona</p>
-        </div>
-        <ol style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
-          {[
-            'Cliente preenche dados e inicia o checkout no chat',
-            'Sistema gera o QR Code Pix via gateway configurado',
-            'Cliente efetua o pagamento no app do banco',
-            'Gateway envia o webhook confirmando o pagamento',
-            'Sistema processa, confirma o pedido e entrega o produto',
-          ].map((step, i) => (
-            <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
-              <span style={{
-                flexShrink: 0, width: '22px', height: '22px', borderRadius: '50%',
-                background: 'rgba(124,58,237,0.15)', color: 'var(--primary-light)',
-                fontSize: '0.7rem', fontWeight: 700,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                {i + 1}
-              </span>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', paddingTop: '0.125rem', lineHeight: 1.5 }}>{step}</p>
-            </li>
-          ))}
-        </ol>
+          <ol className="space-y-3">
+            {[
+              'Cliente preenche dados e inicia o checkout no chat',
+              'Sistema gera o QR Code Pix via gateway configurado',
+              'Cliente efetua o pagamento no app do banco',
+              'Gateway envia o webhook confirmando o pagamento',
+              'Sistema processa, confirma o pedido e entrega o produto',
+            ].map((step, i) => (
+              <li key={i} className="flex items-start gap-3">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-violet-100 text-violet-600 text-xs font-bold flex items-center justify-center">
+                  {i + 1}
+                </span>
+                <p className="text-sm text-slate-600 pt-0.5">{step}</p>
+              </li>
+            ))}
+          </ol>
+        </CardContent>
       </Card>
 
       {/* Save button */}
-      <Button onClick={handleSave} loading={saving} size="lg">
-        <Save size={16} />
+      <Button onClick={handleSave} loading={saving} size="lg" fullWidth leftIcon={<Save size={18} />}>
         Salvar configurações
       </Button>
     </div>

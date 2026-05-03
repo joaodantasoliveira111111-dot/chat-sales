@@ -31,9 +31,22 @@ export async function createMiddlewareClient(request: NextRequest) {
 
 // Service role client for API routes that need to bypass RLS
 export function createAdminClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()
+
+  if (!supabaseUrl) {
+    throw new Error('NEXT_PUBLIC_SUPABASE_URL não está configurada.')
+  }
+
+  if (!serviceRoleKey) {
+    throw new Error(
+      'SUPABASE_SERVICE_ROLE_KEY não está configurada no ambiente do servidor. Copie a service_role key do Supabase Dashboard em Project Settings > API e configure como variável secreta de servidor. Nunca use essa chave no cliente.'
+    )
+  }
+
   return createServiceClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    supabaseUrl,
+    serviceRoleKey,
     {
       auth: {
         autoRefreshToken: false,

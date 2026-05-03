@@ -9,20 +9,19 @@ interface TypingIndicatorProps {
 
 export function TypingIndicator({ theme, avatarUrl }: TypingIndicatorProps) {
   return (
-    <div className="flex items-end gap-2 animate-fade-in">
-      <div className="w-7 h-7 rounded-full flex-shrink-0 mb-1 overflow-hidden">
+    <div className="message-row message-row-bot animate-fade-in">
+      <div className="message-avatar-slot">
         {avatarUrl ? (
-          <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+          <img src={avatarUrl} alt="" className="message-avatar" />
         ) : (
-          <div className="w-full h-full gradient-primary flex items-center justify-center text-xs text-white font-bold">C</div>
+          <div className="message-avatar message-avatar-fallback">C</div>
         )}
       </div>
       <div
-        className="px-4 py-3 flex items-center gap-1.5"
+        className="typing-bubble"
         style={{
-          background: theme.assistantBubble,
-          borderRadius: theme.bubbleRadius || '16px',
-          border: theme.assistantBubbleBorder ? `1px solid ${theme.assistantBubbleBorder}` : undefined,
+          background: theme.assistantBubble || '#fff',
+          borderColor: theme.assistantBubbleBorder || 'transparent',
         }}
       >
         {[0, 1, 2].map(i => (

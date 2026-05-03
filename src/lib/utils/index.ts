@@ -41,9 +41,77 @@ export function interpolateTemplate(
   template: string,
   variables: Record<string, unknown>
 ): string {
-  return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
-    return String(variables[key] ?? match)
+  return renderTemplateVariables(template, variables)
+}
+
+export function renderTemplateVariables(
+  template: string,
+  variables: Record<string, unknown> = {}
+): string {
+  return String(template || '').replace(/\{\{\s*([\w.]+)\s*\}\}/g, (_match: string, key: string) => {
+    if (key in variables) {
+      const directValue = variables[key]
+      return formatTemplateValue(directValue, key)
+    }
+
+    const value = key.split('.').reduce((current: unknown, part: string) => {
+      if (current && typeof current === 'object' && part in current) {
+        return (current as Record<string, unknown>)[part]
+      }
+      return undefined
+    }, variables)
+    return formatTemplateValue(value, key)
   })
+}
+
+function formatTemplateValue(value: unknown, key: string): string {
+  if (value !== undefined && value !== null && value !== '') {
+    if (typeof value === 'number' && shouldFormatAsCurrency(key)) {
+      return formatCurrency(value)
+    }
+    return String(value)
+  }
+  return getTemplateFallback(key)
+}
+
+function shouldFormatAsCurrency(key: string) {
+  return /(^|\.|_)price$|(^|\.|_)amount$|valor/i.test(key)
+}
+
+function getTemplateFallback(key: string): string {
+  const fallbacks: Record<string, string> = {
+    'lead.name': 'tudo certo',
+    'lead.email': '',
+    'lead.phone': '',
+    'lead.city': '',
+    'product.name': 'esse acesso',
+    'product.price': 'consulte o valor',
+    'product.description': 'essa oferta',
+    'plan.name': 'plano escolhido',
+    'plan.price': 'consulte o valor',
+    'order.id': '',
+    'order.amount': 'consulte o valor',
+    'order.status': 'pendente',
+    'payment.status': 'pendente',
+    'payment.pix_code': 'o Pix será gerado aqui',
+    'payment.qr_code': '',
+    'account.login': 'será enviado após a confirmação',
+    'account.password': 'será enviado após a confirmação',
+    'account.email': '',
+    'account.extra_info': '',
+    'delivery.link': 'o link será enviado aqui',
+    'delivery.button_text': 'Acessar',
+    'delivery.content': 'seu acesso será enviado aqui',
+    'system.support_whatsapp': 'suporte disponível por aqui',
+  }
+
+  const planPriceMatch = key.match(/^plan_(\d+)\.price$/)
+  if (planPriceMatch) return 'consulte o valor'
+
+  const planNameMatch = key.match(/^plan_(\d+)\.name$/)
+  if (planNameMatch) return `Plano ${planNameMatch[1]}`
+
+  return fallbacks[key] ?? ''
 }
 
 export function copyToClipboard(text: string): Promise<void> {

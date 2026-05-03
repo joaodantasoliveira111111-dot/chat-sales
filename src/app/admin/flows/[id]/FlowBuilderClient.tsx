@@ -5,12 +5,14 @@ import ReactFlow, {
   Node,
   Edge,
   addEdge,
+  reconnectEdge,
   Background,
   Controls,
   MiniMap,
   useNodesState,
   useEdgesState,
   Connection,
+  ConnectionMode,
   ReactFlowProvider,
   Panel,
 } from 'reactflow'
@@ -62,13 +64,44 @@ function toRFEdge(e: FlowEdge): Edge {
   return {
     id: e.id,
     source: e.source_node_id,
-    sourceHandle: e.source_handle || undefined,
+    sourceHandle: normalizeSourceHandle(e.source_handle),
     target: e.target_node_id,
-    targetHandle: e.target_handle || undefined,
+    targetHandle: normalizeTargetHandle(e.target_handle),
     type: 'smoothstep',
-    style: { stroke: 'rgba(139,92,246,0.7)', strokeWidth: 2 },
+    style: { stroke: 'rgba(99,91,255,0.72)', strokeWidth: 2 },
     animated: false,
+    reconnectable: true,
   }
+}
+
+function normalizeSourceHandle(handle: string | null) {
+  if (!handle) return undefined
+  if (handle === 'bottom-source' || handle === 'right-source') return handle
+  return 'right-source'
+}
+
+function normalizeTargetHandle(handle: string | null) {
+  if (!handle) return undefined
+  if (handle === 'top-target' || handle === 'left-target') return handle
+  return 'top-target'
+}
+
+function validateFlowBeforePublish(nodes: Node[], edges: Edge[]) {
+  const errors: string[] = []
+  const startNode = nodes.find(n => n.data.nodeType === 'start' || n.data.type === 'start')
+  if (!startNode) errors.push('O fluxo precisa ter um no de inicio')
+
+  const nodeIds = new Set(nodes.map(node => node.id))
+  const invalidEdge = edges.find(edge => !nodeIds.has(edge.source) || !nodeIds.has(edge.target))
+  if (invalidEdge) errors.push('Existe uma conexao quebrada no fluxo')
+
+  const disconnected = nodes.find(node => {
+    const nodeType = node.data.nodeType || node.data.type
+    return nodeType !== 'end' && !edges.some(edge => edge.source === node.id)
+  })
+  if (disconnected) errors.push(`O no "${disconnected.data.title || disconnected.id}" nao tem proximo passo`)
+
+  return errors
 }
 
 export function FlowBuilderClient({
@@ -91,12 +124,26 @@ export function FlowBuilderClient({
   const onConnect = useCallback((connection: Connection) => {
     const edge: Edge = {
       ...connection,
-      id: `edge_${uuidv4()}`,
+      id: uuidv4(),
       type: 'smoothstep',
-      style: { stroke: 'rgba(139,92,246,0.7)', strokeWidth: 2 },
+      style: { stroke: 'rgba(99,91,255,0.72)', strokeWidth: 2 },
+      reconnectable: true,
     } as Edge
-    setEdges(eds => addEdge(edge, eds))
+    setEdges(eds => addEdge(edge, eds.filter(e => (
+      e.source !== connection.source || e.sourceHandle !== connection.sourceHandle
+    ))))
   }, [setEdges])
+
+  const onReconnect = useCallback((oldEdge: Edge, newConnection: Connection) => {
+    setEdges(eds => reconnectEdge(oldEdge, newConnection, eds))
+  }, [setEdges])
+
+  const onEdgeDoubleClick = useCallback((event: React.MouseEvent, edge: Edge) => {
+    event.preventDefault()
+    event.stopPropagation()
+    setEdges(eds => eds.filter(e => e.id !== edge.id))
+    toast.success('Ligacao removida')
+  }, [setEdges, toast])
 
   const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
     setSelectedNode(node)
@@ -169,8 +216,10 @@ export function FlowBuilderClient({
       }))
 
       // Delete existing and re-insert
-      await supabase.from('flow_edges').delete().eq('flow_id', flow.id)
-      await supabase.from('flow_nodes').delete().eq('flow_id', flow.id)
+      const { error: deleteEdgesErr } = await supabase.from('flow_edges').delete().eq('flow_id', flow.id).eq('user_id', userId)
+      if (deleteEdgesErr) throw deleteEdgesErr
+      const { error: deleteNodesErr } = await supabase.from('flow_nodes').delete().eq('flow_id', flow.id).eq('user_id', userId)
+      if (deleteNodesErr) throw deleteNodesErr
 
       if (dbNodes.length > 0) {
         const { error: nodesErr } = await supabase.from('flow_nodes').insert(dbNodes)
@@ -183,10 +232,11 @@ export function FlowBuilderClient({
 
       // Update flow start_node_id
       const startNode = nodes.find(n => n.data.nodeType === 'start' || n.data.type === 'start')
-      await supabase.from('flows').update({
+      const { error: flowErr } = await supabase.from('flows').update({
         start_node_id: startNode?.id || null,
         updated_at: new Date().toISOString(),
-      }).eq('id', flow.id)
+      }).eq('id', flow.id).eq('user_id', userId)
+      if (flowErr) throw flowErr
 
       toast.success('Fluxo salvo com sucesso!')
     } catch (err) {
@@ -202,14 +252,20 @@ export function FlowBuilderClient({
       toast.error('Adicione nós ao fluxo antes de publicar')
       return
     }
+    const validationErrors = validateFlowBeforePublish(nodes, edges)
+    if (validationErrors.length > 0) {
+      toast.error(validationErrors[0])
+      return
+    }
     setPublishing(true)
     try {
       await saveFlow()
       const supabase = createClient()
-      await supabase.from('flows').update({
+      const { error } = await supabase.from('flows').update({
         status: 'published',
         published_at: new Date().toISOString(),
-      }).eq('id', flow.id)
+      }).eq('id', flow.id).eq('user_id', userId)
+      if (error) throw error
       setFlow(f => ({ ...f, status: 'published' }))
       toast.success('Fluxo publicado! ✨')
     } catch {
@@ -220,24 +276,24 @@ export function FlowBuilderClient({
   }, [saveFlow, flow.id, nodes.length, toast])
 
   return (
-    <div className="flex flex-col h-full" style={{ height: 'calc(100vh - 56px)' }}>
+    <div className="flow-builder">
       {/* Toolbar */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-white/5 bg-[#0d0d15] flex-shrink-0">
+      <div className="flow-toolbar">
         <div className="flex items-center gap-3">
-          <Link href="/admin/flows" className="p-2 rounded-lg hover:bg-white/5 text-slate-400 hover:text-white transition-colors">
+          <Link href="/admin/flows" className="flow-icon-button">
             <ChevronLeft size={18} />
           </Link>
           <div>
-            <p className="text-sm font-semibold text-white">{flow.name}</p>
+            <p className="flow-title">{flow.name}</p>
             <div className="flex items-center gap-2">
-              <span className={`text-xs px-2 py-0.5 rounded-full ${
+              <span className={`flow-status-pill ${
                 flow.status === 'published'
-                  ? 'bg-green-400/10 text-green-400'
-                  : 'bg-yellow-400/10 text-yellow-400'
+                  ? 'is-published'
+                  : 'is-draft'
               }`}>
                 {flow.status === 'published' ? 'Publicado' : 'Rascunho'}
               </span>
-              <span className="text-xs text-slate-500">{nodes.length} nós</span>
+              <span className="flow-meta">{nodes.length} nós</span>
             </div>
           </div>
         </div>
@@ -274,7 +330,7 @@ export function FlowBuilderClient({
       <div className="flex flex-1 overflow-hidden">
         {/* Node Palette */}
         {showPalette && (
-          <div className="w-56 flex-shrink-0 border-r border-white/5 overflow-y-auto bg-[#0d0d15]">
+          <div className="flow-palette">
             <NodePalette onAddNode={addNode} />
           </div>
         )}
@@ -287,25 +343,31 @@ export function FlowBuilderClient({
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
+            onReconnect={onReconnect}
+            onEdgeDoubleClick={onEdgeDoubleClick}
             onNodeClick={onNodeClick}
             onPaneClick={onPaneClick}
             nodeTypes={nodeTypes}
             onInit={instance => { reactFlowInstance.current = instance }}
             fitView
+            edgesUpdatable
+            edgesFocusable
+            deleteKeyCode={['Backspace', 'Delete']}
+            connectionMode={ConnectionMode.Loose}
             defaultEdgeOptions={{
               type: 'smoothstep',
-              style: { stroke: 'rgba(139,92,246,0.5)', strokeWidth: 2 },
+              style: { stroke: 'rgba(99,91,255,0.5)', strokeWidth: 2 },
             }}
           >
-            <Background color="rgba(255,255,255,0.03)" gap={24} />
+            <Background color="rgba(148,163,184,0.08)" gap={24} />
             <Controls className="react-flow__controls" />
             <MiniMap
-              nodeColor={() => 'rgba(139,92,246,0.6)'}
+              nodeColor={() => 'rgba(99,91,255,0.68)'}
               maskColor="rgba(0,0,0,0.4)"
             />
             <Panel position="bottom-center">
-              <div className="flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 bg-[#111118]/90 backdrop-blur text-xs text-slate-400">
-                <span>Clique nos nós para editar • Arraste para conectar • Scroll para zoom</span>
+              <div className="flow-help-panel">
+                <span>Clique nos nos para editar - Duplo clique na linha ou Delete para cortar ligacao</span>
               </div>
             </Panel>
           </ReactFlow>
@@ -313,10 +375,12 @@ export function FlowBuilderClient({
 
         {/* Node Editor */}
         {selectedNode && (
-          <div className="w-80 flex-shrink-0 border-l border-white/5 overflow-y-auto bg-[#0d0d15]">
+          <div className="flow-editor-panel">
             <NodeEditorPanel
               node={selectedNode}
               products={products}
+              userId={userId}
+              flowId={flow.id}
               onChange={(data) => updateNodeData(selectedNode.id, data)}
               onDelete={() => deleteNode(selectedNode.id)}
             />
@@ -328,6 +392,37 @@ export function FlowBuilderClient({
 }
 
 function getDefaultConfig(type: NodeType): Record<string, unknown> {
+  const salesDefaults: Partial<Record<NodeType, Record<string, unknown>>> = {
+    message: { message_text: 'Oi! Vi que voce quer saber mais. Posso te explicar rapidinho?', show_typing: true, typing_duration_ms: 900, delay_ms: 0 },
+    text_message: { message_text: 'Oi! Vi que voce quer saber mais. Posso te explicar rapidinho?', show_typing: true, typing_duration_ms: 900, delay_ms: 0 },
+    quick_reply: { message_text: 'Qual opcao faz mais sentido pra voce?', buttons: [] },
+    button_message: { message_text: 'Qual opcao faz mais sentido pra voce?', buttons: [] },
+    media_message: { media_type: 'image', media_url: '', caption: '' },
+    audio_message: { media_type: 'audio', media_url: '', caption: '', show_typing: true, typing_duration_ms: 700 },
+    video_message: { media_type: 'video', media_url: '', caption: '' },
+    image_message: { media_type: 'image', media_url: '', caption: '' },
+    file_message: { media_type: 'document', media_url: '', caption: '', button_text: 'Abrir arquivo' },
+    media_gallery: { message_text: 'Olha isso aqui:', media_items: [] },
+    capture_input: { label: 'Perfeito. Me diz seu nome completo.', input_type: 'text', variable_name: 'lead.name', required: true },
+    input: { label: 'Perfeito. Me diz seu nome completo.', input_type: 'text', variable_name: 'lead.name', required: true },
+    condition: { conditions: [], default_target_node_id: null },
+    product_plan: { message_text: 'Escolha como voce prefere comecar:', plans: [], buttons: [] },
+    checkout: { summary_title: 'Confirme seus dados', button_text: 'Continuar para pagamento', required_fields: ['name', 'email'] },
+    payment: { expiration_minutes: 30, pending_text: 'Pix gerado. Copie o codigo abaixo e pague no seu banco.', copy_button_text: 'Copiar codigo Pix' },
+    pix_payment: { expiration_minutes: 30, pending_text: 'Pix gerado. Copie o codigo abaixo e pague no seu banco.', copy_button_text: 'Copiar codigo Pix' },
+    wait_payment: { polling_interval_seconds: 5, timeout_minutes: 30 },
+    delivery: { delivery_template: 'Pagamento aprovado.\n\nAqui esta seu acesso, {{lead.name}}:\n{{delivery.link}}' },
+    faq: { faqs: [], final_button_text: 'Voltar para compra' },
+    delay: { delay_ms: 900 },
+    objection: { message_text: 'Entendo. O que ficou travando pra voce?', objections: [] },
+    social_proof: { message_text: 'Olha o que quem entrou hoje recebeu:', proof_items: [], buttons: [] },
+    update_lead: { update_field: 'lead.stage', update_value: 'interessado' },
+    notification: { notification_channel: 'internal', notification_message: 'Novo lead quente no fluxo' },
+    error_fallback: { final_message: 'Tive um problema aqui, mas sua conversa ficou registrada. Nossa equipe vai te chamar em instantes.' },
+    end: { final_message: 'Obrigado! Ate logo!', restart_button: false },
+  }
+  if (salesDefaults[type]) return salesDefaults[type] || {}
+
   const defaults: Partial<Record<NodeType, Record<string, unknown>>> = {
     text_message: { message_text: 'Olá! 👋', show_typing: true, typing_duration_ms: 1500, delay_ms: 0 },
     button_message: { message_text: 'Escolha uma opção:', buttons: [] },

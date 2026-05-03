@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/middleware'
+import { isMissingServiceRoleError, missingServiceRoleResponse } from '@/lib/supabase/admin-error'
 
 export async function GET(
   request: NextRequest,
@@ -28,14 +29,14 @@ export async function GET(
       return NextResponse.json({ error: 'Pedido não encontrado' }, { status: 404 })
     }
 
-    if (!['paid', 'delivered'].includes(order.status)) {
+    if (!['paid', 'delivered', 'manual_pending', 'paid_pending_stock', 'pending_delivery'].includes(order.status)) {
       return NextResponse.json({ error: 'Pagamento não confirmado' }, { status: 403 })
     }
 
     // Get delivery
     const { data: delivery, error: deliveryError } = await supabase
       .from('deliveries')
-      .select('delivery_payload, delivered_at')
+      .select('delivery_payload, delivered_at, status, error_message')
       .eq('order_id', id)
       .single()
 
@@ -47,10 +48,13 @@ export async function GET(
     return NextResponse.json({
       delivered: true,
       delivered_at: delivery.delivered_at,
+      status: delivery.status,
+      error_message: delivery.error_message,
       payload: delivery.delivery_payload,
     })
   } catch (err) {
     console.error('Delivery fetch error:', err)
+    if (isMissingServiceRoleError(err)) return missingServiceRoleResponse()
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }

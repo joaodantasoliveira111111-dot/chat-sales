@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/middleware'
 import { getPaymentProvider } from '@/lib/payment'
 import { trackEvent } from '@/lib/analytics/trackEvent'
+import { sendMetaCapiEvent } from '@/lib/meta/capi'
+import { generateMetaEventId } from '@/lib/meta/events'
 import { v4 as uuidv4 } from 'uuid'
 import { z } from 'zod'
+import { isMissingServiceRoleError, missingServiceRoleResponse } from '@/lib/supabase/admin-error'
 
 const createPaymentSchema = z.object({
   product_id: z.string().uuid(),
@@ -54,7 +57,7 @@ export async function POST(request: NextRequest) {
 
     // Create order
     const orderId = uuidv4()
-    const webhookUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/payments/webhook`
+    const webhookUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/payments/webhook?u=${userId}`
 
     // Create PIX payment
     const { provider, providerName } = await getPaymentProvider(userId)
@@ -98,14 +101,82 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Erro ao criar pedido' }, { status: 500 })
     }
 
+    await supabase.from('tracking_sessions').update({
+      order_id: orderId,
+      lead_id: session_id,
+      updated_at: new Date().toISOString(),
+    }).eq('tenant_id', userId).eq('session_id', session_id)
+
     // Track event
-    await trackEvent('GeneratePix', {
+    await trackEvent('AddPaymentInfo', {
       page_id,
       product_id,
       flow_id,
       order_id: orderId,
       session_id,
       user_id: userId,
+    })
+
+    const { data: trackingSession } = await supabase
+      .from('tracking_sessions')
+      .select('*')
+      .eq('tenant_id', userId)
+      .eq('session_id', session_id)
+      .maybeSingle()
+
+    await sendMetaCapiEvent({
+      tenantId: userId,
+      eventName: 'InitiateCheckout',
+      eventId: generateMetaEventId('InitiateCheckout', { order_id: orderId, session_id }),
+      request,
+      session: trackingSession || { session_id, page_id, product_id, flow_id, order_id: orderId },
+      lead: {
+        name: customer_name,
+        email: customer_email,
+        phone: customer_whatsapp,
+        external_id: session_id,
+      },
+      customData: {
+        order_id: orderId,
+        product_id,
+        page_id,
+        flow_id,
+        session_id,
+        content_ids: [product_id],
+        content_name: product.name,
+        value: product.price,
+        currency: product.currency || 'BRL',
+      },
+      eventSourceUrl: String(trackingSession?.landing_page_url || ''),
+      source: 'server',
+    })
+
+    await sendMetaCapiEvent({
+      tenantId: userId,
+      eventName: 'AddPaymentInfo',
+      eventId: generateMetaEventId('AddPaymentInfo', { order_id: orderId, session_id }),
+      request,
+      session: trackingSession || { session_id, page_id, product_id, flow_id, order_id: orderId },
+      lead: {
+        name: customer_name,
+        email: customer_email,
+        phone: customer_whatsapp,
+        external_id: session_id,
+      },
+      customData: {
+        order_id: orderId,
+        product_id,
+        page_id,
+        flow_id,
+        session_id,
+        content_ids: [product_id],
+        content_name: product.name,
+        value: product.price,
+        currency: product.currency || 'BRL',
+        payment_method: 'pix',
+      },
+      eventSourceUrl: String(trackingSession?.landing_page_url || ''),
+      source: 'server',
     })
 
     return NextResponse.json({
@@ -119,6 +190,7 @@ export async function POST(request: NextRequest) {
     })
   } catch (err) {
     console.error('Create payment error:', err)
+    if (isMissingServiceRoleError(err)) return missingServiceRoleResponse()
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }

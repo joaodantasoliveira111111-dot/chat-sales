@@ -1,0 +1,4 @@
+
+thread 'tokio-runtime-worker' (9356) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\aggregation_update.rs:1677:17:
+inner_of_uppers_lost_follower is not able to remove follower TaskId 188 (TaskId { id: 188 } <DiskFileSystem as FileSystem>::read) from TaskId 81299 (TaskId { id: 81299 } <EcmascriptModuleAsset as EcmascriptChunkPlaceable>::chunk_item_content) as they don't exist as upper or follower edges
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

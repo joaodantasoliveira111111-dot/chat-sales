@@ -2,26 +2,51 @@
 
 import { NodeType } from '@/types'
 import {
-  Play, MessageSquare, LayoutList, Image, AlignJustify,
-  GitBranch, HelpCircle, ShoppingCart, Wallet, Clock,
-  Package, Headphones, Zap, ArrowRight, Square,
+  AlertTriangle,
+  Bell,
+  Clock,
+  FileText,
+  GitBranch,
+  Image,
+  Images,
+  LayoutList,
+  MessageSquare,
+  Mic,
+  Package,
+  Play,
+  ShoppingCart,
+  Square,
+  Star,
+  Tags,
+  UserPen,
+  Video,
+  Wallet,
+  Zap,
 } from 'lucide-react'
 
 const NODE_TYPES: { type: NodeType; label: string; icon: React.ElementType; color: string; desc: string }[] = [
-  { type: 'start', label: 'Início', icon: Play, color: '#10B981', desc: 'Ponto de entrada do fluxo' },
-  { type: 'text_message', label: 'Mensagem', icon: MessageSquare, color: '#8B5CF6', desc: 'Envia uma mensagem de texto' },
-  { type: 'button_message', label: 'Botões', icon: LayoutList, color: '#8B5CF6', desc: 'Mensagem com botões de opção' },
-  { type: 'input', label: 'Entrada', icon: AlignJustify, color: '#F59E0B', desc: 'Coleta dados do usuário' },
-  { type: 'condition', label: 'Condição', icon: GitBranch, color: '#F97316', desc: 'Ramifica o fluxo por condição' },
-  { type: 'faq', label: 'FAQ', icon: HelpCircle, color: '#06B6D4', desc: 'Perguntas frequentes' },
-  { type: 'checkout', label: 'Checkout', icon: ShoppingCart, color: '#8B5CF6', desc: 'Coleta dados de compra' },
-  { type: 'pix_payment', label: 'Pix', icon: Wallet, color: '#10B981', desc: 'Gera e exibe cobrança Pix' },
-  { type: 'wait_payment', label: 'Aguardar Pag.', icon: Clock, color: '#F59E0B', desc: 'Aguarda confirmação do pagamento' },
-  { type: 'delivery', label: 'Entrega', icon: Package, color: '#06B6D4', desc: 'Exibe entrega do produto' },
-  { type: 'support', label: 'Suporte', icon: Headphones, color: '#8B5CF6', desc: 'Direciona para suporte' },
-  { type: 'action', label: 'Ação', icon: Zap, color: '#F97316', desc: 'Executa ação personalizada' },
-  { type: 'redirect', label: 'Redirecionar', icon: ArrowRight, color: '#94A3B8', desc: 'Redireciona para URL' },
-  { type: 'end', label: 'Fim', icon: Square, color: '#EF4444', desc: 'Encerra o fluxo' },
+  { type: 'start', label: 'Inicio', icon: Play, color: '#10B981', desc: 'Entrada da venda X1' },
+  { type: 'text_message', label: 'Mensagem', icon: MessageSquare, color: '#635BFF', desc: 'Texto curto e natural' },
+  { type: 'audio_message', label: 'Audio', icon: Mic, color: '#22D3EE', desc: 'Explicacao em audio' },
+  { type: 'video_message', label: 'Video', icon: Video, color: '#2F80ED', desc: 'Demo, VSL ou prova' },
+  { type: 'image_message', label: 'Imagem', icon: Image, color: '#06B6D4', desc: 'Print, foto ou oferta' },
+  { type: 'file_message', label: 'Arquivo', icon: FileText, color: '#94A3B8', desc: 'PDF ou material' },
+  { type: 'media_gallery', label: 'Galeria', icon: Images, color: '#14B8A6', desc: 'Sequencia de midias' },
+  { type: 'quick_reply', label: 'Respostas', icon: LayoutList, color: '#8B5CF6', desc: 'Botoes compactos' },
+  { type: 'capture_input', label: 'Captura', icon: UserPen, color: '#F59E0B', desc: 'Nome, email, WhatsApp' },
+  { type: 'condition', label: 'Condicao', icon: GitBranch, color: '#F97316', desc: 'Caminhos por resposta' },
+  { type: 'product_plan', label: 'Planos', icon: Tags, color: '#A78BFA', desc: 'Escolha de produto/plano' },
+  { type: 'checkout', label: 'Dados compra', icon: ShoppingCart, color: '#8B5CF6', desc: 'Coleta conversacional' },
+  { type: 'payment', label: 'Pix', icon: Wallet, color: '#10B981', desc: 'Pagamento no chat' },
+  { type: 'wait_payment', label: 'Aguardar Pix', icon: Clock, color: '#F59E0B', desc: 'Retoma apos webhook' },
+  { type: 'delivery', label: 'Entrega', icon: Package, color: '#06B6D4', desc: 'Entrega automatica' },
+  { type: 'delay', label: 'Delay', icon: Clock, color: '#64748B', desc: 'Pausa natural' },
+  { type: 'objection', label: 'Objecoes', icon: AlertTriangle, color: '#EF4444', desc: 'Quebra de objecoes' },
+  { type: 'social_proof', label: 'Prova social', icon: Star, color: '#F59E0B', desc: 'Prints e depoimentos' },
+  { type: 'update_lead', label: 'Atualizar lead', icon: Zap, color: '#22D3EE', desc: 'Tags e variaveis' },
+  { type: 'notification', label: 'Notificacao', icon: Bell, color: '#2F80ED', desc: 'Alerta interno/webhook' },
+  { type: 'error_fallback', label: 'Fallback', icon: AlertTriangle, color: '#FB7185', desc: 'Rota de erro segura' },
+  { type: 'end', label: 'Fim', icon: Square, color: '#EF4444', desc: 'Encerra a conversa' },
 ]
 
 interface NodePaletteProps {
@@ -31,8 +56,8 @@ interface NodePaletteProps {
 export function NodePalette({ onAddNode }: NodePaletteProps) {
   return (
     <div className="p-3">
-      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-1 mb-3">
-        Tipos de Nó
+      <p className="px-1 mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
+        Sales Flow Builder
       </p>
       <div className="space-y-1">
         {NODE_TYPES.map(node => {
@@ -41,17 +66,17 @@ export function NodePalette({ onAddNode }: NodePaletteProps) {
             <button
               key={node.type}
               onClick={() => onAddNode(node.type)}
-              className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-white/5 transition-all duration-150 text-left group"
+              className="group flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left transition-all duration-150 hover:bg-white/5"
             >
               <div
-                className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-                style={{ background: `${node.color}15`, color: node.color }}
+                className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg"
+                style={{ background: `${node.color}18`, color: node.color }}
               >
                 <Icon size={13} />
               </div>
               <div className="min-w-0">
                 <p className="text-xs font-medium text-slate-300 group-hover:text-white">{node.label}</p>
-                <p className="text-[10px] text-slate-600 truncate">{node.desc}</p>
+                <p className="truncate text-[10px] text-slate-600">{node.desc}</p>
               </div>
             </button>
           )

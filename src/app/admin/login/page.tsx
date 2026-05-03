@@ -4,8 +4,9 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
-import { MessageSquare, Lock, Mail } from 'lucide-react'
+import Input from '@/components/ui/Input'
+import { ChatfyLogo } from '@/components/ui/ChatfyLogo'
+import { Mail, Lock, ShieldCheck, ArrowRight } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -21,97 +22,125 @@ export default function LoginPage() {
 
     try {
       const supabase = createClient()
-      const { error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+      const { error: authError } = await supabase.auth.signInWithPassword({ email, password })
 
       if (authError) {
-        setError('Email ou senha inválidos. Verifique suas credenciais.')
+        setError('E-mail ou senha inválidos. Verifique suas credenciais.')
         return
       }
 
       router.push('/admin')
       router.refresh()
     } catch {
-      setError('Erro ao fazer login. Tente novamente.')
+      setError('Não foi possível entrar agora. Tente novamente.')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
-      style={{ background: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)' }}>
-      {/* Background orbs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-[120px] opacity-20"
-        style={{ background: 'radial-gradient(circle, #8B5CF6, transparent)' }} />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full blur-[120px] opacity-20"
-        style={{ background: 'radial-gradient(circle, #06B6D4, transparent)' }} />
-
-      <div className="relative w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 p-4">
+      <div className="w-full max-w-md">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl gradient-primary mb-4 shadow-2xl shadow-violet-500/40 animate-float">
-            <MessageSquare size={28} className="text-white" />
-          </div>
-          <h1 className="text-3xl font-bold gradient-text mb-2">Chatfy</h1>
-          <p className="text-slate-400 text-sm">Painel administrativo</p>
+        <div className="flex justify-center mb-8">
+          <ChatfyLogo />
         </div>
 
-        {/* Card */}
-        <div className="glass-strong rounded-3xl p-8 shadow-2xl">
-          <h2 className="text-xl font-bold text-white mb-1">Entrar na conta</h2>
-          <p className="text-slate-400 text-sm mb-6">Acesse com suas credenciais de administrador</p>
+        {/* Login Card */}
+        <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 border border-green-200 text-green-700 text-xs font-semibold mb-4">
+              <ShieldCheck size={14} />
+              <span>Acesso restrito a administradores</span>
+            </div>
+            
+            <h1 className="text-2xl font-bold text-slate-900 mb-2">
+              Bem-vindo de volta
+            </h1>
+            
+            <p className="text-slate-600">
+              Entre na sua conta para gerenciar sua operação
+            </p>
+          </div>
 
+          {/* Error Message */}
           {error && (
-            <div className="mb-4 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
-              {error}
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-sm text-red-700">{error}</p>
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="relative">
-              <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="seu@email.com"
-                required
-                className="w-full pl-10 pr-4 py-3 rounded-xl text-sm bg-white/5 border border-white/10 text-white placeholder:text-slate-500 focus:outline-none focus:border-violet-500/60 transition-all"
-              />
-            </div>
+          {/* Form */}
+          <form onSubmit={handleLogin} className="space-y-5">
+            <Input
+              id="email"
+              type="email"
+              label="E-mail"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="seu@email.com"
+              leftIcon={<Mail size={18} />}
+              required
+              fullWidth
+            />
 
-            <div className="relative">
-              <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="Senha"
-                required
-                className="w-full pl-10 pr-4 py-3 rounded-xl text-sm bg-white/5 border border-white/10 text-white placeholder:text-slate-500 focus:outline-none focus:border-violet-500/60 transition-all"
-              />
+            <Input
+              id="password"
+              type="password"
+              label="Senha"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="••••••••"
+              leftIcon={<Lock size={18} />}
+              required
+              fullWidth
+            />
+
+            <div className="flex items-center justify-between text-sm">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
+                />
+                <span className="text-slate-600">Lembrar-me</span>
+              </label>
+              
+              <a
+                href="#"
+                className="text-primary-600 hover:text-primary-700 font-medium"
+              >
+                Esqueceu a senha?
+              </a>
             </div>
 
             <Button
               type="submit"
               loading={loading}
               size="lg"
-              className="w-full mt-2"
+              fullWidth
+              rightIcon={<ArrowRight size={18} />}
             >
-              {loading ? 'Entrando...' : 'Entrar'}
+              Entrar na conta
             </Button>
           </form>
 
-          <div className="mt-6 p-4 rounded-xl bg-white/3 border border-white/5">
-            <p className="text-xs text-slate-500 text-center">
-              Para criar sua conta admin, registre-se no Supabase Auth e faça login aqui.
+          {/* Footer */}
+          <div className="mt-8 pt-6 border-t border-slate-200 text-center">
+            <p className="text-sm text-slate-600">
+              Precisa de ajuda?{' '}
+              <a href="#" className="text-primary-600 hover:text-primary-700 font-medium">
+                Entre em contato
+              </a>
             </p>
           </div>
+        </div>
+
+        {/* Security Notice */}
+        <div className="mt-6 text-center">
+          <p className="text-xs text-slate-500">
+            🔒 Seus dados estão protegidos com criptografia de ponta a ponta
+          </p>
         </div>
       </div>
     </div>
