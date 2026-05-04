@@ -108,7 +108,7 @@
 .whatsapp-message-list {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
 }
 
 /* Message Row */
@@ -127,7 +127,7 @@
 }
 
 .whatsapp-message-row-compact {
-  margin-top: -3px;
+  margin-top: -4px;
 }
 
 .whatsapp-message-avatar-slot {
