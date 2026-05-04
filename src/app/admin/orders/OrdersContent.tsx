@@ -100,18 +100,18 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 min-w-[200px]">
           <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71869B] pointer-events-none" />
-          <input
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Buscar por email, nome ou ID..."
-            className="w-full h-10 pl-10 pr-4 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          />
-        </div>
-        <select
-          value={statusFilter}
-          onChange={e => setStatusFilter(e.target.value)}
-          className="h-10 px-4 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+        <input
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Buscar por email, nome ou ID..."
+          className="w-full h-10 pl-10 pr-4 text-sm bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15)] text-[#081827] placeholder:text-[#71869B]"
+        />
+      </div>
+      <select
+        value={statusFilter}
+        onChange={e => setStatusFilter(e.target.value)}
+        className="h-10 px-4 text-sm bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15)] text-[#081827]"
         >
           {statusOptions.map(option => (
             <option key={option.value} value={option.value}>
@@ -139,8 +139,8 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
               <CardContent className="p-4">
                 <div className="flex items-center gap-4">
                   {/* Icon */}
-                  <div className="w-12 h-12 rounded-xl flex-shrink-0 bg-orange-100 flex items-center justify-center">
-                    <ShoppingCart size={24} className="text-orange-600" />
+                <div className="w-12 h-12 rounded-xl flex-shrink-0 bg-[rgba(249,115,22,0.08)] flex items-center justify-center">
+                  <ShoppingCart size={24} className="text-[#F97316]" />
                   </div>
 
                   {/* Content */}
@@ -151,7 +151,7 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
                         {statusLabelMap[order.status] || order.status}
                       </Badge>
                       {order.delivery && (
-                        <span className="text-xs text-green-600 font-medium flex items-center gap-1">
+                        <span className="text-xs text-[#16A34A] font-medium flex items-center gap-1">
                           <CheckCircle size={12} />
                           Entregue
                         </span>
@@ -176,14 +176,14 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
 
                   {/* Price & Actions */}
                   <div className="text-right flex-shrink-0">
-                    <p className="text-lg font-bold text-cyan-600">
-                      {formatCurrency(order.amount)}
-                    </p>
-                    {order.status === 'pending' && (
-                      <button
-                        onClick={() => simulatePayment(order.id)}
-                        disabled={simulating === order.id}
-                        className="mt-2 text-xs text-cyan-600 hover:text-cyan-700 font-medium flex items-center gap-1 disabled:opacity-50"
+              <p className="text-lg font-bold text-[#0B7CFF]">
+                {formatCurrency(order.amount)}
+              </p>
+              {order.status === 'pending' && (
+                <button
+                  onClick={() => simulatePayment(order.id)}
+                  disabled={simulating === order.id}
+                  className="mt-2 text-xs text-[#0B7CFF] hover:text-[#0A6FE6] font-medium flex items-center gap-1 disabled:opacity-50"
                       >
                         <Zap size={12} />
                         {simulating === order.id ? 'Simulando...' : 'Simular'}
@@ -194,7 +194,7 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
                   {/* View Details Button */}
                   <button
                     onClick={() => setSelectedOrder(order)}
-                    className="p-2 rounded-lg text-[#71869B] hover:text-[#35516B] hover:bg-[#EAF1F8] transition-colors"
+                    className="p-2 rounded-xl text-[#71869B] hover:text-[#35516B] hover:bg-[#F3F7FB] transition-colors"
                     title="Ver detalhes"
                   >
                     <Eye size={18} />
@@ -254,7 +254,7 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
 
               <div className="space-y-1">
                 <p className="text-xs text-[#71869B] font-medium">Valor</p>
-                <p className="text-sm font-bold text-cyan-600">
+                <p className="text-sm font-bold text-[#0B7CFF]">
                   {formatCurrency(selectedOrder.amount)}
                 </p>
               </div>
@@ -279,7 +279,7 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
               <div className="space-y-2">
                 <p className="text-sm font-semibold text-[#081827]">Código PIX</p>
                 <div className="relative">
-                  <div className="p-3 bg-[#F3F7FB] rounded-lg border border-[rgba(8,24,39,0.08)] text-xs font-mono text-[#35516B] break-all">
+                  <div className="p-3 bg-[#F3F7FB] rounded-xl border border-[rgba(8,24,39,0.08)] text-xs font-mono text-[#35516B] break-all">
                     {selectedOrder.pix_code}
                   </div>
                   <button
@@ -295,12 +295,12 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
 
             {/* Delivery Status */}
             {selectedOrder.delivery && (
-              <div className="p-4 bg-green-50 rounded-xl border border-green-200">
+              <div className="p-4 bg-[rgba(22,163,74,0.04)] rounded-xl border border-[rgba(22,163,74,0.15)]">
                 <div className="flex items-center gap-2 mb-1">
-                  <CheckCircle size={20} className="text-green-600" />
-                  <p className="font-semibold text-green-900">Entrega realizada</p>
+                  <CheckCircle size={20} className="text-[#16A34A]" />
+                  <p className="font-semibold text-[#16A34A]">Entrega realizada</p>
                 </div>
-                <p className="text-sm text-green-700">
+                <p className="text-sm text-[#35516B]">
                   {formatDate(selectedOrder.delivery.delivered_at)}
                 </p>
               </div>

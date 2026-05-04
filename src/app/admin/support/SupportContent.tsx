@@ -84,18 +84,18 @@ export function SupportContent({ requests: initialRequests }: { requests: Suppor
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 min-w-[200px]">
           <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71869B] pointer-events-none" />
-          <input
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Buscar..."
-            className="w-full h-10 pl-10 pr-4 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          />
-        </div>
-        <select
-          value={statusFilter}
-          onChange={e => setStatusFilter(e.target.value)}
-          className="h-10 px-4 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+        <input
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Buscar..."
+          className="w-full h-10 pl-10 pr-4 text-sm bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15)] text-[#081827] placeholder:text-[#71869B]"
+        />
+      </div>
+      <select
+        value={statusFilter}
+        onChange={e => setStatusFilter(e.target.value)}
+        className="h-10 px-4 text-sm bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15)] text-[#081827]"
         >
           {statusOptions.map(option => (
             <option key={option.value} value={option.value}>
@@ -123,8 +123,8 @@ export function SupportContent({ requests: initialRequests }: { requests: Suppor
               <CardContent className="p-4">
                 <div className="flex items-center gap-4 cursor-pointer" onClick={() => setSelected(req)}>
                   {/* Icon */}
-                  <div className="w-12 h-12 rounded-xl flex-shrink-0 bg-violet-100 flex items-center justify-center">
-                    <MessageSquare size={24} className="text-violet-600" />
+                  <div className="w-12 h-12 rounded-xl flex-shrink-0 bg-[rgba(109,93,246,0.08)] flex items-center justify-center">
+                    <MessageSquare size={24} className="text-[#6D5DF6]" />
                   </div>
 
                   {/* Content */}

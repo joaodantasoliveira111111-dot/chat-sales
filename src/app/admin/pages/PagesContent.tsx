@@ -22,8 +22,8 @@ const emptyForm = {
   public_subtitle: '',
   avatar_url: '',
   theme_id: 'dark_premium',
-  primary_color: '#8B5CF6',
-  secondary_color: '#06B6D4',
+  primary_color: '#0B7CFF',
+  secondary_color: '#00C2FF',
   show_header: true,
   show_support_button: false,
   show_microcopy: false,
@@ -264,8 +264,8 @@ export function PagesContent({
               <CardContent className="p-4">
                 <div className="flex items-start gap-4">
                   {/* Icon */}
-                  <div className="w-12 h-12 rounded-xl flex-shrink-0 bg-cyan-100 flex items-center justify-center">
-                    <Globe size={24} className="text-cyan-600" />
+          <div className="w-12 h-12 rounded-xl flex-shrink-0 bg-[rgba(11,124,255,0.08)] flex items-center justify-center">
+            <Globe size={24} className="text-[#0B7CFF]" />
                   </div>
 
                   {/* Content */}
@@ -296,51 +296,51 @@ export function PagesContent({
                     </div>
 
                     {/* URL Display */}
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#F3F7FB] rounded-lg">
-                      <span className="text-xs text-[#35516B] font-mono">
-                        {getPageUrl(page.slug)}
-                      </span>
-                    </div>
-                  </div>
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#F3F7FB] rounded-xl">
+          <span className="text-xs text-[#35516B] font-mono">
+            {getPageUrl(page.slug)}
+          </span>
+        </div>
+      </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-1">
-                    {page.status === 'published' && (
-                      <a
-                        href={getPageUrl(page.slug)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-2 rounded-lg text-[#71869B] hover:text-[#35516B] hover:bg-[#F3F7FB] transition-colors"
-                        title="Ver página"
-                      >
-                        <ExternalLink size={18} />
-                      </a>
-                    )}
-                    
-                    <button
-                      onClick={() => handleCopyUrl(page.slug)}
-                      className="p-2 rounded-lg text-[#71869B] hover:text-[#35516B] hover:bg-[#F3F7FB] transition-colors"
-                      title="Copiar link"
-                    >
-                      {copiedSlug === page.slug ? (
-                        <CheckCircle size={18} className="text-green-600" />
-                      ) : (
-                        <Copy size={18} />
-                      )}
-                    </button>
-                    
-                    <button
-                      onClick={() => openEdit(page)}
-                      className="p-2 rounded-lg text-[#71869B] hover:text-[#35516B] hover:bg-[#F3F7FB] transition-colors"
-                      title="Editar"
-                    >
-                      <Edit size={18} />
-                    </button>
-                    
-                    <button
-                      onClick={() => setDeletePage(page)}
-                      className="p-2 rounded-lg text-[#71869B] hover:text-red-600 hover:bg-red-50 transition-colors"
-                      title="Excluir"
+      {/* Actions */}
+      <div className="flex items-center gap-1">
+        {page.status === 'published' && (
+          <a
+            href={getPageUrl(page.slug)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-2 rounded-xl text-[#71869B] hover:text-[#35516B] hover:bg-[#F3F7FB] transition-colors"
+            title="Ver pagina"
+          >
+            <ExternalLink size={18} />
+          </a>
+        )}
+
+        <button
+          onClick={() => handleCopyUrl(page.slug)}
+          className="p-2 rounded-xl text-[#71869B] hover:text-[#35516B] hover:bg-[#F3F7FB] transition-colors"
+          title="Copiar link"
+        >
+          {copiedSlug === page.slug ? (
+            <CheckCircle size={18} className="text-[#16A34A]" />
+          ) : (
+            <Copy size={18} />
+          )}
+        </button>
+
+        <button
+          onClick={() => openEdit(page)}
+          className="p-2 rounded-xl text-[#71869B] hover:text-[#35516B] hover:bg-[#F3F7FB] transition-colors"
+          title="Editar"
+        >
+          <Edit size={18} />
+        </button>
+
+        <button
+          onClick={() => setDeletePage(page)}
+          className="p-2 rounded-xl text-[#71869B] hover:text-[#DC2626] hover:bg-[rgba(220,38,38,0.06)] transition-colors"
+          title="Excluir"
                     >
                       <Trash2 size={18} />
                     </button>
@@ -371,7 +371,7 @@ export function PagesContent({
       >
         <div className="space-y-4">
           {formError && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+            <div className="p-3 bg-[rgba(220,38,38,0.06)] border border-[rgba(220,38,38,0.15)] rounded-xl text-sm text-[#DC2626]">
               {formError}
             </div>
           )}
@@ -404,7 +404,7 @@ export function PagesContent({
               onChange={e => setForm(f => ({ ...f, public_subtitle: e.target.value }))}
               placeholder="Tagline da oferta"
               rows={2}
-              className="w-full px-3 py-2 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 text-sm bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15)] resize-none text-[#081827] placeholder:text-[#71869B]"
             />
           </div>
 
@@ -462,13 +462,13 @@ export function PagesContent({
                         type="color"
                         value={form.primary_color}
                         onChange={e => setForm(f => ({ ...f, primary_color: e.target.value }))}
-                        className="w-10 h-10 rounded-lg cursor-pointer border border-[rgba(8,24,39,0.08)]"
-                      />
-                      <input
-                        type="text"
-                        value={form.primary_color}
-                        onChange={e => setForm(f => ({ ...f, primary_color: e.target.value }))}
-                        className="flex-1 h-10 px-3 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+          className="w-10 h-10 rounded-xl cursor-pointer border border-[rgba(8,24,39,0.08)]"
+        />
+        <input
+          type="text"
+          value={form.primary_color}
+          onChange={e => setForm(f => ({ ...f, primary_color: e.target.value }))}
+          className="flex-1 h-10 px-3 text-sm bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15)] text-[#081827]"
                       />
                     </div>
                   </div>
@@ -482,13 +482,13 @@ export function PagesContent({
                         type="color"
                         value={form.secondary_color}
                         onChange={e => setForm(f => ({ ...f, secondary_color: e.target.value }))}
-                        className="w-10 h-10 rounded-lg cursor-pointer border border-[rgba(8,24,39,0.08)]"
-                      />
-                      <input
-                        type="text"
-                        value={form.secondary_color}
-                        onChange={e => setForm(f => ({ ...f, secondary_color: e.target.value }))}
-                        className="flex-1 h-10 px-3 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+          className="w-10 h-10 rounded-xl cursor-pointer border border-[rgba(8,24,39,0.08)]"
+        />
+        <input
+          type="text"
+          value={form.secondary_color}
+          onChange={e => setForm(f => ({ ...f, secondary_color: e.target.value }))}
+          className="flex-1 h-10 px-3 text-sm bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15)] text-[#081827]"
                       />
                     </div>
                   </div>

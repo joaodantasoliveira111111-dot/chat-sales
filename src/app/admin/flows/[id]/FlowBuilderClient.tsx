@@ -68,7 +68,7 @@ function toRFEdge(e: FlowEdge): Edge {
     target: e.target_node_id,
     targetHandle: normalizeTargetHandle(e.target_handle),
     type: 'smoothstep',
-    style: { stroke: 'rgba(11,124,255,0.72)', strokeWidth: 2 },
+    style: { stroke: 'rgba(11,124,255,0.4)', strokeWidth: 1.5 },
     reconnectable: true,
   }
 }
@@ -125,7 +125,7 @@ export function FlowBuilderClient({
       ...connection,
       id: uuidv4(),
       type: 'smoothstep',
-      style: { stroke: 'rgba(11,124,255,0.72)', strokeWidth: 2 },
+      style: { stroke: 'rgba(11,124,255,0.4)', strokeWidth: 1.5 },
       reconnectable: true,
     } as Edge
     setEdges(eds => addEdge(edge, eds.filter(e => (
@@ -278,52 +278,52 @@ export function FlowBuilderClient({
     <div className="flow-builder">
       {/* Toolbar */}
       <div className="flow-toolbar">
-        <div className="flex items-center gap-3">
-          <Link href="/admin/flows" className="flow-icon-button">
-            <ChevronLeft size={18} />
-          </Link>
-          <div>
-            <p className="flow-title">{flow.name}</p>
-            <div className="flex items-center gap-2">
-              <span className={`flow-status-pill ${
-                flow.status === 'published'
-                  ? 'is-published'
-                  : 'is-draft'
-              }`}>
-                {flow.status === 'published' ? 'Publicado' : 'Rascunho'}
-              </span>
-              <span className="flow-meta">{nodes.length} nós</span>
-            </div>
+<div className="flex items-center gap-3">
+        <Link href="/admin/flows" className="flow-icon-button">
+          <ChevronLeft size={18} />
+        </Link>
+        <div>
+          <p className="flow-title">{flow.name}</p>
+          <div className="flex items-center gap-2">
+            <span className={`flow-status-pill ${
+              flow.status === 'published'
+                ? 'is-published'
+                : 'is-draft'
+            }`}>
+              {flow.status === 'published' ? 'Publicado' : 'Rascunho'}
+            </span>
+            <span className="flow-meta">{nodes.length} nos</span>
           </div>
         </div>
+      </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowPalette(!showPalette)}
-          >
-            <Layers size={14} />
-            {showPalette ? 'Ocultar' : 'Tipos de Nó'}
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={saveFlow}
-            isLoading={saving}
-          >
-            <Save size={14} />
-            Salvar
-          </Button>
-          <Button
-            size="sm"
-            onClick={publishFlow}
-            isLoading={publishing}
-          >
-            <Rocket size={14} />
-            Publicar
-          </Button>
-        </div>
+      <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowPalette(!showPalette)}
+        >
+          <Layers size={14} />
+          {showPalette ? 'Ocultar' : 'Componentes'}
+        </Button>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={saveFlow}
+          isLoading={saving}
+        >
+          <Save size={14} />
+          Salvar
+        </Button>
+        <Button
+          size="sm"
+          onClick={publishFlow}
+          isLoading={publishing}
+        >
+          <Rocket size={14} />
+          Publicar
+        </Button>
+      </div>
       </div>
 
       <div className="flex flex-1 overflow-hidden">
@@ -353,12 +353,12 @@ export function FlowBuilderClient({
             edgesFocusable
             deleteKeyCode={['Backspace', 'Delete']}
             connectionMode={ConnectionMode.Loose}
-            defaultEdgeOptions={{
-              type: 'smoothstep',
-    style: { stroke: 'rgba(11,124,255,0.5)', strokeWidth: 2 },
-  }}
->
-  <Background color="rgba(8,24,39,0.06)" gap={24} />
+      defaultEdgeOptions={{
+        type: 'smoothstep',
+        style: { stroke: 'rgba(11,124,255,0.4)', strokeWidth: 1.5 },
+      }}
+    >
+      <Background color="rgba(8,24,39,0.04)" gap={24} />
   <Controls className="react-flow__controls" />
   <MiniMap
     nodeColor={() => 'rgba(11,124,255,0.5)'}
@@ -366,7 +366,7 @@ export function FlowBuilderClient({
             />
             <Panel position="bottom-center">
               <div className="flow-help-panel">
-                <span>Clique nos nos para editar - Duplo clique na linha ou Delete para cortar ligacao</span>
+                <span>Clique para editar - Duplo clique na conexao ou Delete para remover</span>
               </div>
             </Panel>
           </ReactFlow>

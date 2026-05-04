@@ -137,7 +137,7 @@ export function AnalyticsDashboardContent({ userId }: Props) {
 
       {/* Diagnostics Alerts */}
       {diagnosticsData && diagnosticsData.alerts.length > 0 && (
-    <Card variant="neu">
+    <Card variant="neu-soft">
       <CardContent className="p-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-9 h-9 rounded-xl bg-[rgba(11,124,255,0.08)] flex items-center justify-center text-[#0B7CFF]">
@@ -154,48 +154,48 @@ export function AnalyticsDashboardContent({ userId }: Props) {
         </Card>
       )}
 
-      {/* Funnel Overview */}
-      {funnelData && (
-        <div className="grid gap-6 md:grid-cols-3">
-          <Card>
-            <CardContent className="p-6">
-    <div className="flex items-center gap-3 mb-2">
-          <div className="w-9 h-9 rounded-xl bg-[rgba(11,124,255,0.08)] flex items-center justify-center text-[#0B7CFF]">
-            <Users size={16} />
+  {/* Funnel Overview */}
+  {funnelData && (
+    <div className="grid gap-6 md:grid-cols-3">
+      <Card variant="metric" accentColor="linear-gradient(90deg, #0B7CFF, #00C2FF)">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-9 h-9 rounded-xl bg-[rgba(11,124,255,0.1)] flex items-center justify-center text-[#0B7CFF]">
+              <Users size={16} />
+            </div>
+            <p className="text-xs font-semibold text-[#35516B] uppercase tracking-wider">Total de Visitas</p>
           </div>
-          <p className="text-sm text-[#71869B]">Total de Visitas</p>
-        </div>
-        <p className="text-3xl font-extrabold text-[#081827]">{funnelData.totalVisits.toLocaleString()}</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6">
-    <div className="flex items-center gap-3 mb-2">
-          <div className="w-9 h-9 rounded-xl bg-[rgba(22,163,74,0.08)] flex items-center justify-center text-[#16A34A]">
-            <TrendingUp size={16} />
+          <p className="text-[1.75rem] font-extrabold text-[#081827] tracking-tight leading-none">{funnelData.totalVisits.toLocaleString()}</p>
+        </CardContent>
+      </Card>
+      <Card variant="metric" accentColor="linear-gradient(90deg, #16A34A, #22C55E)">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-9 h-9 rounded-xl bg-[rgba(22,163,74,0.1)] flex items-center justify-center text-[#16A34A]">
+              <TrendingUp size={16} />
+            </div>
+            <p className="text-xs font-semibold text-[#35516B] uppercase tracking-wider">Taxa de Conversao</p>
           </div>
-          <p className="text-sm text-[#71869B]">Taxa de Conversao</p>
-        </div>
-        <p className="text-3xl font-extrabold text-[#081827]">
-          {funnelData.funnel.find(f => f.name === 'Purchase')?.percentage || 0}%
-        </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6">
-    <div className="flex items-center gap-3 mb-2">
-          <div className="w-9 h-9 rounded-xl bg-[rgba(124,58,237,0.08)] flex items-center justify-center text-violet-600">
-            <Activity size={16} />
+          <p className="text-[1.75rem] font-extrabold text-[#081827] tracking-tight leading-none">
+            {funnelData.funnel.find(f => f.name === 'Purchase')?.percentage || 0}%
+          </p>
+        </CardContent>
+      </Card>
+      <Card variant="metric" accentColor="linear-gradient(90deg, #6D5DF6, #8B5CF6)">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-9 h-9 rounded-xl bg-[rgba(109,93,246,0.1)] flex items-center justify-center text-[#6D5DF6]">
+              <Activity size={16} />
+            </div>
+            <p className="text-xs font-semibold text-[#35516B] uppercase tracking-wider">Total de Interacoes</p>
           </div>
-          <p className="text-sm text-[#71869B]">Total de Interacoes</p>
-        </div>
-        <p className="text-3xl font-extrabold text-[#081827]">
-          {engagementData?.totalInteractions.toLocaleString() || 0}
-        </p>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+          <p className="text-[1.75rem] font-extrabold text-[#081827] tracking-tight leading-none">
+            {engagementData?.totalInteractions.toLocaleString() || 0}
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  )}
 
       {/* Funnel Visualization */}
       {funnelData && <FunnelChart funnel={funnelData.funnel} />}
@@ -216,10 +216,10 @@ export function AnalyticsDashboardContent({ userId }: Props) {
 
 function AlertCard({ alert }: { alert: Alert }) {
   const icons = {
-    error: <XCircle className="w-5 h-5 text-red-500" />,
-    warning: <AlertTriangle className="w-5 h-5 text-yellow-500" />,
-    info: <Info className="w-5 h-5 text-blue-500" />,
-    success: <CheckCircle className="w-5 h-5 text-green-500" />,
+  error: <XCircle className="w-5 h-5 text-[#DC2626]" />,
+  warning: <AlertTriangle className="w-5 h-5 text-[#CA8A04]" />,
+  info: <Info className="w-5 h-5 text-[#0B7CFF]" />,
+  success: <CheckCircle className="w-5 h-5 text-[#16A34A]" />,
   }
 
   const bgColors = {
@@ -254,7 +254,7 @@ function FunnelChart({ funnel }: { funnel: FunnelStage[] }) {
             <div key={stage.name} className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-[rgba(11,124,255,0.08)] flex items-center justify-center text-[#0B7CFF] text-sm font-bold">
+                  <div className="w-8 h-8 rounded-xl bg-[rgba(11,124,255,0.08)] flex items-center justify-center text-[#0B7CFF] text-sm font-bold">
                     {index + 1}
                   </div>
                   <div>
@@ -385,7 +385,7 @@ function TrafficSourcesCard({ data }: { data: TrafficData }) {
                 <div className="flex items-center gap-2">
                   <div className="w-24 h-2 bg-[#EAF1F8] rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-violet-500 rounded-full"
+                      className="h-full bg-[#0B7CFF] rounded-full"
                       style={{ width: `${referrer.percentage}%` }}
                     />
                   </div>

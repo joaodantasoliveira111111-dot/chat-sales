@@ -202,13 +202,13 @@ export function ProductsContent({ products: initialProducts, userId }: ProductsC
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar produto..."
-            className="w-full h-10 pl-10 pr-4 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          />
-        </div>
-        <select
-          value={statusFilter}
-          onChange={e => setStatusFilter(e.target.value)}
-          className="h-10 px-4 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+          className="w-full h-10 pl-10 pr-4 text-sm bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15)] text-[#081827] placeholder:text-[#71869B]"
+        />
+      </div>
+      <select
+        value={statusFilter}
+        onChange={e => setStatusFilter(e.target.value)}
+        className="h-10 px-4 text-sm bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15)] text-[#081827]"
         >
           <option value="all">Todos os status</option>
           <option value="draft">Rascunho</option>
@@ -259,7 +259,7 @@ export function ProductsContent({ products: initialProducts, userId }: ProductsC
                     </div>
                     <div className="flex items-center gap-3 text-sm">
                       <span className="text-[#71869B] font-mono">/{product.slug}</span>
-                      <span className="font-semibold text-violet-600">
+                      <span className="font-semibold text-[#0B7CFF]">
                         {formatCurrency(product.price)}
                       </span>
                       {product.delivery_type && (
@@ -276,21 +276,21 @@ export function ProductsContent({ products: initialProducts, userId }: ProductsC
                       href={`/p/${product.slug}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-2 rounded-lg text-[#71869B] hover:text-[#35516B] hover:bg-[#F3F7FB] transition-colors"
-                      title="Ver página pública"
-                    >
-                      <ExternalLink size={18} />
-                    </a>
-                    <button
-                      onClick={() => openEdit(product)}
-                      className="p-2 rounded-lg text-[#71869B] hover:text-[#35516B] hover:bg-[#F3F7FB] transition-colors"
-                      title="Editar"
-                    >
-                      <Edit size={18} />
-                    </button>
-                    <button
-                      onClick={() => setDeleteProduct(product)}
-                      className="p-2 rounded-lg text-[#71869B] hover:text-red-600 hover:bg-red-50 transition-colors"
+          className="p-2 rounded-xl text-[#71869B] hover:text-[#35516B] hover:bg-[#F3F7FB] transition-colors"
+          title="Ver pagina publica"
+        >
+          <ExternalLink size={18} />
+        </a>
+        <button
+          onClick={() => openEdit(product)}
+          className="p-2 rounded-xl text-[#71869B] hover:text-[#35516B] hover:bg-[#F3F7FB] transition-colors"
+          title="Editar"
+        >
+          <Edit size={18} />
+        </button>
+        <button
+          onClick={() => setDeleteProduct(product)}
+          className="p-2 rounded-xl text-[#71869B] hover:text-[#DC2626] hover:bg-[rgba(220,38,38,0.06)] transition-colors"
                       title="Excluir"
                     >
                       <Trash2 size={18} />
@@ -322,7 +322,7 @@ export function ProductsContent({ products: initialProducts, userId }: ProductsC
       >
         <div className="space-y-4">
           {formError && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+            <div className="p-3 bg-[rgba(220,38,38,0.06)] border border-[rgba(220,38,38,0.15)] rounded-xl text-sm text-[#DC2626]">
               {formError}
             </div>
           )}
@@ -355,7 +355,7 @@ export function ProductsContent({ products: initialProducts, userId }: ProductsC
               onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
               placeholder="Descreva brevemente o produto..."
               rows={3}
-              className="w-full px-3 py-2 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 text-sm bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15)] resize-none text-[#081827] placeholder:text-[#71869B]"
             />
           </div>
 
@@ -409,7 +409,7 @@ export function ProductsContent({ products: initialProducts, userId }: ProductsC
               onChange={e => setForm(f => ({ ...f, default_instructions: e.target.value }))}
               placeholder="Instruções enviadas ao comprador após o pagamento confirmado..."
               rows={3}
-              className="w-full px-3 py-2 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 text-sm bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15)] resize-none text-[#081827] placeholder:text-[#71869B]"
             />
           </div>
 
@@ -422,7 +422,7 @@ export function ProductsContent({ products: initialProducts, userId }: ProductsC
               onChange={e => setForm(f => ({ ...f, support_text: e.target.value }))}
               placeholder="Como o comprador pode entrar em contato para suporte..."
               rows={2}
-              className="w-full px-3 py-2 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 text-sm bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15)] resize-none text-[#081827] placeholder:text-[#71869B]"
             />
           </div>
         </div>

@@ -187,7 +187,7 @@ export function DashboardContent({ metrics, checklist, recentOrders, trackingHea
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-7 h-7 rounded-lg bg-[rgba(11,124,255,0.1)] flex items-center justify-center">
+                <div className="w-7 h-7 rounded-xl bg-[rgba(11,124,255,0.1)] flex items-center justify-center">
                   <Sparkles size={14} className="text-[#0B7CFF]" />
                 </div>
                 <span className="text-xs font-bold text-[#0B7CFF] uppercase tracking-wider">
@@ -251,10 +251,10 @@ export function DashboardContent({ metrics, checklist, recentOrders, trackingHea
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="w-7 h-7 rounded-lg bg-[rgba(124,58,237,0.1)] flex items-center justify-center">
-                    <Target size={14} className="text-violet-600" />
-                  </div>
-                  <span className="text-xs font-bold text-violet-600 uppercase tracking-wider">Progresso inicial</span>
+        <div className="w-7 h-7 rounded-xl bg-[rgba(109,93,246,0.1)] flex items-center justify-center">
+          <Target size={14} className="text-[#6D5DF6]" />
+        </div>
+        <span className="text-xs font-bold text-[#6D5DF6] uppercase tracking-wider">Progresso inicial</span>
                 </div>
                 <CardTitle className="text-xl mb-1">Configure sua primeira operacao</CardTitle>
                 <p className="text-sm text-[#35516B]">Complete os passos essenciais para deixar a venda pronta.</p>
@@ -273,9 +273,9 @@ export function DashboardContent({ metrics, checklist, recentOrders, trackingHea
               {checklistItems.map((item, index) => {
                 const done = checklist[item.key as keyof Checklist]
                 return (
-                  <Link key={item.key} href={item.href} className={`relative p-4 rounded-xl border-2 transition-all duration-200 ${done ? 'bg-[rgba(22,163,74,0.04)] border-[rgba(22,163,74,0.2)]' : 'bg-white border-[rgba(8,24,39,0.08)] hover:border-violet-300 hover:shadow-md'}`}>
+                  <Link key={item.key} href={item.href} className={`relative p-4 rounded-xl border-2 transition-all duration-200 ${done ? 'bg-[rgba(22,163,74,0.04)] border-[rgba(22,163,74,0.2)]' : 'bg-white border-[rgba(8,24,39,0.08)] hover:border-[rgba(109,93,246,0.3)] hover:shadow-md'}`}>
                     <div className="flex items-start justify-between mb-3">
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${done ? 'bg-[rgba(22,163,74,0.1)] text-[#16A34A]' : 'bg-[#F3F7FB] text-[#35516B]'}`}>
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${done ? 'bg-[rgba(22,163,74,0.1)] text-[#16A34A]' : 'bg-[#F3F7FB] text-[#35516B]'}`}>
                         {done ? <CheckCircle size={18} /> : <span className="text-sm font-bold">{index + 1}</span>}
                       </div>
                       <item.icon size={18} className={done ? 'text-[#16A34A]' : 'text-[#71869B]'} />
@@ -292,22 +292,22 @@ export function DashboardContent({ metrics, checklist, recentOrders, trackingHea
 
       {/* Key Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <MetricCard icon={DollarSign} iconBg="bg-[rgba(11,124,255,0.08)]" iconColor="text-[#0B7CFF]" title="Faturamento" value={formatCurrency(metrics.totalRevenue)} subtitle="Receita aprovada" />
-        <MetricCard icon={CheckCircle} iconBg="bg-[rgba(22,163,74,0.08)]" iconColor="text-[#16A34A]" title="Pedidos pagos" value={String(metrics.paidOrders)} subtitle={`${metrics.totalOrders} total`} />
-        <MetricCard icon={Truck} iconBg="bg-[rgba(0,194,255,0.08)]" iconColor="text-[#00C2FF]" title="Entregas" value={String(metrics.deliveries)} subtitle="Liberadas para clientes" />
-        <MetricCard icon={CreditCard} iconBg="bg-[rgba(124,58,237,0.08)]" iconColor="text-violet-600" title="Ticket medio" value={formatCurrency(metrics.avgTicket)} subtitle="Valor medio por pedido" />
+        <MetricCard icon={DollarSign} accent="linear-gradient(90deg, #0B7CFF, #00C2FF)" iconBg="bg-[rgba(11,124,255,0.1)]" iconColor="text-[#0B7CFF]" title="Faturamento" value={formatCurrency(metrics.totalRevenue)} subtitle="Receita aprovada" />
+        <MetricCard icon={CheckCircle} accent="linear-gradient(90deg, #16A34A, #22C55E)" iconBg="bg-[rgba(22,163,74,0.1)]" iconColor="text-[#16A34A]" title="Pedidos pagos" value={String(metrics.paidOrders)} subtitle={`${metrics.totalOrders} total`} />
+        <MetricCard icon={Truck} accent="linear-gradient(90deg, #00C2FF, #06B6D4)" iconBg="bg-[rgba(0,194,255,0.1)]" iconColor="text-[#00C2FF]" title="Entregas" value={String(metrics.deliveries)} subtitle="Liberadas para clientes" />
+        <MetricCard icon={CreditCard} accent="linear-gradient(90deg, #6D5DF6, #8B5CF6)" iconBg="bg-[rgba(109,93,246,0.1)]" iconColor="text-[#6D5DF6]" title="Ticket medio" value={formatCurrency(metrics.avgTicket)} subtitle="Valor medio por pedido" />
       </div>
 
       {/* Funnel + Tracking Health Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Funnel */}
-        <Card variant="neu" className="lg:col-span-2">
+        <Card variant="neu-soft" className="lg:col-span-2">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <BarChart3 size={14} className="text-[#35516B]" />
-                  <span className="text-xs font-bold text-[#4A6178] uppercase tracking-wider">Funil</span>
+                  <BarChart3 size={14} className="text-[#71869B]" />
+                  <span className="text-[10px] font-bold text-[#71869B] uppercase tracking-widest">Funil</span>
                 </div>
                 <CardTitle className="text-base">Pedidos &gt; Pagos &gt; Entregues</CardTitle>
               </div>
@@ -325,7 +325,7 @@ export function DashboardContent({ metrics, checklist, recentOrders, trackingHea
                   <div key={stage.label}>
                     <div className="flex items-center justify-between mb-1.5">
                       <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: `${stage.color}14`, color: stage.color }}>
+                        <div className="w-7 h-7 rounded-xl flex items-center justify-center" style={{ background: `${stage.color}14`, color: stage.color }}>
                           <Icon size={14} />
                         </div>
                         <span className="text-sm font-semibold text-[#081827]">{stage.label}</span>
@@ -354,11 +354,11 @@ export function DashboardContent({ metrics, checklist, recentOrders, trackingHea
         </Card>
 
         {/* Tracking Health */}
-        <Card variant="neu">
+        <Card variant="neu-soft">
           <CardHeader>
             <div className="flex items-center gap-2 mb-1">
-              <Shield size={14} className="text-[#35516B]" />
-              <span className="text-xs font-bold text-[#4A6178] uppercase tracking-wider">Tracking</span>
+              <Shield size={14} className="text-[#71869B]" />
+              <span className="text-[10px] font-bold text-[#71869B] uppercase tracking-widest">Tracking</span>
             </div>
             <CardTitle className="text-base">Meta Pixel</CardTitle>
           </CardHeader>
@@ -388,13 +388,13 @@ export function DashboardContent({ metrics, checklist, recentOrders, trackingHea
       {/* Recent Orders + Secondary Metrics Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Recent Orders */}
-        <Card variant="neu" className="lg:col-span-2">
+        <Card variant="neu-soft" className="lg:col-span-2">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <ShoppingCart size={14} className="text-[#35516B]" />
-                  <span className="text-xs font-bold text-[#4A6178] uppercase tracking-wider">Pedidos recentes</span>
+                  <ShoppingCart size={14} className="text-[#71869B]" />
+                  <span className="text-[10px] font-bold text-[#71869B] uppercase tracking-widest">Pedidos recentes</span>
                 </div>
                 <CardTitle className="text-base">Ultimas atividades</CardTitle>
               </div>
@@ -413,8 +413,8 @@ export function DashboardContent({ metrics, checklist, recentOrders, trackingHea
               <div className="space-y-2">
                 {recentOrders.map(order => (
                   <div key={order.id} className="flex items-center gap-3 p-3 rounded-xl bg-[#F8FBFF] border border-[rgba(8,24,39,0.04)]">
-                    <div className="w-9 h-9 rounded-lg bg-[rgba(249,115,22,0.08)] flex items-center justify-center flex-shrink-0">
-                      <ShoppingCart size={16} className="text-orange-500" />
+                    <div className="w-9 h-9 rounded-xl bg-[rgba(249,115,22,0.08)] flex items-center justify-center flex-shrink-0">
+                      <ShoppingCart size={16} className="text-[#F97316]" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
@@ -437,11 +437,11 @@ export function DashboardContent({ metrics, checklist, recentOrders, trackingHea
         </Card>
 
         {/* Secondary Metrics */}
-        <Card variant="neu">
+        <Card variant="neu-soft">
           <CardHeader>
             <div className="flex items-center gap-2 mb-1">
-              <Activity size={14} className="text-[#35516B]" />
-              <span className="text-xs font-bold text-[#4A6178] uppercase tracking-wider">Status</span>
+              <Activity size={14} className="text-[#71869B]" />
+              <span className="text-[10px] font-bold text-[#71869B] uppercase tracking-widest">Status</span>
             </div>
             <CardTitle className="text-base">Operacional</CardTitle>
           </CardHeader>
@@ -452,20 +452,20 @@ export function DashboardContent({ metrics, checklist, recentOrders, trackingHea
               <SecondaryMetric icon={Package} iconBg="bg-[rgba(11,124,255,0.08)]" iconColor="text-[#0B7CFF]" label="Produtos ativos" value={metrics.activeProducts} />
               <SecondaryMetric icon={Globe} iconBg="bg-[rgba(0,194,255,0.08)]" iconColor="text-[#00C2FF]" label="Paginas publicadas" value={metrics.publishedPages} />
               <SecondaryMetric icon={Archive} iconBg="bg-[rgba(22,163,74,0.08)]" iconColor="text-[#16A34A]" label="Estoque disponivel" value={metrics.availableStock} />
-              <SecondaryMetric icon={HeadphonesIcon} iconBg="bg-[rgba(124,58,237,0.08)]" iconColor="text-violet-600" label="Suportes abertos" value={metrics.openSupport} />
+              <SecondaryMetric icon={HeadphonesIcon} iconBg="bg-[rgba(109,93,246,0.08)]" iconColor="text-[#6D5DF6]" label="Suportes abertos" value={metrics.openSupport} />
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Quick Actions */}
-      <Card variant="neu">
+      <Card variant="neu-soft">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <Zap size={14} className="text-[#35516B]" />
-                <span className="text-xs font-bold text-[#4A6178] uppercase tracking-wider">Acoes rapidas</span>
+                <Zap size={14} className="text-[#71869B]" />
+                <span className="text-[10px] font-bold text-[#71869B] uppercase tracking-widest">Acoes rapidas</span>
               </div>
               <CardTitle className="text-base">Atalhos da operacao</CardTitle>
             </div>
@@ -474,7 +474,7 @@ export function DashboardContent({ metrics, checklist, recentOrders, trackingHea
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {[
-              { href: '/admin/products', icon: Package, label: 'Novo produto', desc: 'Cadastrar uma nova oferta digital', color: 'bg-[rgba(124,58,237,0.08)] text-violet-600' },
+              { href: '/admin/products', icon: Package, label: 'Novo produto', desc: 'Cadastrar uma nova oferta digital', color: 'bg-[rgba(109,93,246,0.08)] text-[#6D5DF6]' },
               { href: '/admin/pages', icon: Globe, label: 'Nova pagina', desc: 'Criar uma pagina publica de venda', color: 'bg-[rgba(0,194,255,0.08)] text-[#00C2FF]' },
               { href: '/admin/flows', icon: Zap, label: 'Novo fluxo', desc: 'Desenhar atendimento conversacional', color: 'bg-[rgba(11,124,255,0.08)] text-[#0B7CFF]' },
               { href: '/admin/inventory', icon: Archive, label: 'Adicionar estoque', desc: 'Subir codigos, links ou arquivos', color: 'bg-[rgba(22,163,74,0.08)] text-[#16A34A]' },
@@ -499,17 +499,17 @@ export function DashboardContent({ metrics, checklist, recentOrders, trackingHea
   )
 }
 
-function MetricCard({ icon: Icon, iconBg, iconColor, title, value, subtitle }: { icon: React.ElementType; iconBg: string; iconColor: string; title: string; value: string; subtitle: string }) {
+function MetricCard({ icon: Icon, accent, iconBg, iconColor, title, value, subtitle }: { icon: React.ElementType; accent?: string; iconBg: string; iconColor: string; title: string; value: string; subtitle: string }) {
   return (
-    <Card variant="neu" hoverable>
+    <Card variant="metric" accentColor={accent} hoverable>
       <CardContent className="p-5">
-        <div className="flex items-center gap-3 mb-3">
+        <div className="flex items-center gap-3 mb-4">
           <div className={`w-10 h-10 rounded-xl ${iconBg} ${iconColor} flex items-center justify-center`}>
             <Icon size={20} />
           </div>
+          <span className="text-xs font-semibold text-[#35516B] uppercase tracking-wider">{title}</span>
         </div>
-        <div className="text-xl font-extrabold text-[#081827] tracking-tight mb-0.5">{value}</div>
-        <div className="text-xs font-semibold text-[#35516B] mb-0.5">{title}</div>
+        <div className="text-[1.75rem] font-extrabold text-[#081827] tracking-tight leading-none mb-1.5">{value}</div>
         <div className="text-xs text-[#71869B]">{subtitle}</div>
       </CardContent>
     </Card>
@@ -519,7 +519,7 @@ function MetricCard({ icon: Icon, iconBg, iconColor, title, value, subtitle }: {
 function SecondaryMetric({ icon: Icon, iconBg, iconColor, label, value }: { icon: React.ElementType; iconBg: string; iconColor: string; label: string; value: number }) {
   return (
     <div className="flex items-center gap-3">
-      <div className={`w-8 h-8 rounded-lg ${iconBg} ${iconColor} flex items-center justify-center flex-shrink-0`}>
+      <div className={`w-8 h-8 rounded-xl ${iconBg} ${iconColor} flex items-center justify-center flex-shrink-0`}>
         <Icon size={14} />
       </div>
       <span className="text-sm text-[#35516B] flex-1">{label}</span>
@@ -531,7 +531,7 @@ function SecondaryMetric({ icon: Icon, iconBg, iconColor, label, value }: { icon
 function TrackingItem({ icon, label, connected }: { icon: React.ReactNode; label: string; connected: boolean }) {
   return (
     <div className="flex items-center gap-2.5">
-      <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${connected ? 'bg-[rgba(22,163,74,0.08)] text-[#16A34A]' : 'bg-[#EAF1F8] text-[#71869B]'}`}>
+      <div className={`w-7 h-7 rounded-xl flex items-center justify-center ${connected ? 'bg-[rgba(22,163,74,0.08)] text-[#16A34A]' : 'bg-[#EAF1F8] text-[#71869B]'}`}>
         {icon}
       </div>
       <span className="text-sm text-[#35516B] flex-1">{label}</span>

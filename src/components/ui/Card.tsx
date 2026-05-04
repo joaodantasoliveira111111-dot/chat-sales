@@ -4,13 +4,14 @@ import { cn } from '@/lib/utils'
 import { forwardRef, HTMLAttributes } from 'react'
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'elevated' | 'outlined' | 'neu' | 'neu-soft' | 'flat'
+  variant?: 'default' | 'elevated' | 'outlined' | 'neu' | 'neu-soft' | 'flat' | 'metric'
+  accentColor?: string
   hoverable?: boolean
   hover?: boolean
 }
 
 export const Card = forwardRef<HTMLDivElement, CardProps>(
-  ({ className, variant = 'neu', hoverable = false, children, ...props }, ref) => {
+  ({ className, variant = 'neu', accentColor, hoverable = false, children, ...props }, ref) => {
     const variantStyles = {
       default: 'bg-white border border-[rgba(8,24,39,0.08)] shadow-[var(--shadow-neu-raised-subtle)]',
       elevated: 'bg-white border border-[rgba(8,24,39,0.08)] shadow-[var(--shadow-elevated)]',
@@ -18,6 +19,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
       neu: 'bg-white border border-[rgba(8,24,39,0.08)] shadow-[10px_10px_24px_rgba(8,24,39,0.06),-8px_-8px_20px_rgba(255,255,255,0.8)]',
       'neu-soft': 'bg-[#F8FBFF] border border-[rgba(8,24,39,0.06)] shadow-[6px_6px_16px_rgba(8,24,39,0.04),-4px_-4px_12px_rgba(255,255,255,0.7)]',
       flat: 'bg-white border border-[rgba(8,24,39,0.08)] shadow-[0_1px_3px_rgba(8,24,39,0.04),0_1px_2px_rgba(8,24,39,0.02)]',
+      metric: 'bg-white border border-[rgba(8,24,39,0.06)] shadow-[10px_10px_24px_rgba(8,24,39,0.06),-8px_-8px_20px_rgba(255,255,255,0.8)]',
     }
 
     return (
@@ -26,11 +28,18 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
         className={cn(
           'rounded-[22px] overflow-hidden',
           variantStyles[variant],
+          variant === 'metric' && 'relative',
           hoverable && 'transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:shadow-[14px_14px_32px_rgba(8,24,39,0.08),-10px_-10px_24px_rgba(255,255,255,0.9)] hover:-translate-y-0.5',
           className
         )}
         {...props}
       >
+        {variant === 'metric' && (
+          <div
+            className="h-1 rounded-t-[22px]"
+            style={{ background: accentColor || 'linear-gradient(90deg, #0B7CFF, #00C2FF)' }}
+          />
+        )}
         {children}
       </div>
     )

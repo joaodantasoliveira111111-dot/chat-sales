@@ -244,13 +244,13 @@ export function InventoryContent({
   const getDeliveryIcon = (type: string) => {
     switch (type) {
       case 'digital_credential':
-        return <Mail size={20} className="text-blue-600" />
+        return <Mail size={20} className="text-[#0B7CFF]" />
       case 'license_key':
-        return <Key size={20} className="text-purple-600" />
+        return <Key size={20} className="text-[#6D5DF6]" />
       case 'link':
-        return <LinkIcon size={20} className="text-cyan-600" />
+        return <LinkIcon size={20} className="text-[#00C2FF]" />
       case 'file':
-        return <FileText size={20} className="text-orange-600" />
+        return <FileText size={20} className="text-[#F97316]" />
       default:
         return <Archive size={20} className="text-[#35516B]" />
     }
@@ -286,29 +286,29 @@ export function InventoryContent({
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 min-w-[200px]">
           <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71869B] pointer-events-none" />
-          <input
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Buscar..."
-            className="w-full h-10 pl-10 pr-4 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          />
-        </div>
-        <select
-          value={statusFilter}
-          onChange={e => setStatusFilter(e.target.value)}
-          className="h-10 px-4 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
-        >
-          {statusOptions.map(option => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        <select
-          value={productFilter}
-          onChange={e => setProductFilter(e.target.value)}
-          className="h-10 px-4 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+        <input
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Buscar..."
+          className="w-full h-10 pl-10 pr-4 text-sm bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15)] text-[#081827] placeholder:text-[#71869B]"
+        />
+      </div>
+      <select
+        value={statusFilter}
+        onChange={e => setStatusFilter(e.target.value)}
+        className="h-10 px-4 text-sm bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15)] text-[#081827]"
+      >
+        {statusOptions.map(option => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+      <select
+        value={productFilter}
+        onChange={e => setProductFilter(e.target.value)}
+        className="h-10 px-4 text-sm bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15)] text-[#081827]"
         >
           {productFilterOptions.map(option => (
             <option key={option.value} value={option.value}>
@@ -387,14 +387,14 @@ export function InventoryContent({
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => openEdit(item)}
-                        className="p-2 rounded-lg text-[#71869B] hover:text-[#35516B] hover:bg-[#F3F7FB] transition-colors"
-                        title="Editar"
-                      >
-                        <Edit size={18} />
-                      </button>
-                      <button
-                        onClick={() => setDeleteItem(item)}
-                        className="p-2 rounded-lg text-[#71869B] hover:text-red-600 hover:bg-red-50 transition-colors"
+          className="p-2 rounded-xl text-[#71869B] hover:text-[#35516B] hover:bg-[#F3F7FB] transition-colors"
+          title="Editar"
+        >
+          <Edit size={18} />
+        </button>
+        <button
+          onClick={() => setDeleteItem(item)}
+          className="p-2 rounded-xl text-[#71869B] hover:text-[#DC2626] hover:bg-[rgba(220,38,38,0.06)] transition-colors"
                         title="Remover"
                       >
                         <Trash2 size={18} />
@@ -500,20 +500,20 @@ export function InventoryContent({
               onChange={e => setForm(f => ({ ...f, custom_content: e.target.value }))}
               placeholder="Conteúdo a entregar..."
               rows={3}
-              className="w-full px-3 py-2 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
-            />
-          </div>
+          className="w-full px-3 py-2 text-sm bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15)] resize-none text-[#081827] placeholder:text-[#71869B]"
+        />
+      </div>
 
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-[#4A6178]">
-              Instruções extras
-            </label>
-            <textarea
-              value={form.extra_instructions}
-              onChange={e => setForm(f => ({ ...f, extra_instructions: e.target.value }))}
-              placeholder="Como usar o produto..."
-              rows={2}
-              className="w-full px-3 py-2 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-[#4A6178]">
+          Instrucoes extras
+        </label>
+        <textarea
+          value={form.extra_instructions}
+          onChange={e => setForm(f => ({ ...f, extra_instructions: e.target.value }))}
+          placeholder="Como usar o produto..."
+          rows={2}
+          className="w-full px-3 py-2 text-sm bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15)] resize-none text-[#081827] placeholder:text-[#71869B]"
             />
           </div>
         </div>

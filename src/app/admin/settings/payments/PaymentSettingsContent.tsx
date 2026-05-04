@@ -58,9 +58,9 @@ const GATEWAYS: GatewayConfig[] = [
 
 function GatewayIcon({ icon }: { icon: 'flask' | 'credit-card' | 'landmark' }) {
   const config = {
-    flask: { Icon: FlaskConical, bg: 'bg-orange-50', color: 'text-orange-600' },
+    flask: { Icon: FlaskConical, bg: 'bg-[rgba(249,115,22,0.08)]', color: 'text-[#F97316]' },
     'credit-card': { Icon: CreditCard, bg: 'bg-[rgba(11,124,255,0.08)]', color: 'text-[#0B7CFF]' },
-    landmark: { Icon: Landmark, bg: 'bg-violet-50', color: 'text-violet-600' },
+    landmark: { Icon: Landmark, bg: 'bg-[rgba(109,93,246,0.08)]', color: 'text-[#6D5DF6]' },
   }[icon]
   return (
     <div className={`w-10 h-10 rounded-xl ${config.bg} flex items-center justify-center ${config.color} flex-shrink-0`}>
@@ -168,7 +168,7 @@ export function PaymentSettingsContent({
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="h-10 bg-[#EAF1F8] rounded-lg animate-pulse" />
+        <div className="h-10 bg-[#EAF1F8] rounded-xl animate-pulse" />
         <div className="h-48 bg-[#EAF1F8] rounded-xl animate-pulse" />
         <div className="h-40 bg-[#EAF1F8] rounded-xl animate-pulse" />
       </div>
@@ -191,8 +191,8 @@ export function PaymentSettingsContent({
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center">
-              <CreditCard size={20} className="text-violet-600" />
+        <div className="w-10 h-10 rounded-xl bg-[rgba(11,124,255,0.08)] flex items-center justify-center">
+          <CreditCard size={20} className="text-[#0B7CFF]" />
             </div>
             <div>
               <p className="text-base font-semibold text-[#081827]">Gateway Ativo</p>
@@ -210,7 +210,7 @@ export function PaymentSettingsContent({
                 className={`
                   w-full flex items-center gap-4 p-4 rounded-xl border-2 text-left transition-all
                   ${activeGateway === g.id
-                    ? 'border-violet-500 bg-violet-50'
+                    ? 'border-[#0B7CFF] bg-[rgba(11,124,255,0.04)]'
                     : 'border-[rgba(8,24,39,0.08)] hover:border-[rgba(8,24,39,0.08)] bg-white'
                   }
                 `}
@@ -221,19 +221,19 @@ export function PaymentSettingsContent({
                   <p className="text-xs text-[#35516B]">{g.desc}</p>
                 </div>
                 {activeGateway === g.id && (
-                  <CheckCircle size={20} className="text-green-600 flex-shrink-0" />
+                  <CheckCircle size={20} className="text-[#16A34A] flex-shrink-0" />
                 )}
               </button>
             ))}
           </div>
 
           {activeGateway === 'mock' && (
-            <div className="mt-4 p-4 bg-yellow-50 rounded-xl border border-yellow-200">
-              <div className="flex items-center gap-2 mb-1">
-                <AlertCircle size={16} className="text-yellow-600" />
-                <p className="text-sm font-semibold text-yellow-900">Modo de desenvolvimento ativo</p>
-              </div>
-              <p className="text-xs text-yellow-800">
+        <div className="mt-4 p-4 bg-[rgba(234,179,8,0.06)] rounded-xl border border-[rgba(234,179,8,0.15)]">
+          <div className="flex items-center gap-2 mb-1">
+            <AlertCircle size={16} className="text-[#CA8A04]" />
+            <p className="text-sm font-semibold text-[#854D0E]">Modo de desenvolvimento ativo</p>
+          </div>
+          <p className="text-xs text-[#92400E]">
                 Em modo Mock, os QR codes Pix são falsos e os pagamentos não são reais. Ideal para testar o fluxo sem cobrar clientes.
               </p>
             </div>
@@ -246,8 +246,8 @@ export function PaymentSettingsContent({
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
-                <Shield size={20} className="text-green-600" />
+        <div className="w-10 h-10 rounded-xl bg-[rgba(22,163,74,0.08)] flex items-center justify-center">
+          <Shield size={20} className="text-[#16A34A]" />
               </div>
               <div>
                 <p className="text-base font-semibold text-[#081827]">
@@ -271,7 +271,7 @@ export function PaymentSettingsContent({
                       value={credentials[activeGateway]?.[field.key] || ''}
                       onChange={e => handleCredentialChange(activeGateway, field.key, e.target.value)}
                       placeholder={field.placeholder}
-                      className="w-full h-10 px-3 pr-10 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full h-10 px-3 pr-10 text-sm bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15)] text-[#081827]"
                     />
                     {field.type === 'password' && (
                       <button
@@ -293,8 +293,8 @@ export function PaymentSettingsContent({
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-cyan-100 flex items-center justify-center">
-              <Globe size={20} className="text-cyan-600" />
+        <div className="w-10 h-10 rounded-xl bg-[rgba(0,194,255,0.08)] flex items-center justify-center">
+          <Globe size={20} className="text-[#00C2FF]" />
             </div>
             <div>
               <p className="text-base font-semibold text-[#081827]">URL do Webhook</p>
@@ -302,14 +302,14 @@ export function PaymentSettingsContent({
             </div>
           </div>
           <div className="flex gap-3 items-center">
-            <code className="flex-1 text-xs text-[#4A6178] bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-lg p-3 break-all">
+            <code className="flex-1 text-xs text-[#4A6178] bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl p-3 break-all">
               {webhookUrl}
             </code>
             <Button
               variant="secondary"
               size="sm"
               onClick={handleCopyWebhook}
-              leftIcon={copiedWebhook ? <CheckCircle size={16} className="text-green-600" /> : <Copy size={16} />}
+              leftIcon={copiedWebhook ? <CheckCircle size={16} className="text-[#16A34A]" /> : <Copy size={16} />}
             >
               {copiedWebhook ? 'Copiado!' : 'Copiar'}
             </Button>
@@ -321,8 +321,8 @@ export function PaymentSettingsContent({
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center">
-              <Zap size={20} className="text-violet-600" />
+        <div className="w-10 h-10 rounded-xl bg-[rgba(109,93,246,0.08)] flex items-center justify-center">
+          <Zap size={20} className="text-[#6D5DF6]" />
             </div>
             <p className="text-base font-semibold text-[#081827]">Como funciona</p>
           </div>
@@ -335,7 +335,7 @@ export function PaymentSettingsContent({
               'Sistema processa, confirma o pedido e entrega o produto',
             ].map((step, i) => (
               <li key={i} className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-violet-100 text-violet-600 text-xs font-bold flex items-center justify-center">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[rgba(109,93,246,0.08)] text-[#6D5DF6] text-xs font-bold flex items-center justify-center">
                   {i + 1}
                 </span>
                 <p className="text-sm text-[#35516B] pt-0.5">{step}</p>
