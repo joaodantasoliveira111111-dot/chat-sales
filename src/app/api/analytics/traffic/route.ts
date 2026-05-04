@@ -10,16 +10,38 @@ export async function GET(request: NextRequest) {
 
     const admin = createAdminClient()
     const url = new URL(request.url)
-    const days = parseInt(url.searchParams.get('days') || '30')
-    const startDate = new Date()
-    startDate.setDate(startDate.getDate() - days)
+    const period = url.searchParams.get('days') || '30'
+    let startDate: Date
+    let endDate: Date | undefined
+
+    if (period === 'hoje') {
+      startDate = new Date()
+      startDate.setHours(0, 0, 0, 0)
+    } else if (period === 'ontem') {
+      startDate = new Date()
+      startDate.setDate(startDate.getDate() - 1)
+      startDate.setHours(0, 0, 0, 0)
+      endDate = new Date()
+      endDate.setDate(endDate.getDate() - 1)
+      endDate.setHours(23, 59, 59, 999)
+    } else {
+      const days = parseInt(period)
+      startDate = new Date()
+      startDate.setDate(startDate.getDate() - days)
+    }
 
     // Get tracking sessions with traffic data
-    const { data: sessions } = await admin
+    let query = admin
       .from('tracking_sessions')
       .select('*')
       .eq('tenant_id', user.id)
       .gte('created_at', startDate.toISOString())
+
+    if (endDate) {
+      query = query.lte('created_at', endDate.toISOString())
+    }
+
+    const { data: sessions } = await query
 
     if (!sessions) {
       return NextResponse.json({

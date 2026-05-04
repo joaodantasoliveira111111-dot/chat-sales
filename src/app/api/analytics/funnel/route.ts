@@ -10,17 +10,39 @@ export async function GET(request: NextRequest) {
 
     const admin = createAdminClient()
     const url = new URL(request.url)
-    const days = parseInt(url.searchParams.get('days') || '30')
-    const startDate = new Date()
-    startDate.setDate(startDate.getDate() - days)
+    const period = url.searchParams.get('days') || '30'
+    let startDate: Date
+    let endDate: Date | undefined
+
+    if (period === 'hoje') {
+      startDate = new Date()
+      startDate.setHours(0, 0, 0, 0)
+    } else if (period === 'ontem') {
+      startDate = new Date()
+      startDate.setDate(startDate.getDate() - 1)
+      startDate.setHours(0, 0, 0, 0)
+      endDate = new Date()
+      endDate.setDate(endDate.getDate() - 1)
+      endDate.setHours(23, 59, 59, 999)
+    } else {
+      const days = parseInt(period)
+      startDate = new Date()
+      startDate.setDate(startDate.getDate() - days)
+    }
 
     // Get all events for the user
-    const { data: events } = await admin
+    let query = admin
       .from('tracking_events')
       .select('*')
       .eq('tenant_id', user.id)
       .gte('created_at', startDate.toISOString())
       .order('created_at', { ascending: true })
+
+    if (endDate) {
+      query = query.lte('created_at', endDate.toISOString())
+    }
+
+    const { data: events } = await query
 
     if (!events) {
       return NextResponse.json({
@@ -85,7 +107,7 @@ export async function GET(request: NextRequest) {
       funnel,
       conversionRates,
       totalVisits,
-      period: { days, startDate: startDate.toISOString() },
+      period: { days: period, startDate: startDate.toISOString(), endDate: endDate?.toISOString() },
     })
   } catch (error) {
     console.error('[analytics/funnel] error:', error)

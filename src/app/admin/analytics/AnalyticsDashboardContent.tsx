@@ -65,7 +65,7 @@ interface Props {
 }
 
 export function AnalyticsDashboardContent({ userId }: Props) {
-  const [days, setDays] = useState(30)
+  const [days, setDays] = useState<string | number>(30)
   const [loading, setLoading] = useState(true)
   const [funnelData, setFunnelData] = useState<FunnelData | null>(null)
   const [engagementData, setEngagementData] = useState<EngagementData | null>(null)
@@ -123,13 +123,13 @@ export function AnalyticsDashboardContent({ userId }: Props) {
           </p>
         </div>
         <div className="flex gap-2">
-          {[7, 30, 90].map(d => (
+          {['hoje', 'ontem', 7, 30, 90].map(d => (
             <Button
               key={d}
               variant={days === d ? 'primary' : 'secondary'}
               onClick={() => setDays(d)}
             >
-              {d} dias
+              {typeof d === 'number' ? `${d} dias` : d}
             </Button>
           ))}
         </div>
