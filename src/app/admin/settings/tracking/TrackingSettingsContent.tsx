@@ -7,9 +7,35 @@ import { Input } from '@/components/ui/Input'
 import { useToast } from '@/components/ui/Toast'
 import { Activity, CheckCircle, Send, Shield, Zap } from 'lucide-react'
 
+interface TrackingSettings {
+  is_enabled: boolean
+  pixel_id: string
+  access_token: string
+  dataset_id: string
+  test_event_code: string
+  verified_domain: string
+  business_name: string
+  browser_tracking_enabled: boolean
+  server_tracking_enabled: boolean
+  advanced_matching_enabled: boolean
+  deduplication_enabled: boolean
+  access_token_encrypted?: boolean
+}
+
+interface TrackingEvent {
+  id: string
+  meta_event_name?: string
+  event_name: string
+  source: string
+  status: string
+  event_id: string
+  order_id: string | null
+  created_at: string
+}
+
 interface Props {
-  initialSettings: any
-  events: any[]
+  initialSettings: Partial<TrackingSettings> | null
+  events: TrackingEvent[]
 }
 
 export function TrackingSettingsContent({ initialSettings, events }: Props) {
