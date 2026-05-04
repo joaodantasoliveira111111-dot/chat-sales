@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { PublicChatPage } from '@/components/chat/PublicChatPage'
+import './whatsapp.css'
+import './instagram.css'
 
 interface PageProps {
   params: Promise<{ slug: string }>

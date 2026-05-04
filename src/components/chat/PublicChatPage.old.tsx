@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef, useCallback } from 'react'
-import { PublicPage, FlowNode, FlowEdge, ChatMessage, FlowSessionState, FlowButton, DeliveryPayload, ThemeConfig } from '@/types'
+import { PublicPage, FlowNode, FlowEdge, ChatMessage, FlowSessionState, ThemeConfig, FlowButton, DeliveryPayload } from '@/types'
 import {
   getStartNode,
   getNextNode,
@@ -13,66 +13,18 @@ import {
 } from '@/lib/flow/flowRunner'
 import { sleep, renderTemplateVariables } from '@/lib/utils'
 import { TypingIndicator } from './TypingIndicator'
+import { MessageBubble } from './MessageBubble'
+import { MediaMessageBubble } from './MediaMessageBubble'
+import { QuickReplyButtons } from './QuickReplyButtons'
 import { ConversationalFormFlow } from './ConversationalFormFlow'
-import { DeliveryCard } from './DeliveryCard'
+import { ChatLayout } from './ChatLayout'
+import { ChatHeader } from './ChatHeader'
+import { ChatInputBar } from './ChatInputBar'
 import { PixPaymentCard } from './PixPaymentCard'
+import { DeliveryCard } from './DeliveryCard'
 import { getMetaBrowserContext, loadMetaPixel, trackMetaBrowserEvent, BrowserMetaSettings } from '@/lib/meta/browser'
 import { generateMetaEventId, toMetaEventName } from '@/lib/meta/events'
 import { v4 as uuidv4 } from 'uuid'
-
-// Theme imports
-import {
-  WhatsAppHeader,
-  WhatsAppMessageBubble,
-  WhatsAppQuickReplies,
-  WhatsAppInputBar,
-  WhatsAppMediaMessage,
-  WhatsAppLayout,
-  WhatsAppTypingIndicator,
-  whatsappTheme,
-} from './themes/whatsapp'
-
-import {
-  InstagramHeader,
-  InstagramMessageBubble,
-  InstagramQuickReplies,
-  InstagramInputBar,
-  InstagramMediaMessage,
-  InstagramLayout,
-  InstagramTypingIndicator,
-  instagramTheme,
-} from './themes/instagram'
-
-// Convert new theme structure to old ThemeConfig
-function convertThemeToConfig(theme: typeof whatsappTheme | typeof instagramTheme): ThemeConfig {
-  return {
-    background: theme.colors.background,
-    backgroundPattern: theme.colors.backgroundPattern,
-    chatContainer: 'transparent',
-    chatContainerBorder: 'transparent',
-    assistantBubble: theme.colors.assistantBubble,
-    assistantBubbleBorder: theme.colors.assistantBubbleBorder,
-    assistantText: theme.colors.assistantText,
-    userBubble: theme.colors.userBubble,
-    userText: theme.colors.userText,
-    button: theme.colors.button,
-    buttonText: theme.colors.buttonText,
-    buttonHover: theme.colors.buttonHover,
-    headerBg: theme.colors.headerBg,
-    headerText: theme.colors.headerText,
-    inputBg: theme.colors.inputBg,
-    inputBorder: theme.colors.inputBorder,
-    inputText: theme.colors.inputText,
-    scrollbar: theme.colors.scrollbar,
-    typingDot: theme.colors.typingDot,
-    borderRadius: theme.radius.bubble,
-    bubbleRadius: theme.radius.bubble,
-    shadow: 'none',
-    fontFamily: theme.typography.fontFamily,
-    backdropFilter: 'none',
-    timestamp: theme.colors.timestamp,
-  }
-}
 
 const textNodeTypes = ['text_message', 'message']
 const buttonNodeTypes = ['button_message', 'quick_reply']
@@ -185,10 +137,8 @@ interface PublicChatPageProps {
 }
 
 export function PublicChatPage({ page, nodes, edges, metaSettings }: PublicChatPageProps) {
+  const theme = (page.theme?.config || {}) as ThemeConfig
   const template = (page.theme_id || 'whatsapp').replace(/[^a-z0-9_-]/gi, '_')
-  const isWhatsApp = template === 'whatsapp'
-  const isInstagram = template === 'instagram'
-
   const [state, setState] = useState<FlowSessionState | null>(null)
   const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -410,7 +360,7 @@ export function PublicChatPage({ page, nodes, edges, metaSettings }: PublicChatP
         if (node.config.message_text) {
           addMessage({
             type: 'assistant',
-            content: renderText(node.config.message_text || '', vars),
+            content: renderText(node.config.message_text, vars),
             nodeType: node.type,
             nodeId: node.id,
           })
@@ -503,7 +453,7 @@ export function PublicChatPage({ page, nodes, edges, metaSettings }: PublicChatP
           if (node.config.message_text) {
             addMessage({
               type: 'assistant',
-              content: renderText(node.config.message_text || '', vars),
+              content: renderText(node.config.message_text, vars),
               nodeType: 'button_message',
               nodeId: node.id,
             })
@@ -965,49 +915,44 @@ export function PublicChatPage({ page, nodes, edges, metaSettings }: PublicChatP
     }
   }, [orderId, state?.session_id, nodes, edges, processNode, trackChatEvent])
 
-  // Theme-specific components
-  const Header = isWhatsApp ? WhatsAppHeader : InstagramHeader
-  const MessageBubble = isWhatsApp ? WhatsAppMessageBubble : InstagramMessageBubble
-  const QuickReplies = isWhatsApp ? WhatsAppQuickReplies : InstagramQuickReplies
-  const InputBar = isWhatsApp ? WhatsAppInputBar : InstagramInputBar
-  const MediaMessage = isWhatsApp ? WhatsAppMediaMessage : InstagramMediaMessage
-  const Layout = isWhatsApp ? WhatsAppLayout : InstagramLayout
-  const TypingIndicator = isWhatsApp ? WhatsAppTypingIndicator : InstagramTypingIndicator
-
-  const header = <Header page={page} />
+  const header = <ChatHeader page={page} theme={theme} template={template} />
   const inputBar = (
-    <InputBar
+    <ChatInputBar
       value={inputValue}
       onChange={setInputValue}
       onSend={handleInputSubmit}
       active={!!waitingInput}
       type={waitingInput?.config.input_type || 'text'}
-      placeholder={waitingInput?.config.placeholder || (isWhatsApp ? 'Digite uma mensagem' : 'Mensagem...')}
+      placeholder={waitingInput?.config.placeholder || 'Digite uma mensagem'}
+      template={template}
     />
   )
 
   if (nodes.length === 0) {
     return (
-      <Layout header={header} inputBar={inputBar} customCss={page.custom_css}>
+      <ChatLayout theme={theme} template={template} header={header} inputBar={inputBar} customCss={page.custom_css}>
         <MessageBubble
-          message={{ id: 'empty', type: 'assistant', content: 'Esta conversa ainda não tem um fluxo publicado.', timestamp: Date.now() }}
+          message={{ id: 'empty', type: 'assistant', content: 'Esta conversa ainda n\u00e3o tem um fluxo publicado.', timestamp: Date.now() }}
+          theme={theme}
           avatarUrl={page.avatar_url}
           isUser={false}
         />
-      </Layout>
+      </ChatLayout>
     )
   }
 
   if (!state) {
     return (
-      <Layout header={header} inputBar={inputBar} customCss={page.custom_css}>
-        <TypingIndicator avatarUrl={page.avatar_url} />
-      </Layout>
+      <ChatLayout theme={theme} template={template} header={header} inputBar={inputBar} customCss={page.custom_css}>
+        <TypingIndicator theme={theme} avatarUrl={page.avatar_url} />
+      </ChatLayout>
     )
   }
 
   return (
-    <Layout
+    <ChatLayout
+      theme={theme}
+      template={template}
       header={page.show_header ? header : null}
       inputBar={inputBar}
       customCss={page.custom_css}
@@ -1025,6 +970,7 @@ export function PublicChatPage({ page, nodes, edges, metaSettings }: PublicChatP
               <MessageBubble
                 key={msg.id}
                 message={msg.content ? { ...msg, content: renderText(msg.content, variables) } : msg}
+                theme={theme}
                 avatarUrl={page.avatar_url}
                 isUser={isUser}
                 showAvatar={!prevSame}
@@ -1035,10 +981,10 @@ export function PublicChatPage({ page, nodes, edges, metaSettings }: PublicChatP
 
           if (msg.type === 'media') {
             return (
-              <MediaMessage
+              <MediaMessageBubble
                 key={msg.id}
                 message={msg.content ? { ...msg, content: renderText(msg.content, variables) } : msg}
-                isUser={isUser}
+                theme={theme}
                 avatarUrl={page.avatar_url}
                 showAvatar={!prevSame}
                 compact={!!prevSame || !!nextSame}
@@ -1048,7 +994,7 @@ export function PublicChatPage({ page, nodes, edges, metaSettings }: PublicChatP
 
           if (msg.type === 'buttons') {
             return (
-              <QuickReplies
+              <QuickReplyButtons
                 key={msg.id}
                 buttons={renderButtons(msg.buttons || [], variables)}
                 onSelect={(button) => handleButtonClick(button, msg.nodeId || '')}
@@ -1061,7 +1007,7 @@ export function PublicChatPage({ page, nodes, edges, metaSettings }: PublicChatP
               <ConversationalFormFlow
                 key={msg.id}
                 config={msg.payload || {}}
-                theme={convertThemeToConfig(isWhatsApp ? whatsappTheme : instagramTheme)}
+                theme={theme}
                 page={page}
                 variables={variables}
                 onSubmit={(data) => handleCheckoutSubmit(data, msg.nodeId || '')}
@@ -1074,7 +1020,7 @@ export function PublicChatPage({ page, nodes, edges, metaSettings }: PublicChatP
               <PixPaymentCard
                 key={msg.id}
                 config={msg.payload || {}}
-                theme={convertThemeToConfig(isWhatsApp ? whatsappTheme : instagramTheme)}
+                theme={theme}
                 page={page}
                 variables={variables}
                 orderId={orderId}
@@ -1089,7 +1035,7 @@ export function PublicChatPage({ page, nodes, edges, metaSettings }: PublicChatP
               <DeliveryCard
                 key={msg.id}
                 config={msg.payload || {}}
-                theme={convertThemeToConfig(isWhatsApp ? whatsappTheme : instagramTheme)}
+                theme={theme}
                 orderId={orderId}
                 sessionId={state.session_id}
                 onFetchDelivery={() => handleDeliveryFetch(msg.nodeId || '')}
@@ -1101,13 +1047,13 @@ export function PublicChatPage({ page, nodes, edges, metaSettings }: PublicChatP
           return null
         })}
 
-        {isTyping && <TypingIndicator avatarUrl={page.avatar_url} />}
+        {isTyping && <TypingIndicator theme={theme} avatarUrl={page.avatar_url} />}
         <div ref={messagesEndRef} />
 
       {/* Microcopy */}
       {page.show_microcopy && page.microcopy_text && (
         <div className="flex-shrink-0 py-2 text-center">
-          <p className="text-xs opacity-40">
+          <p className="text-xs opacity-40" style={{ color: theme.assistantText }}>
             {page.microcopy_text}
           </p>
         </div>
@@ -1116,11 +1062,11 @@ export function PublicChatPage({ page, nodes, edges, metaSettings }: PublicChatP
       {/* Powered by */}
       {page.show_powered_by && (
         <div className="flex-shrink-0 py-2 text-center">
-          <p className="text-xs opacity-30">
+          <p className="text-xs opacity-30" style={{ color: theme.assistantText }}>
             Powered by Chatfy
           </p>
         </div>
       )}
-    </Layout>
+    </ChatLayout>
   )
 }
