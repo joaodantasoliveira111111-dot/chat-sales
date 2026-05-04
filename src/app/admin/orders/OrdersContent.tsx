@@ -1,21 +1,41 @@
 'use client'
 
 import { useState } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { Order } from '@/types'
 import { Badge } from '@/components/ui/Badge'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Modal } from '@/components/ui/Modal'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { Pagination } from '@/components/ui/Pagination'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { ShoppingCart, Search, Eye, Zap, Copy, CheckCircle, Calendar, User, Mail, Package, CreditCard } from 'lucide-react'
 
-export function OrdersContent({ orders: initialOrders }: { orders: (Order & { product?: { name: string } | null; delivery?: { id: string; delivered_at: string } | null })[] }) {
+export function OrdersContent({
+  orders: initialOrders,
+  totalCount,
+  currentPage,
+  totalPages,
+}: {
+  orders: (Order & { product?: { name: string } | null; delivery?: { id: string; delivered_at: string } | null })[]
+  totalCount: number
+  currentPage: number
+  totalPages: number
+}) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [orders, setOrders] = useState(initialOrders)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [selectedOrder, setSelectedOrder] = useState<typeof initialOrders[0] | null>(null)
   const [simulating, setSimulating] = useState<string | null>(null)
+
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('page', String(page))
+    router.push(`?${params.toString()}`)
+  }
 
   const statusOptions = [
     { value: 'all', label: 'Todos' },
@@ -90,9 +110,9 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
           <h1 className="text-2xl font-bold text-[#081827]">
             Pedidos
           </h1>
-          <p className="text-sm text-[#35516B] mt-1">
-            {orders.length} pedido{orders.length !== 1 ? 's' : ''}
-          </p>
+        <p className="text-sm text-[#35516B] mt-1">
+          {totalCount} pedido{totalCount !== 1 ? 's' : ''}
+        </p>
         </div>
       </div>
 
@@ -203,10 +223,12 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
               </CardContent>
             </Card>
           ))}
-        </div>
-      )}
+      </div>
+    )}
 
-      {/* Order Detail Modal */}
+    <Pagination page={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+
+    {/* Order Detail Modal */}
       <Modal
         isOpen={!!selectedOrder}
         onClose={() => setSelectedOrder(null)}
