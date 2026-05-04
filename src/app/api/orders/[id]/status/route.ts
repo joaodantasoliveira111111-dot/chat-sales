@@ -11,11 +11,15 @@ export async function GET(
     const { searchParams } = new URL(request.url)
     const sessionId = searchParams.get('session_id')
 
+    if (!sessionId) {
+      return NextResponse.json({ error: 'session_id é obrigatório' }, { status: 400 })
+    }
+
     const supabase = createAdminClient()
 
     const { data: order, error } = await supabase
       .from('orders')
-      .select('id, status, paid_at, delivered_at, expires_at, amount, customer_name')
+      .select('id, status, paid_at, delivered_at, expires_at, amount, customer_name, session_id')
       .eq('id', id)
       .single()
 
@@ -23,17 +27,8 @@ export async function GET(
       return NextResponse.json({ error: 'Pedido não encontrado' }, { status: 404 })
     }
 
-    // Validate session if provided
-    if (sessionId) {
-      const { data: fullOrder } = await supabase
-        .from('orders')
-        .select('session_id')
-        .eq('id', id)
-        .single()
-      
-      if (fullOrder && fullOrder.session_id !== sessionId) {
-        return NextResponse.json({ error: 'Sessão inválida' }, { status: 403 })
-      }
+    if (order.session_id !== sessionId) {
+      return NextResponse.json({ error: 'Sessão inválida' }, { status: 403 })
     }
 
     return NextResponse.json({
