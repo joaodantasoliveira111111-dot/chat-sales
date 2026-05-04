@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Product } from '@/types'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
@@ -11,12 +11,16 @@ import { Modal } from '@/components/ui/Modal'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { Pagination } from '@/components/ui/Pagination'
 import { formatCurrency, slugify } from '@/lib/utils'
 import { Plus, Package, Edit, Trash2, Search, ExternalLink, DollarSign, Tag, X } from 'lucide-react'
 
 interface ProductsContentProps {
   products: Product[]
   userId: string
+  totalCount: number
+  currentPage: number
+  totalPages: number
 }
 
 const emptyForm = {
@@ -55,8 +59,9 @@ const statusVariantMap: Record<string, 'success' | 'warning' | 'danger' | 'info'
   archived: 'default',
 }
 
-export function ProductsContent({ products: initialProducts, userId }: ProductsContentProps) {
+export function ProductsContent({ products: initialProducts, userId, totalCount, currentPage, totalPages }: ProductsContentProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [products, setProducts] = useState(initialProducts)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -450,6 +455,11 @@ export function ProductsContent({ products: initialProducts, userId }: ProductsC
           </div>
         }
       />
+      <Pagination page={currentPage} totalPages={totalPages} onPageChange={(p) => {
+        const params = new URLSearchParams(searchParams.toString())
+        params.set('page', String(p))
+        router.push(`?${params.toString()}`)
+      }} />
     </div>
   )
 }

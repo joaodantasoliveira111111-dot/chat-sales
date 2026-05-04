@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { SupportRequest } from '@/types'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent } from '@/components/ui/Card'
@@ -9,10 +10,23 @@ import { Button } from '@/components/ui/Button'
 import { Modal } from '@/components/ui/Modal'
 import Select from '@/components/ui/Select'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { Pagination } from '@/components/ui/Pagination'
 import { formatDate } from '@/lib/utils'
 import { HeadphonesIcon, Search, MessageSquare, Mail, Phone, Calendar, User } from 'lucide-react'
 
-export function SupportContent({ requests: initialRequests }: { requests: SupportRequest[] }) {
+export function SupportContent({
+  requests: initialRequests,
+  totalCount,
+  currentPage,
+  totalPages,
+}: {
+  requests: SupportRequest[]
+  totalCount: number
+  currentPage: number
+  totalPages: number
+}) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [requests, setRequests] = useState(initialRequests)
   const [selected, setSelected] = useState<SupportRequest | null>(null)
   const [search, setSearch] = useState('')
@@ -221,6 +235,11 @@ export function SupportContent({ requests: initialRequests }: { requests: Suppor
           </div>
         )}
       </Modal>
+      <Pagination page={currentPage} totalPages={totalPages} onPageChange={(p) => {
+        const params = new URLSearchParams(searchParams.toString())
+        params.set('page', String(p))
+        router.push(`?${params.toString()}`)
+      }} />
     </div>
   )
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { InventoryItem } from '@/types'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
@@ -10,6 +11,7 @@ import { Modal } from '@/components/ui/Modal'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { Pagination } from '@/components/ui/Pagination'
 import { formatDate } from '@/lib/utils'
 import { Plus, Archive, Edit, Trash2, Search, Upload, Download, Mail, Key, Link as LinkIcon, FileText } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
@@ -69,11 +71,19 @@ export function InventoryContent({
   items: initialItems,
   products,
   userId,
+  totalCount,
+  currentPage,
+  totalPages,
 }: {
   items: (InventoryItem & { product?: { name: string } | null })[]
   products: { id: string; name: string; delivery_type: string | null }[]
   userId: string
+  totalCount: number
+  currentPage: number
+  totalPages: number
 }) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [items, setItems] = useState(initialItems)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -541,6 +551,11 @@ export function InventoryContent({
           </div>
         }
       />
+      <Pagination page={currentPage} totalPages={totalPages} onPageChange={(p) => {
+        const params = new URLSearchParams(searchParams.toString())
+        params.set('page', String(p))
+        router.push(`?${params.toString()}`)
+      }} />
     </div>
   )
 }

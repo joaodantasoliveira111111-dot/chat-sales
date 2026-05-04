@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { PublicPage } from '@/types'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
@@ -11,6 +11,7 @@ import { Modal } from '@/components/ui/Modal'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { Pagination } from '@/components/ui/Pagination'
 import { slugify, copyToClipboard } from '@/lib/utils'
 import { Plus, Globe, Edit, Trash2, ExternalLink, Copy, Palette, CheckCircle } from 'lucide-react'
 
@@ -56,6 +57,9 @@ export function PagesContent({
   themes,
   userId,
   appUrl,
+  totalCount,
+  currentPage,
+  totalPages,
 }: {
   pages: PageWithRelations[]
   products: { id: string; name: string }[]
@@ -63,8 +67,12 @@ export function PagesContent({
   themes: { id: string; name: string; description: string | null }[]
   userId: string
   appUrl: string
+  totalCount: number
+  currentPage: number
+  totalPages: number
 }) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [pages, setPages] = useState(initialPages)
   const [showForm, setShowForm] = useState(false)
   const [editPage, setEditPage] = useState<typeof initialPages[0] | null>(null)
@@ -487,6 +495,11 @@ export function PagesContent({
           </div>
         }
       />
+      <Pagination page={currentPage} totalPages={totalPages} onPageChange={(p) => {
+        const params = new URLSearchParams(searchParams.toString())
+        params.set('page', String(p))
+        router.push(`?${params.toString()}`)
+      }} />
     </div>
   )
 }
