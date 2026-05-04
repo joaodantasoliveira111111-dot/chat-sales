@@ -30,6 +30,7 @@ const navGroups = [
     label: 'Principal',
     items: [
       { label: 'Dashboard', href: '/admin', icon: LayoutDashboard, exact: true },
+      { label: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
       { label: 'Produtos', href: '/admin/products', icon: Package },
       { label: 'Páginas', href: '/admin/pages', icon: Globe },
       { label: 'Fluxos', href: '/admin/flows', icon: Workflow },
@@ -47,7 +48,7 @@ const navGroups = [
     label: 'Configurações',
     items: [
       { label: 'Pagamentos', href: '/admin/settings/payments', icon: CreditCard },
-      { label: 'Rastreamento', href: '/admin/settings/tracking', icon: BarChart3 },
+      { label: 'Rastreamento', href: '/admin/settings/tracking', icon: ShieldCheck },
       { label: 'Conta', href: '/admin/settings/account', icon: User },
     ],
   },
@@ -143,6 +144,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
   const pageTitle = (() => {
     if (pathname === '/admin') return 'Dashboard'
+    if (pathname.startsWith('/admin/analytics')) return 'Analytics'
     if (pathname.startsWith('/admin/products')) return 'Produtos'
     if (pathname.startsWith('/admin/pages')) return 'Páginas Públicas'
     if (pathname.startsWith('/admin/flows')) return 'Fluxos'
@@ -157,6 +159,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
   const pageDescription = (() => {
     if (pathname === '/admin') return 'Acompanhe vendas, entregas e configuração da operação.'
+    if (pathname.startsWith('/admin/analytics')) return 'Métricas de funil, engajamento e desempenho da operação.'
     if (pathname.startsWith('/admin/products')) return 'Organize produtos, preços e status de venda.'
     if (pathname.startsWith('/admin/pages')) return 'Publique experiências conversacionais para seus produtos.'
     if (pathname.startsWith('/admin/flows')) return 'Construa jornadas automatizadas de atendimento e venda.'

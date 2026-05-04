@@ -4,26 +4,29 @@ import { cn } from '@/lib/utils'
 import { forwardRef, HTMLAttributes } from 'react'
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'elevated' | 'outlined'
+  variant?: 'default' | 'elevated' | 'outlined' | 'neu' | 'neu-soft' | 'flat'
   hoverable?: boolean
   hover?: boolean
 }
 
 export const Card = forwardRef<HTMLDivElement, CardProps>(
-  ({ className, variant = 'default', hoverable = false, children, ...props }, ref) => {
+  ({ className, variant = 'neu', hoverable = false, children, ...props }, ref) => {
     const variantStyles = {
-      default: 'bg-white border border-slate-200 shadow-sm',
-      elevated: 'bg-white border border-slate-200 shadow-lg',
-      outlined: 'bg-white border-2 border-slate-300',
+      default: 'bg-white border border-[rgba(8,24,39,0.08)] shadow-[var(--shadow-neu-raised-subtle)]',
+      elevated: 'bg-white border border-[rgba(8,24,39,0.08)] shadow-[var(--shadow-elevated)]',
+      outlined: 'bg-white border-2 border-[rgba(8,24,39,0.14)]',
+      neu: 'bg-white border border-[rgba(8,24,39,0.08)] shadow-[10px_10px_24px_rgba(8,24,39,0.06),-8px_-8px_20px_rgba(255,255,255,0.8)]',
+      'neu-soft': 'bg-[#F8FBFF] border border-[rgba(8,24,39,0.06)] shadow-[6px_6px_16px_rgba(8,24,39,0.04),-4px_-4px_12px_rgba(255,255,255,0.7)]',
+      flat: 'bg-white border border-[rgba(8,24,39,0.08)] shadow-[0_1px_3px_rgba(8,24,39,0.04),0_1px_2px_rgba(8,24,39,0.02)]',
     }
 
     return (
       <div
         ref={ref}
         className={cn(
-          'rounded-xl overflow-hidden',
+          'rounded-[22px] overflow-hidden',
           variantStyles[variant],
-          hoverable && 'transition-all duration-200 hover:shadow-md hover:-translate-y-0.5',
+          hoverable && 'transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:shadow-[14px_14px_32px_rgba(8,24,39,0.08),-10px_-10px_24px_rgba(255,255,255,0.9)] hover:-translate-y-0.5',
           className
         )}
         {...props}
@@ -52,7 +55,7 @@ export const CardTitle = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLHea
   ({ className, ...props }, ref) => (
     <h3
       ref={ref}
-      className={cn('text-lg font-semibold text-slate-900 leading-none tracking-tight', className)}
+      className={cn('text-xl font-semibold text-[#081827] leading-none tracking-tight', className)}
       {...props}
     />
   )
@@ -64,7 +67,7 @@ export const CardDescription = forwardRef<HTMLParagraphElement, HTMLAttributes<H
   ({ className, ...props }, ref) => (
     <p
       ref={ref}
-      className={cn('text-sm text-slate-500', className)}
+      className={cn('text-sm text-[#71869B]', className)}
       {...props}
     />
   )

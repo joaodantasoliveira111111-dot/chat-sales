@@ -18,30 +18,30 @@ export interface ConfirmDialogProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const ConfirmDialog = forwardRef<HTMLDivElement, ConfirmDialogProps>(
-  ({ 
-    className, 
-    isOpen = false, 
-    onClose, 
-    onConfirm, 
-    title = 'Confirmar ação', 
+  ({
+    className,
+    isOpen = false,
+    onClose,
+    onConfirm,
+    title = 'Confirmar ação',
     description,
     confirmText = 'Confirmar',
     cancelText = 'Cancelar',
     isLoading = false,
-    ...props 
+    ...props
   }, ref) => {
     if (!isOpen) return null
 
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 z-[1070] flex items-center justify-center">
         <div
-          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+          className="absolute inset-0 bg-[rgba(8,24,39,0.5)] backdrop-blur-sm"
           onClick={onClose}
         />
         <div
           ref={ref}
           className={cn(
-            'relative bg-white rounded-xl shadow-2xl w-full mx-4 overflow-hidden max-w-md',
+            'relative bg-white rounded-[22px] shadow-[var(--shadow-elevated)] w-full mx-4 overflow-hidden max-w-md border border-[rgba(8,24,39,0.08)]',
             className
           )}
           {...props}
@@ -49,30 +49,30 @@ export const ConfirmDialog = forwardRef<HTMLDivElement, ConfirmDialogProps>(
           <div className="p-6">
             <div className="flex items-start gap-4">
               <div className="flex-shrink-0">
-                <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-                  <AlertTriangle className="w-6 h-6 text-red-600" />
+                <div className="w-12 h-12 rounded-full bg-[rgba(220,38,38,0.08)] flex items-center justify-center">
+                  <AlertTriangle className="w-6 h-6 text-[#DC2626]" />
                 </div>
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-slate-900 mb-2">{title}</h3>
+                <h3 className="text-xl font-semibold text-[#081827] mb-2">{title}</h3>
                 {description && (
-                  <p className="text-sm text-slate-600">{description}</p>
+                  <p className="text-[14px] text-[#71869B]">{description}</p>
                 )}
               </div>
             </div>
           </div>
-          <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3">
+          <div className="px-6 py-4 bg-[#F8FBFF] border-t border-[rgba(8,24,39,0.08)] flex justify-end gap-3">
             <button
               onClick={onClose}
               disabled={isLoading}
-              className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 rounded-lg transition-colors disabled:opacity-50"
+              className="px-4 py-2.5 text-[14px] font-medium text-[#35516B] hover:bg-[rgba(8,24,39,0.04)] rounded-xl transition-colors disabled:opacity-50"
             >
               {cancelText}
             </button>
             <button
               onClick={onConfirm}
               disabled={isLoading}
-              className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors disabled:opacity-50"
+              className="px-4 py-2.5 text-[14px] font-medium text-white bg-[#DC2626] hover:bg-[#B91C1C] hover:shadow-[0_0_18px_rgba(220,38,38,0.2)] rounded-xl transition-all disabled:opacity-50"
             >
               {isLoading ? 'Processando...' : confirmText}
             </button>

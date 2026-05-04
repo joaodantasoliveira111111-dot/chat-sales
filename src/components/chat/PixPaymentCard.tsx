@@ -222,7 +222,9 @@ export function PixPaymentCard({
   if (status === 'paid') {
     return (
       <div className="chat-inline-card pix-payment-card animate-fade-in p-5 rounded-2xl text-center" style={{ background: theme.assistantBubble }}>
-        <div className="text-4xl mb-2">✅</div>
+        <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-2">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+        </div>
         <p className="text-sm font-bold" style={{ color: theme.assistantText }}>Pagamento confirmado!</p>
         <p className="text-xs opacity-70 mt-1" style={{ color: theme.assistantText }}>Aguarde enquanto preparamos sua entrega...</p>
       </div>

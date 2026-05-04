@@ -231,10 +231,10 @@ export function PagesContent({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-2xl font-bold text-[#081827]">
             Páginas Públicas
           </h1>
-          <p className="text-sm text-slate-600 mt-1">
+          <p className="text-sm text-[#35516B] mt-1">
             {pages.length} página{pages.length !== 1 ? 's' : ''} criada{pages.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -248,7 +248,7 @@ export function PagesContent({
         <Card>
           <CardContent className="p-8">
             <EmptyState
-              icon={<Globe className="w-12 h-12 text-slate-300" />}
+              icon={<Globe className="w-12 h-12 text-[#71869B]" />}
               title="Nenhuma página criada"
               description="Crie uma página pública com um design otimizado para vender seu produto ou capturar leads."
               action={
@@ -271,7 +271,7 @@ export function PagesContent({
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-semibold text-slate-900">{page.public_title}</h3>
+                      <h3 className="font-semibold text-[#081827]">{page.public_title}</h3>
                       <Badge variant={statusVariantMap[page.status] || 'default'} size="sm">
                         {page.status === 'published' ? 'Publicado' : 
                          page.status === 'draft' ? 'Rascunho' : 'Arquivado'}
@@ -279,25 +279,25 @@ export function PagesContent({
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3 text-sm mb-2">
-                      <span className="text-slate-500 font-mono">/p/{page.slug}</span>
+                      <span className="text-[#71869B] font-mono">/p/{page.slug}</span>
                       {page.product && (
-                        <span className="text-slate-600">
-                          <span className="text-slate-400">Produto:</span> {page.product.name}
+                        <span className="text-[#35516B]">
+                          <span className="text-[#71869B]">Produto:</span> {page.product.name}
                         </span>
                       )}
                       {page.flow && (
-                        <span className="text-slate-600">
-                          <span className="text-slate-400">Fluxo:</span> {page.flow.name}
+                        <span className="text-[#35516B]">
+                          <span className="text-[#71869B]">Fluxo:</span> {page.flow.name}
                         </span>
                       )}
-                      <span className="text-slate-600">
-                        <span className="text-slate-400">Tema:</span> {page.theme_id}
+                      <span className="text-[#35516B]">
+                        <span className="text-[#71869B]">Tema:</span> {page.theme_id}
                       </span>
                     </div>
 
                     {/* URL Display */}
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-lg">
-                      <span className="text-xs text-slate-600 font-mono">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#F3F7FB] rounded-lg">
+                      <span className="text-xs text-[#35516B] font-mono">
                         {getPageUrl(page.slug)}
                       </span>
                     </div>
@@ -310,7 +310,7 @@ export function PagesContent({
                         href={getPageUrl(page.slug)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                        className="p-2 rounded-lg text-[#71869B] hover:text-[#35516B] hover:bg-[#F3F7FB] transition-colors"
                         title="Ver página"
                       >
                         <ExternalLink size={18} />
@@ -319,7 +319,7 @@ export function PagesContent({
                     
                     <button
                       onClick={() => handleCopyUrl(page.slug)}
-                      className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                      className="p-2 rounded-lg text-[#71869B] hover:text-[#35516B] hover:bg-[#F3F7FB] transition-colors"
                       title="Copiar link"
                     >
                       {copiedSlug === page.slug ? (
@@ -331,7 +331,7 @@ export function PagesContent({
                     
                     <button
                       onClick={() => openEdit(page)}
-                      className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                      className="p-2 rounded-lg text-[#71869B] hover:text-[#35516B] hover:bg-[#F3F7FB] transition-colors"
                       title="Editar"
                     >
                       <Edit size={18} />
@@ -339,7 +339,7 @@ export function PagesContent({
                     
                     <button
                       onClick={() => setDeletePage(page)}
-                      className="p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                      className="p-2 rounded-lg text-[#71869B] hover:text-red-600 hover:bg-red-50 transition-colors"
                       title="Excluir"
                     >
                       <Trash2 size={18} />
@@ -396,7 +396,7 @@ export function PagesContent({
           />
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-slate-700">
+            <label className="block text-sm font-medium text-[#4A6178]">
               Subtítulo
             </label>
             <textarea
@@ -404,7 +404,7 @@ export function PagesContent({
               onChange={e => setForm(f => ({ ...f, public_subtitle: e.target.value }))}
               placeholder="Tagline da oferta"
               rows={2}
-              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
             />
           </div>
 
@@ -440,7 +440,7 @@ export function PagesContent({
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-4">
                 <Palette size={18} className="text-primary-600" />
-                <h3 className="font-semibold text-slate-900">Design e Template</h3>
+                <h3 className="font-semibold text-[#081827]">Design e Template</h3>
               </div>
               
               <div className="space-y-4">
@@ -454,7 +454,7 @@ export function PagesContent({
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-slate-700">
+                    <label className="block text-sm font-medium text-[#4A6178]">
                       Cor primária
                     </label>
                     <div className="flex items-center gap-2">
@@ -462,19 +462,19 @@ export function PagesContent({
                         type="color"
                         value={form.primary_color}
                         onChange={e => setForm(f => ({ ...f, primary_color: e.target.value }))}
-                        className="w-10 h-10 rounded-lg cursor-pointer border border-slate-300"
+                        className="w-10 h-10 rounded-lg cursor-pointer border border-[rgba(8,24,39,0.08)]"
                       />
                       <input
                         type="text"
                         value={form.primary_color}
                         onChange={e => setForm(f => ({ ...f, primary_color: e.target.value }))}
-                        className="flex-1 h-10 px-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="flex-1 h-10 px-3 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                       />
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-slate-700">
+                    <label className="block text-sm font-medium text-[#4A6178]">
                       Cor secundária
                     </label>
                     <div className="flex items-center gap-2">
@@ -482,13 +482,13 @@ export function PagesContent({
                         type="color"
                         value={form.secondary_color}
                         onChange={e => setForm(f => ({ ...f, secondary_color: e.target.value }))}
-                        className="w-10 h-10 rounded-lg cursor-pointer border border-slate-300"
+                        className="w-10 h-10 rounded-lg cursor-pointer border border-[rgba(8,24,39,0.08)]"
                       />
                       <input
                         type="text"
                         value={form.secondary_color}
                         onChange={e => setForm(f => ({ ...f, secondary_color: e.target.value }))}
-                        className="flex-1 h-10 px-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="flex-1 h-10 px-3 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                       />
                     </div>
                   </div>

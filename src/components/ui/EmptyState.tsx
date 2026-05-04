@@ -12,19 +12,19 @@ interface EmptyStateProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 const iconMap = {
-  products: <Package className="w-12 h-12 text-slate-300" />,
-  orders: <ShoppingCart className="w-12 h-12 text-slate-300" />,
-  pages: <FileText className="w-12 h-12 text-slate-300" />,
-  default: <AlertCircle className="w-12 h-12 text-slate-300" />,
+  products: <Package className="w-12 h-12 text-[#B0C4D8]" />,
+  orders: <ShoppingCart className="w-12 h-12 text-[#B0C4D8]" />,
+  pages: <FileText className="w-12 h-12 text-[#B0C4D8]" />,
+  default: <AlertCircle className="w-12 h-12 text-[#B0C4D8]" />,
 }
 
-export function EmptyState({ 
-  icon, 
-  title, 
-  description, 
-  action, 
+export function EmptyState({
+  icon,
+  title,
+  description,
+  action,
   className,
-  ...props 
+  ...props
 }: EmptyStateProps) {
   const displayIcon = icon || iconMap.default
 
@@ -37,9 +37,9 @@ export function EmptyState({
       {...props}
     >
       <div className="mb-4">{displayIcon}</div>
-      <h3 className="text-lg font-semibold text-slate-900 mb-2">{title}</h3>
+      <h3 className="text-xl font-semibold text-[#081827] mb-2">{title}</h3>
       {description && (
-        <p className="text-slate-500 max-w-sm mb-6">{description}</p>
+        <p className="text-[#71869B] text-[14px] max-w-sm mb-6">{description}</p>
       )}
       {action && <div className="mt-2">{action}</div>}
     </div>

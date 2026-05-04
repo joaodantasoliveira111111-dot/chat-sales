@@ -39,39 +39,34 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#F3F7FB] p-4">
       <div className="w-full max-w-md">
-        {/* Logo */}
         <div className="flex justify-center mb-8">
           <ChatfyLogo />
         </div>
 
-        {/* Login Card */}
-        <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
-          {/* Header */}
+        <div className="bg-white rounded-[22px] shadow-[10px_10px_24px_rgba(8,24,39,0.06),-8px_-8px_20px_rgba(255,255,255,0.8)] border border-[rgba(8,24,39,0.08)] p-8">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 border border-green-200 text-green-700 text-xs font-semibold mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgba(22,163,74,0.08)] border border-[rgba(22,163,74,0.12)] text-[#16A34A] text-[13px] font-semibold mb-4">
               <ShieldCheck size={14} />
               <span>Acesso restrito a administradores</span>
             </div>
-            
-            <h1 className="text-2xl font-bold text-slate-900 mb-2">
+
+            <h1 className="text-[26px] font-semibold text-[#081827] tracking-tight mb-2">
               Bem-vindo de volta
             </h1>
-            
-            <p className="text-slate-600">
+
+            <p className="text-[14px] text-[#71869B]">
               Entre na sua conta para gerenciar sua operação
             </p>
           </div>
 
-          {/* Error Message */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-700">{error}</p>
+            <div className="mb-6 p-4 bg-[rgba(220,38,38,0.08)] border border-[rgba(220,38,38,0.12)] rounded-xl">
+              <p className="text-[13px] text-[#DC2626]">{error}</p>
             </div>
           )}
 
-          {/* Form */}
           <form onSubmit={handleLogin} className="space-y-5">
             <Input
               id="email"
@@ -97,18 +92,18 @@ export default function LoginPage() {
               fullWidth
             />
 
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center justify-between text-[13px]">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
-                  className="w-4 h-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
+                  className="w-4 h-4 rounded border-[rgba(8,24,39,0.14)] text-[#0B7CFF] focus:ring-[rgba(0,194,255,0.15)]"
                 />
-                <span className="text-slate-600">Lembrar-me</span>
+                <span className="text-[#35516B]">Lembrar-me</span>
               </label>
-              
+
               <a
                 href="#"
-                className="text-primary-600 hover:text-primary-700 font-medium"
+                className="text-[#0B7CFF] hover:text-[#0A6FE6] font-medium"
               >
                 Esqueceu a senha?
               </a>
@@ -125,21 +120,19 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          {/* Footer */}
-          <div className="mt-8 pt-6 border-t border-slate-200 text-center">
-            <p className="text-sm text-slate-600">
+          <div className="mt-8 pt-6 border-t border-[rgba(8,24,39,0.08)] text-center">
+            <p className="text-[13px] text-[#71869B]">
               Precisa de ajuda?{' '}
-              <a href="#" className="text-primary-600 hover:text-primary-700 font-medium">
+              <a href="#" className="text-[#0B7CFF] hover:text-[#0A6FE6] font-medium">
                 Entre em contato
               </a>
             </p>
           </div>
         </div>
 
-        {/* Security Notice */}
         <div className="mt-6 text-center">
-          <p className="text-xs text-slate-500">
-            🔒 Seus dados estão protegidos com criptografia de ponta a ponta
+          <p className="text-[11px] text-[#94A3B8]">
+            Seus dados estão protegidos com criptografia de ponta a ponta
           </p>
         </div>
       </div>

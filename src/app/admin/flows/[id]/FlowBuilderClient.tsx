@@ -68,8 +68,7 @@ function toRFEdge(e: FlowEdge): Edge {
     target: e.target_node_id,
     targetHandle: normalizeTargetHandle(e.target_handle),
     type: 'smoothstep',
-    style: { stroke: 'rgba(99,91,255,0.72)', strokeWidth: 2 },
-    animated: false,
+    style: { stroke: 'rgba(11,124,255,0.72)', strokeWidth: 2 },
     reconnectable: true,
   }
 }
@@ -126,7 +125,7 @@ export function FlowBuilderClient({
       ...connection,
       id: uuidv4(),
       type: 'smoothstep',
-      style: { stroke: 'rgba(99,91,255,0.72)', strokeWidth: 2 },
+      style: { stroke: 'rgba(11,124,255,0.72)', strokeWidth: 2 },
       reconnectable: true,
     } as Edge
     setEdges(eds => addEdge(edge, eds.filter(e => (
@@ -267,7 +266,7 @@ export function FlowBuilderClient({
       }).eq('id', flow.id).eq('user_id', userId)
       if (error) throw error
       setFlow(f => ({ ...f, status: 'published' }))
-      toast.success('Fluxo publicado! ✨')
+      toast.success('Fluxo publicado!')
     } catch {
       toast.error('Erro ao publicar fluxo')
     } finally {
@@ -356,14 +355,14 @@ export function FlowBuilderClient({
             connectionMode={ConnectionMode.Loose}
             defaultEdgeOptions={{
               type: 'smoothstep',
-              style: { stroke: 'rgba(99,91,255,0.5)', strokeWidth: 2 },
-            }}
-          >
-            <Background color="rgba(148,163,184,0.08)" gap={24} />
-            <Controls className="react-flow__controls" />
-            <MiniMap
-              nodeColor={() => 'rgba(99,91,255,0.68)'}
-              maskColor="rgba(0,0,0,0.4)"
+    style: { stroke: 'rgba(11,124,255,0.5)', strokeWidth: 2 },
+  }}
+>
+  <Background color="rgba(8,24,39,0.06)" gap={24} />
+  <Controls className="react-flow__controls" />
+  <MiniMap
+    nodeColor={() => 'rgba(11,124,255,0.5)'}
+    maskColor="rgba(8,24,39,0.08)"
             />
             <Panel position="bottom-center">
               <div className="flow-help-panel">
@@ -424,16 +423,16 @@ function getDefaultConfig(type: NodeType): Record<string, unknown> {
   if (salesDefaults[type]) return salesDefaults[type] || {}
 
   const defaults: Partial<Record<NodeType, Record<string, unknown>>> = {
-    text_message: { message_text: 'Olá! 👋', show_typing: true, typing_duration_ms: 1500, delay_ms: 0 },
-    button_message: { message_text: 'Escolha uma opção:', buttons: [] },
-    input: { label: 'Qual é o seu nome?', input_type: 'text', variable_name: 'customer_name', required: true },
+    text_message: { message_text: 'Ola!', show_typing: true, typing_duration_ms: 1500, delay_ms: 0 },
+    button_message: { message_text: 'Escolha uma opcao:', buttons: [] },
+    input: { label: 'Qual e o seu nome?', input_type: 'text', variable_name: 'customer_name', required: true },
     checkout: { summary_title: 'Confirme seus dados', button_text: 'Continuar para pagamento', required_fields: ['name', 'email'] },
-    pix_payment: { expiration_minutes: 30, pending_text: 'Escaneie o QR Code ou copie o código Pix', copy_button_text: '📋 Copiar código Pix' },
+    pix_payment: { expiration_minutes: 30, pending_text: 'Escaneie o QR Code ou copie o codigo Pix', copy_button_text: 'Copiar codigo Pix' },
     wait_payment: { polling_interval_seconds: 5, timeout_minutes: 30 },
-    delivery: { delivery_template: 'Aqui está seu acesso, {{customer_name}}! 🎉' },
+    delivery: { delivery_template: 'Aqui esta seu acesso, {{customer_name}}!' },
     faq: { faqs: [], final_button_text: 'Voltar para compra' },
     condition: { conditions: [], default_target_node_id: null },
-    end: { final_message: 'Obrigado! Até logo! 👋', restart_button: false },
+    end: { final_message: 'Obrigado! Ate logo!', restart_button: false },
   }
   return defaults[type] || {}
 }

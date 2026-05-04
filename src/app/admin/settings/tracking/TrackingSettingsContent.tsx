@@ -65,20 +65,20 @@ export function TrackingSettingsContent({ initialSettings, events }: Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Rastreamento / Meta Pixel</h1>
-        <p className="text-sm text-slate-500 mt-1">
-          Configure Pixel, Conversions API, deduplicação e debug dos eventos das páginas públicas.
+        <h1 className="text-2xl font-bold text-[#081827]">Rastreamento / Meta Pixel</h1>
+        <p className="text-sm text-[#71869B] mt-1">
+          Configure Pixel, Conversions API, deduplicacao e debug dos eventos das paginas publicas.
         </p>
       </div>
 
-      <Card>
+      <Card variant="neu">
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(0,149,246,0.1)', color: '#0095F6' }}>
+          <div className="w-10 h-10 rounded-xl bg-[rgba(11,124,255,0.08)] flex items-center justify-center text-[#0B7CFF]">
             <Zap size={18} />
           </div>
           <div>
-            <p className="font-bold">Configuração Meta</p>
-            <p className="text-sm text-slate-500">O token fica salvo apenas no servidor.</p>
+            <p className="font-bold text-[#081827]">Configuracao Meta</p>
+            <p className="text-sm text-[#71869B]">O token fica salvo apenas no servidor.</p>
           </div>
         </div>
 
@@ -105,14 +105,16 @@ export function TrackingSettingsContent({ initialSettings, events }: Props) {
         </div>
       </Card>
 
-      <Card>
-        <div className="flex items-center gap-3 mb-4">
-          <Activity size={18} style={{ color: '#0095F6' }} />
-          <div>
-            <p className="font-bold">Últimos eventos</p>
-            <p className="text-sm text-slate-500">Debug de browser/server, status, event_id e resposta da Meta.</p>
-          </div>
-        </div>
+  <Card variant="neu">
+    <div className="flex items-center gap-3 mb-4">
+      <div className="w-10 h-10 rounded-xl bg-[rgba(0,194,255,0.08)] flex items-center justify-center text-[#00C2FF]">
+        <Activity size={18} />
+      </div>
+      <div>
+        <p className="font-bold text-[#081827]">Ultimos eventos</p>
+        <p className="text-sm text-[#71869B]">Debug de browser/server, status, event_id e resposta da Meta.</p>
+      </div>
+    </div>
         <div className="overflow-x-auto">
           <table className="data-table">
             <thead>
@@ -143,23 +145,29 @@ export function TrackingSettingsContent({ initialSettings, events }: Props) {
         </div>
       </Card>
 
-      <Card>
-        <div className="flex gap-3">
-          <Shield size={18} style={{ color: '#16C784' }} />
-          <p className="text-sm text-slate-500">
-            O Chatfy não envia senhas, mensagens privadas ou dados de cartão. Dados pessoais enviados à Meta via CAPI são normalizados e hasheados quando aplicável; `_fbp`, `_fbc`, IP e user agent são enviados sem hash conforme esperado pela integração web.
-          </p>
-        </div>
-      </Card>
+  <Card variant="neu-soft">
+    <div className="flex gap-3">
+      <div className="w-10 h-10 rounded-xl bg-[rgba(22,163,74,0.08)] flex items-center justify-center text-[#16A34A] flex-shrink-0">
+        <Shield size={18} />
+      </div>
+      <p className="text-sm text-[#35516B]">
+        O Chatfy nao envia senhas, mensagens privadas ou dados de cartao. Dados pessoais enviados a Meta via CAPI sao normalizados e hasheados quando aplicavel; `_fbp`, `_fbc`, IP e user agent sao enviados sem hash conforme esperado pela integracao web.
+      </p>
+    </div>
+  </Card>
     </div>
   )
 }
 
 function Toggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (value: boolean) => void }) {
   return (
-    <label className="flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 cursor-pointer" style={{ borderColor: 'var(--border)', background: 'rgba(255,255,255,0.72)' }}>
-      <span className="text-sm font-semibold">{label}</span>
-      <input type="checkbox" checked={checked} onChange={e => onChange(e.target.checked)} />
+    <label className="flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 cursor-pointer transition-colors" style={{ borderColor: checked ? 'rgba(11,124,255,0.3)' : 'rgba(8,24,39,0.08)', background: checked ? 'rgba(11,124,255,0.04)' : 'rgba(255,255,255,0.72)' }}>
+      <span className="text-sm font-semibold text-[#081827]">{label}</span>
+      <div className="relative">
+        <input type="checkbox" checked={checked} onChange={e => onChange(e.target.checked)} className="sr-only peer" />
+        <div className="w-9 h-5 bg-[#EAF1F8] peer-checked:bg-[#0B7CFF] rounded-full transition-colors" />
+        <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform peer-checked:translate-x-4" />
+      </div>
     </label>
   )
 }

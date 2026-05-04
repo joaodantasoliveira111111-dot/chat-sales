@@ -8,6 +8,7 @@ import { copyToClipboard } from '@/lib/utils'
 import {
   CreditCard, Copy, CheckCircle, AlertCircle,
   Zap, Globe, Eye, EyeOff, Save, Shield,
+  FlaskConical, Landmark,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
@@ -22,7 +23,7 @@ interface GatewayConfig {
   id: string
   name: string
   desc: string
-  icon: string
+  icon: 'flask' | 'credit-card' | 'landmark'
   fields: GatewayField[]
 }
 
@@ -31,14 +32,14 @@ const GATEWAYS: GatewayConfig[] = [
     id: 'mock',
     name: 'Mock / Desenvolvimento',
     desc: 'Gera QR codes falsos para testes. Use apenas em desenvolvimento.',
-    icon: '🧪',
+    icon: 'flask',
     fields: [],
   },
   {
     id: 'pushinpay',
     name: 'PushinPay',
     desc: 'Receba Pix automaticamente via PushinPay. Integração via Bearer Token.',
-    icon: '💳',
+    icon: 'credit-card',
     fields: [
       { key: 'token', label: 'Token de Acesso', type: 'password', placeholder: 'Seu token PushinPay' },
     ],
@@ -47,13 +48,26 @@ const GATEWAYS: GatewayConfig[] = [
     id: 'amplopay',
     name: 'AmploPay',
     desc: 'Receba Pix via AmploPay usando chave pública + chave privada.',
-    icon: '🏦',
+    icon: 'landmark',
     fields: [
       { key: 'public_key', label: 'Chave Pública', type: 'text', placeholder: 'x-public-key da AmploPay' },
       { key: 'secret_key', label: 'Chave Secreta', type: 'password', placeholder: 'x-secret-key da AmploPay' },
     ],
   },
 ]
+
+function GatewayIcon({ icon }: { icon: 'flask' | 'credit-card' | 'landmark' }) {
+  const config = {
+    flask: { Icon: FlaskConical, bg: 'bg-orange-50', color: 'text-orange-600' },
+    'credit-card': { Icon: CreditCard, bg: 'bg-[rgba(11,124,255,0.08)]', color: 'text-[#0B7CFF]' },
+    landmark: { Icon: Landmark, bg: 'bg-violet-50', color: 'text-violet-600' },
+  }[icon]
+  return (
+    <div className={`w-10 h-10 rounded-xl ${config.bg} flex items-center justify-center ${config.color} flex-shrink-0`}>
+      <config.Icon size={20} />
+    </div>
+  )
+}
 
 export function PaymentSettingsContent({
   userId,
@@ -154,9 +168,9 @@ export function PaymentSettingsContent({
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="h-10 bg-slate-200 rounded-lg animate-pulse" />
-        <div className="h-48 bg-slate-200 rounded-xl animate-pulse" />
-        <div className="h-40 bg-slate-200 rounded-xl animate-pulse" />
+        <div className="h-10 bg-[#EAF1F8] rounded-lg animate-pulse" />
+        <div className="h-48 bg-[#EAF1F8] rounded-xl animate-pulse" />
+        <div className="h-40 bg-[#EAF1F8] rounded-xl animate-pulse" />
       </div>
     )
   }
@@ -165,10 +179,10 @@ export function PaymentSettingsContent({
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">
+        <h1 className="text-2xl font-bold text-[#081827]">
           Pagamentos
         </h1>
-        <p className="text-sm text-slate-600 mt-1">
+        <p className="text-sm text-[#35516B] mt-1">
           Configure o gateway de Pix para receber pagamentos automaticamente.
         </p>
       </div>
@@ -181,8 +195,8 @@ export function PaymentSettingsContent({
               <CreditCard size={20} className="text-violet-600" />
             </div>
             <div>
-              <p className="text-base font-semibold text-slate-900">Gateway Ativo</p>
-              <p className="text-sm text-slate-600">
+              <p className="text-base font-semibold text-[#081827]">Gateway Ativo</p>
+              <p className="text-sm text-[#35516B]">
                 Selecione e configure o gateway de pagamento
               </p>
             </div>
@@ -197,14 +211,14 @@ export function PaymentSettingsContent({
                   w-full flex items-center gap-4 p-4 rounded-xl border-2 text-left transition-all
                   ${activeGateway === g.id
                     ? 'border-violet-500 bg-violet-50'
-                    : 'border-slate-200 hover:border-slate-300 bg-white'
+                    : 'border-[rgba(8,24,39,0.08)] hover:border-[rgba(8,24,39,0.08)] bg-white'
                   }
                 `}
               >
-                <span className="text-2xl">{g.icon}</span>
+                <GatewayIcon icon={g.icon} />
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-slate-900">{g.name}</p>
-                  <p className="text-xs text-slate-600">{g.desc}</p>
+                  <p className="text-sm font-semibold text-[#081827]">{g.name}</p>
+                  <p className="text-xs text-[#35516B]">{g.desc}</p>
                 </div>
                 {activeGateway === g.id && (
                   <CheckCircle size={20} className="text-green-600 flex-shrink-0" />
@@ -236,10 +250,10 @@ export function PaymentSettingsContent({
                 <Shield size={20} className="text-green-600" />
               </div>
               <div>
-                <p className="text-base font-semibold text-slate-900">
+                <p className="text-base font-semibold text-[#081827]">
                   Credenciais — {activeConfig.name}
                 </p>
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-[#35516B]">
                   Salvas com segurança. Nunca expostas no frontend.
                 </p>
               </div>
@@ -248,7 +262,7 @@ export function PaymentSettingsContent({
             <div className="space-y-4">
               {activeConfig.fields.map(field => (
                 <div key={field.key}>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-medium text-[#4A6178] mb-2">
                     {field.label}
                   </label>
                   <div className="relative">
@@ -257,12 +271,12 @@ export function PaymentSettingsContent({
                       value={credentials[activeGateway]?.[field.key] || ''}
                       onChange={e => handleCredentialChange(activeGateway, field.key, e.target.value)}
                       placeholder={field.placeholder}
-                      className="w-full h-10 px-3 pr-10 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full h-10 px-3 pr-10 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     />
                     {field.type === 'password' && (
                       <button
                         onClick={() => setShowSecrets(p => ({ ...p, [field.key]: !p[field.key] }))}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71869B] hover:text-[#35516B]"
                       >
                         {showSecrets[field.key] ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
@@ -283,12 +297,12 @@ export function PaymentSettingsContent({
               <Globe size={20} className="text-cyan-600" />
             </div>
             <div>
-              <p className="text-base font-semibold text-slate-900">URL do Webhook</p>
-              <p className="text-sm text-slate-600">Configure no painel do gateway para confirmação automática</p>
+              <p className="text-base font-semibold text-[#081827]">URL do Webhook</p>
+              <p className="text-sm text-[#35516B]">Configure no painel do gateway para confirmação automática</p>
             </div>
           </div>
           <div className="flex gap-3 items-center">
-            <code className="flex-1 text-xs text-slate-700 bg-slate-50 border border-slate-200 rounded-lg p-3 break-all">
+            <code className="flex-1 text-xs text-[#4A6178] bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-lg p-3 break-all">
               {webhookUrl}
             </code>
             <Button
@@ -310,7 +324,7 @@ export function PaymentSettingsContent({
             <div className="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center">
               <Zap size={20} className="text-violet-600" />
             </div>
-            <p className="text-base font-semibold text-slate-900">Como funciona</p>
+            <p className="text-base font-semibold text-[#081827]">Como funciona</p>
           </div>
           <ol className="space-y-3">
             {[
@@ -324,7 +338,7 @@ export function PaymentSettingsContent({
                 <span className="flex-shrink-0 w-6 h-6 rounded-full bg-violet-100 text-violet-600 text-xs font-bold flex items-center justify-center">
                   {i + 1}
                 </span>
-                <p className="text-sm text-slate-600 pt-0.5">{step}</p>
+                <p className="text-sm text-[#35516B] pt-0.5">{step}</p>
               </li>
             ))}
           </ol>

@@ -252,7 +252,7 @@ export function InventoryContent({
       case 'file':
         return <FileText size={20} className="text-orange-600" />
       default:
-        return <Archive size={20} className="text-slate-600" />
+        return <Archive size={20} className="text-[#35516B]" />
     }
   }
 
@@ -261,10 +261,10 @@ export function InventoryContent({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-2xl font-bold text-[#081827]">
             Estoque
           </h1>
-          <p className="text-sm text-slate-600 mt-1">
+          <p className="text-sm text-[#35516B] mt-1">
             {availableCount} disponível · {deliveredCount} entregue · {items.length} total
           </p>
         </div>
@@ -285,19 +285,19 @@ export function InventoryContent({
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 min-w-[200px]">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71869B] pointer-events-none" />
           <input
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar..."
-            className="w-full h-10 pl-10 pr-4 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full h-10 pl-10 pr-4 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
         </div>
         <select
           value={statusFilter}
           onChange={e => setStatusFilter(e.target.value)}
-          className="h-10 px-4 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+          className="h-10 px-4 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
         >
           {statusOptions.map(option => (
             <option key={option.value} value={option.value}>
@@ -308,7 +308,7 @@ export function InventoryContent({
         <select
           value={productFilter}
           onChange={e => setProductFilter(e.target.value)}
-          className="h-10 px-4 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+          className="h-10 px-4 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
         >
           {productFilterOptions.map(option => (
             <option key={option.value} value={option.value}>
@@ -323,7 +323,7 @@ export function InventoryContent({
         <Card>
           <CardContent className="p-8">
             <EmptyState
-              icon={<Archive className="w-12 h-12 text-slate-300" />}
+              icon={<Archive className="w-12 h-12 text-[#71869B]" />}
               title={items.length === 0 ? 'Estoque vazio' : 'Nenhum item encontrado'}
               description={items.length === 0 ? 'Adicione credenciais, links, arquivos ou outros entregáveis digitais.' : 'Nenhum item corresponde à sua busca.'}
               action={items.length === 0 ? (
@@ -339,25 +339,25 @@ export function InventoryContent({
               <CardContent className="p-4">
                 <div className="flex items-center gap-4">
                   {/* Icon */}
-                  <div className="w-12 h-12 rounded-xl flex-shrink-0 bg-slate-100 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-xl flex-shrink-0 bg-[#F3F7FB] flex items-center justify-center">
                     {getDeliveryIcon(item.delivery_type)}
                   </div>
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-slate-900">
+                      <h3 className="font-semibold text-[#081827]">
                         {item.title || deliveryTypeLabelMap[item.delivery_type]}
                       </h3>
                       <Badge variant={statusVariantMap[item.status] || 'default'} size="sm">
                         {statusLabelMap[item.status] || item.status}
                       </Badge>
-                      <span className="text-xs text-slate-500">
+                      <span className="text-xs text-[#71869B]">
                         {item.product?.name}
                       </span>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-3 text-sm text-slate-600">
+                    <div className="flex flex-wrap items-center gap-3 text-sm text-[#35516B]">
                       {item.access_email && (
                         <span className="flex items-center gap-1">
                           <Mail size={14} />
@@ -376,7 +376,7 @@ export function InventoryContent({
                           Link
                         </span>
                       )}
-                      <span className="text-slate-400">
+                      <span className="text-[#71869B]">
                         {formatDate(item.created_at)}
                       </span>
                     </div>
@@ -387,14 +387,14 @@ export function InventoryContent({
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => openEdit(item)}
-                        className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                        className="p-2 rounded-lg text-[#71869B] hover:text-[#35516B] hover:bg-[#F3F7FB] transition-colors"
                         title="Editar"
                       >
                         <Edit size={18} />
                       </button>
                       <button
                         onClick={() => setDeleteItem(item)}
-                        className="p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                        className="p-2 rounded-lg text-[#71869B] hover:text-red-600 hover:bg-red-50 transition-colors"
                         title="Remover"
                       >
                         <Trash2 size={18} />
@@ -492,7 +492,7 @@ export function InventoryContent({
           />
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-slate-700">
+            <label className="block text-sm font-medium text-[#4A6178]">
               Conteúdo personalizado
             </label>
             <textarea
@@ -500,12 +500,12 @@ export function InventoryContent({
               onChange={e => setForm(f => ({ ...f, custom_content: e.target.value }))}
               placeholder="Conteúdo a entregar..."
               rows={3}
-              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-slate-700">
+            <label className="block text-sm font-medium text-[#4A6178]">
               Instruções extras
             </label>
             <textarea
@@ -513,7 +513,7 @@ export function InventoryContent({
               onChange={e => setForm(f => ({ ...f, extra_instructions: e.target.value }))}
               placeholder="Como usar o produto..."
               rows={2}
-              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
             />
           </div>
         </div>

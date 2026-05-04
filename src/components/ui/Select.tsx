@@ -57,7 +57,7 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(
         className={cn('relative', fullWidth && 'w-full', className)}
       >
         {label && (
-          <label className="block text-sm font-medium text-slate-700 mb-1.5">
+          <label className="block text-[13px] font-semibold text-[#35516B] mb-1.5">
             {label}
           </label>
         )}
@@ -68,22 +68,22 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(
             onClick={() => !disabled && setIsOpen(!isOpen)}
             disabled={disabled}
             className={cn(
-              'w-full h-10 px-3 py-2',
-              'text-sm text-left text-slate-900',
-              'bg-white border border-slate-300 rounded-lg',
-              'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent',
-              'disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed',
+              'w-full min-h-[48px] px-4 py-2.5',
+              'text-[14px] text-left text-[#081827]',
+              'bg-white border border-[rgba(8,24,39,0.08)] rounded-xl',
+              'focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15),0_0_18px_rgba(0,194,255,0.12)]',
+              'disabled:bg-[#F8FBFF] disabled:text-[#71869B] disabled:cursor-not-allowed',
               'transition-all duration-200',
-              error && 'border-red-300 focus:ring-red-500',
+              error && 'border-[#DC2626] focus:border-[#DC2626] focus:shadow-[0_0_0_3px_rgba(220,38,38,0.12)]',
               'flex items-center justify-between'
             )}
           >
-            <span className={cn(!selectedOption && 'text-slate-400')}>
+            <span className={cn(!selectedOption && 'text-[#71869B]')}>
               {selectedOption?.label || placeholder}
             </span>
             <ChevronDown
               className={cn(
-                'w-4 h-4 text-slate-400 transition-transform',
+                'w-4 h-4 text-[#71869B] transition-transform',
                 isOpen && 'rotate-180'
               )}
             />
@@ -92,10 +92,10 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(
           {isOpen && (
             <>
               <div
-                className="fixed inset-0 z-10"
+                className="fixed inset-0 z-[1080]"
                 onClick={() => setIsOpen(false)}
               />
-              <div className="absolute z-20 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-60 overflow-auto">
+              <div className="absolute z-[1090] w-full mt-1 bg-white border border-[rgba(8,24,39,0.08)] rounded-xl shadow-[var(--shadow-elevated)] max-h-60 overflow-auto">
                 {options.map((option) => (
                   <button
                     key={option.value}
@@ -103,11 +103,11 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(
                     onClick={() => handleSelect(option)}
                     disabled={option.disabled}
                     className={cn(
-                      'w-full px-3 py-2 text-sm text-left',
+                      'w-full px-4 py-2.5 text-[14px] text-left',
                       'flex items-center justify-between',
-                      'hover:bg-slate-50 transition-colors',
+                      'hover:bg-[rgba(8,24,39,0.04)] transition-colors',
                       option.disabled && 'opacity-50 cursor-not-allowed',
-                      option.value === value && 'bg-blue-50 text-blue-700'
+                      option.value === value && 'bg-[rgba(11,124,255,0.08)] text-[#0B7CFF]'
                     )}
                   >
                     <span>{option.label}</span>
@@ -122,11 +122,11 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(
         </div>
 
         {error && (
-          <p className="mt-1.5 text-sm text-red-600">{error}</p>
+          <p className="mt-1.5 text-[13px] text-[#DC2626]">{error}</p>
         )}
 
         {helperText && !error && (
-          <p className="mt-1.5 text-sm text-slate-500">{helperText}</p>
+          <p className="mt-1.5 text-[13px] text-[#71869B]">{helperText}</p>
         )}
       </div>
     )

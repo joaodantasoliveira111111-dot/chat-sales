@@ -14,29 +14,29 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <div className="w-full">
         {label && (
-          <label className="block text-sm font-medium text-slate-700 mb-2">
+          <label className="block text-[13px] font-semibold text-[#35516B] mb-2">
             {label}
           </label>
         )}
         <textarea
           ref={ref}
           className={cn(
-            'w-full px-4 py-2.5 rounded-lg border border-slate-300',
-            'bg-white text-slate-900 placeholder:text-slate-400',
-            'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+            'w-full min-h-[120px] px-4 py-2.5 rounded-xl border border-[rgba(8,24,39,0.08)]',
+            'bg-white text-[#081827] text-[14px] placeholder:text-[#71869B]',
+            'focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15),0_0_18px_rgba(0,194,255,0.12)]',
             'transition-all duration-200',
             'disabled:opacity-50 disabled:cursor-not-allowed',
             'resize-none',
-            error && 'border-red-500 focus:ring-red-500',
+            error && 'border-[#DC2626] focus:border-[#DC2626] focus:shadow-[0_0_0_3px_rgba(220,38,38,0.12)]',
             className
           )}
           {...props}
         />
         {hint && !error && (
-          <p className="mt-1.5 text-sm text-slate-500">{hint}</p>
+          <p className="mt-1.5 text-[13px] text-[#71869B]">{hint}</p>
         )}
         {error && (
-          <p className="mt-1.5 text-sm text-red-600">{error}</p>
+          <p className="mt-1.5 text-[13px] text-[#DC2626]">{error}</p>
         )}
       </div>
     )

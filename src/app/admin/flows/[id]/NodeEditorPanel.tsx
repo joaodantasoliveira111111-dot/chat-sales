@@ -33,11 +33,11 @@ export function NodeEditorPanel({ node, products, userId, flowId, onChange, onDe
   return (
     <div className="p-4 space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-bold text-white">Editar Nó</h3>
-        <button
-          onClick={onDelete}
-          className="p-1.5 rounded-lg hover:bg-red-500/10 text-slate-400 hover:text-red-400 transition-colors"
-        >
+		<h3 className="text-sm font-bold text-[#081827]">Editar Nó</h3>
+		<button
+			onClick={onDelete}
+			className="p-1.5 rounded-lg hover:bg-red-50 text-[#71869B] hover:text-red-500 transition-colors"
+		>
           <Trash2 size={15} />
         </button>
       </div>
@@ -168,33 +168,33 @@ function TextMessageEditor({ config, onChange }: { config: any; onChange: (u: an
       />
       <div className="grid grid-cols-2 gap-2">
         <div>
-          <label className="text-xs font-medium text-slate-300 block mb-1">Delay inicial (ms)</label>
-          <input
-            type="number"
-            value={config.delay_ms || 0}
-            onChange={e => onChange({ delay_ms: parseInt(e.target.value) })}
-            className="w-full px-3 py-2 rounded-xl text-sm bg-white/5 border border-white/10 text-white focus:outline-none focus:border-violet-500/60"
-          />
-        </div>
-        <div>
-          <label className="text-xs font-medium text-slate-300 block mb-1">Digitação (ms)</label>
-          <input
-            type="number"
-            value={config.typing_duration_ms || 1500}
-            onChange={e => onChange({ typing_duration_ms: parseInt(e.target.value) })}
-            className="w-full px-3 py-2 rounded-xl text-sm bg-white/5 border border-white/10 text-white focus:outline-none focus:border-violet-500/60"
-          />
+			<label className="text-xs font-medium text-[#35516B] block mb-1">Delay inicial (ms)</label>
+			<input
+				type="number"
+				value={config.delay_ms || 0}
+				onChange={e => onChange({ delay_ms: parseInt(e.target.value) })}
+				className="w-full px-3 py-2 rounded-xl text-sm bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] text-[#081827] focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15)]"
+			/>
+		</div>
+		<div>
+			<label className="text-xs font-medium text-[#35516B] block mb-1">Digitação (ms)</label>
+			<input
+				type="number"
+				value={config.typing_duration_ms || 1500}
+				onChange={e => onChange({ typing_duration_ms: parseInt(e.target.value) })}
+				className="w-full px-3 py-2 rounded-xl text-sm bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] text-[#081827] focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15)]"
+			/>
         </div>
       </div>
-      <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
-        <input
-          type="checkbox"
-          checked={config.show_typing || false}
-          onChange={e => onChange({ show_typing: e.target.checked })}
-          className="w-4 h-4 accent-violet-500 rounded"
-        />
-        Mostrar "digitando..."
-      </label>
+	<label className="flex items-center gap-2 text-sm text-[#35516B] cursor-pointer">
+		<input
+			type="checkbox"
+			checked={config.show_typing || false}
+			onChange={e => onChange({ show_typing: e.target.checked })}
+			className="w-4 h-4 accent-[#0B7CFF] rounded"
+		/>
+		Mostrar "digitando..."
+	</label>
     </div>
   )
 }
@@ -219,45 +219,45 @@ function ButtonsEditor({ config, onChange }: { config: any; onChange: (u: any) =
 
   return (
     <div className="space-y-2">
-      <p className="text-xs font-medium text-slate-300">Botões ({buttons.length})</p>
-      {buttons.map((btn: any, idx: number) => (
-        <div key={btn.id} className="p-3 rounded-xl bg-white/3 border border-white/8 space-y-2">
-          <div className="flex items-center gap-2">
-            <input
-              value={btn.label}
-              onChange={e => updateButton(idx, { label: e.target.value })}
-              placeholder="Texto do botão"
-              className="flex-1 px-2.5 py-1.5 rounded-lg text-sm bg-white/5 border border-white/10 text-white focus:outline-none"
-            />
-            <button onClick={() => removeButton(idx)} className="p-1 hover:text-red-400 text-slate-500">
-              <X size={14} />
-            </button>
-          </div>
-          <select
-            value={btn.action_type}
-            onChange={e => updateButton(idx, { action_type: e.target.value })}
-            className="w-full px-2.5 py-1.5 rounded-lg text-xs bg-[#111118] border border-white/10 text-white focus:outline-none"
-          >
-            <option value="go_to_node">Ir para nó</option>
-            <option value="open_checkout">Abrir checkout</option>
-            <option value="open_support">Abrir suporte</option>
-            <option value="external_link">Link externo</option>
-            <option value="restart_flow">Reiniciar fluxo</option>
-          </select>
-          {btn.action_type === 'external_link' && (
-            <input
-              value={btn.external_url || ''}
-              onChange={e => updateButton(idx, { external_url: e.target.value })}
-              placeholder="https://..."
-              className="w-full px-2.5 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 text-white focus:outline-none"
-            />
-          )}
-        </div>
-      ))}
-      <button
-        onClick={addButton}
-        className="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-dashed border-white/15 text-xs text-slate-500 hover:text-violet-400 hover:border-violet-500/40 transition-all"
-      >
+		<p className="text-xs font-medium text-[#35516B]">Botões ({buttons.length})</p>
+		{buttons.map((btn: any, idx: number) => (
+			<div key={btn.id} className="p-3 rounded-xl bg-[#F3F7FB] border border-[rgba(8,24,39,0.06)] space-y-2">
+				<div className="flex items-center gap-2">
+					<input
+						value={btn.label}
+						onChange={e => updateButton(idx, { label: e.target.value })}
+						placeholder="Texto do botão"
+						className="flex-1 px-2.5 py-1.5 rounded-lg text-sm bg-white border border-[rgba(8,24,39,0.08)] text-[#081827] focus:outline-none focus:border-[#0B7CFF]"
+					/>
+					<button onClick={() => removeButton(idx)} className="p-1 hover:text-red-500 text-[#71869B]">
+						<X size={14} />
+					</button>
+				</div>
+				<select
+					value={btn.action_type}
+					onChange={e => updateButton(idx, { action_type: e.target.value })}
+					className="w-full px-2.5 py-1.5 rounded-lg text-xs bg-white border border-[rgba(8,24,39,0.08)] text-[#081827] focus:outline-none"
+				>
+					<option value="go_to_node">Ir para nó</option>
+					<option value="open_checkout">Abrir checkout</option>
+					<option value="open_support">Abrir suporte</option>
+					<option value="external_link">Link externo</option>
+					<option value="restart_flow">Reiniciar fluxo</option>
+				</select>
+				{btn.action_type === 'external_link' && (
+					<input
+						value={btn.external_url || ''}
+						onChange={e => updateButton(idx, { external_url: e.target.value })}
+						placeholder="https://..."
+						className="w-full px-2.5 py-1.5 rounded-lg text-xs bg-white border border-[rgba(8,24,39,0.08)] text-[#081827] focus:outline-none"
+					/>
+				)}
+			</div>
+		))}
+		<button
+			onClick={addButton}
+			className="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-dashed border-[rgba(8,24,39,0.12)] text-xs text-[#71869B] hover:text-[#0B7CFF] hover:border-[#0B7CFF]/40 transition-all"
+		>
         <Plus size={13} />
         Adicionar botão
       </button>
@@ -412,7 +412,7 @@ function MediaNodeEditor({
         placeholder="https://..."
       />
 
-      <label className="flex min-h-[96px] cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 bg-white/[0.03] px-3 py-4 text-center text-xs text-slate-400 hover:border-violet-400/50 hover:text-white">
+	<label className="flex min-h-[96px] cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[rgba(8,24,39,0.12)] bg-[#F3F7FB] px-3 py-4 text-center text-xs text-[#71869B] hover:border-[#0B7CFF]/50 hover:text-[#081827]">
         <Upload size={18} />
         {uploading ? 'Enviando...' : 'Clique para enviar arquivo'}
         <input
@@ -475,42 +475,42 @@ function MediaGalleryEditor(props: {
 
   return (
     <div className="space-y-3">
-      <p className="text-xs font-medium text-slate-300">Midias da sequencia</p>
-      {items.map((item: any, idx: number) => (
-        <div key={item.id} className="space-y-2 rounded-xl border border-white/8 bg-white/3 p-3">
-          <div className="flex items-center gap-2">
-            <select
-              value={item.type || 'image'}
-              onChange={e => updateItem(idx, { type: e.target.value })}
-              className="w-28 rounded-lg border border-white/10 bg-[#111118] px-2 py-1.5 text-xs text-white focus:outline-none"
-            >
-              <option value="image">Imagem</option>
-              <option value="video">Video</option>
-              <option value="audio">Audio</option>
-              <option value="document">PDF</option>
-            </select>
-            <button onClick={() => removeItem(idx)} className="ml-auto p-1 text-slate-500 hover:text-red-400">
-              <X size={14} />
-            </button>
-          </div>
-          <input
-            value={item.url || ''}
-            onChange={e => updateItem(idx, { url: e.target.value })}
-            placeholder="URL da midia"
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs text-white focus:outline-none"
-          />
-          <input
-            value={item.caption || ''}
-            onChange={e => updateItem(idx, { caption: e.target.value })}
-            placeholder="Legenda opcional"
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs text-white focus:outline-none"
-          />
-        </div>
-      ))}
-      <button
-        onClick={addItem}
-        className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 py-2 text-xs text-slate-500 transition-all hover:border-violet-500/40 hover:text-violet-400"
-      >
+		<p className="text-xs font-medium text-[#35516B]">Midias da sequencia</p>
+		{items.map((item: any, idx: number) => (
+			<div key={item.id} className="space-y-2 rounded-xl border border-[rgba(8,24,39,0.06)] bg-[#F3F7FB] p-3">
+				<div className="flex items-center gap-2">
+					<select
+						value={item.type || 'image'}
+						onChange={e => updateItem(idx, { type: e.target.value })}
+						className="w-28 rounded-lg border border-[rgba(8,24,39,0.08)] bg-white px-2 py-1.5 text-xs text-[#081827] focus:outline-none"
+					>
+						<option value="image">Imagem</option>
+						<option value="video">Video</option>
+						<option value="audio">Audio</option>
+						<option value="document">PDF</option>
+					</select>
+					<button onClick={() => removeItem(idx)} className="ml-auto p-1 text-[#71869B] hover:text-red-500">
+						<X size={14} />
+					</button>
+				</div>
+				<input
+					value={item.url || ''}
+					onChange={e => updateItem(idx, { url: e.target.value })}
+					placeholder="URL da midia"
+					className="w-full rounded-lg border border-[rgba(8,24,39,0.08)] bg-white px-2.5 py-1.5 text-xs text-[#081827] focus:outline-none"
+				/>
+				<input
+					value={item.caption || ''}
+					onChange={e => updateItem(idx, { caption: e.target.value })}
+					placeholder="Legenda opcional"
+					className="w-full rounded-lg border border-[rgba(8,24,39,0.08)] bg-white px-2.5 py-1.5 text-xs text-[#081827] focus:outline-none"
+				/>
+			</div>
+		))}
+		<button
+			onClick={addItem}
+			className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-[rgba(8,24,39,0.12)] py-2 text-xs text-[#71869B] transition-all hover:border-[#0B7CFF]/40 hover:text-[#0B7CFF]"
+		>
         <Plus size={13} />
         Adicionar midia
       </button>
@@ -531,9 +531,9 @@ function ProductPlanEditor({ config, onChange, products }: { config: any; onChan
 
   return (
     <div className="space-y-2">
-      <p className="text-xs font-medium text-slate-300">Planos/produtos da oferta</p>
-      {plans.map((plan: any, idx: number) => (
-        <div key={plan.id} className="space-y-2 rounded-xl border border-white/8 bg-white/3 p-3">
+		<p className="text-xs font-medium text-[#35516B]">Planos/produtos da oferta</p>
+		{plans.map((plan: any, idx: number) => (
+			<div key={plan.id} className="space-y-2 rounded-xl border border-[rgba(8,24,39,0.06)] bg-[#F3F7FB] p-3">
           <Input label="Nome do plano" value={plan.plan_name || ''} onChange={e => updatePlans(plans.map((p: any, i: number) => i === idx ? { ...p, plan_name: e.target.value, label: e.target.value } : p))} />
           <Select label="Produto vinculado" value={plan.product_id || ''} onChange={value => updatePlans(plans.map((p: any, i: number) => i === idx ? { ...p, product_id: value } : p))} options={[{ value: '', label: 'Sem produto vinculado' }, ...products.map(p => ({ value: p.id, label: p.name }))]} />
           <Input label="Preco" type="number" value={String(plan.price || '')} onChange={e => updatePlans(plans.map((p: any, i: number) => i === idx ? { ...p, price: Number(e.target.value) } : p))} />
@@ -541,7 +541,7 @@ function ProductPlanEditor({ config, onChange, products }: { config: any; onChan
           <button onClick={() => updatePlans(plans.filter((_: any, i: number) => i !== idx))} className="text-xs text-red-400">Remover plano</button>
         </div>
       ))}
-      <button onClick={() => updatePlans([...plans, { id: uuidv4(), plan_name: 'Plano completo', button_text: 'Quero esse' }])} className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 py-2 text-xs text-slate-500 hover:text-violet-400">
+		<button onClick={() => updatePlans([...plans, { id: uuidv4(), plan_name: 'Plano completo', button_text: 'Quero esse' }])} className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-[rgba(8,24,39,0.12)] py-2 text-xs text-[#71869B] hover:text-[#0B7CFF]">
         <Plus size={13} />
         Adicionar plano
       </button>
@@ -592,7 +592,7 @@ function PixPaymentEditor({ config, onChange }: { config: any; onChange: (u: any
         label="Texto botão copiar"
         value={config.copy_button_text || ''}
         onChange={e => onChange({ copy_button_text: e.target.value })}
-        placeholder="📋 Copiar código Pix"
+        placeholder="Copiar codigo Pix"
       />
       <Input
         label="Expiração (minutos)"
@@ -630,7 +630,7 @@ function DeliveryEditor({ config, onChange }: { config: any; onChange: (u: any) 
         label="Template de entrega"
         value={config.delivery_template || ''}
         onChange={e => onChange({ delivery_template: e.target.value })}
-        placeholder="Aqui está seu acesso, {{customer_name}}! 🎉"
+        placeholder="Aqui esta seu acesso, {{customer_name}}!"
         rows={4}
         hint="Vars: {{customer_name}}, {{access_email}}, {{access_password}}, {{access_url}}, {{license_key}}, {{custom_content}}"
       />
@@ -675,10 +675,10 @@ const deliveryVariables = [
 function AdvancedDeliveryEditor({ config, onChange, products }: { config: any; onChange: (u: any) => void; products: any[] }) {
   const deliveryType = config.delivery_type || 'account_credentials'
   const defaultTemplate = deliveryType === 'account_credentials'
-    ? 'Pagamento aprovado ✅\n\nAqui está seu acesso:\n\nLogin: {{account.login}}\nSenha: {{account.password}}\n\nGuarde esses dados com segurança.'
+    ? 'Pagamento aprovado\n\nAqui esta seu acesso:\n\nLogin: {{account.login}}\nSenha: {{account.password}}\n\nGuarde esses dados com seguranca.'
     : deliveryType === 'manual_access'
-      ? 'Pagamento aprovado ✅\n\nObrigado pela compra, {{lead.name}}. Nossa equipe vai liberar seu acesso em instantes.'
-      : 'Pagamento aprovado ✅\n\nSeu acesso foi liberado.\n\nAcesse por aqui: {{delivery.link}}'
+    ? 'Pagamento aprovado\n\nObrigado pela compra, {{lead.name}}. Nossa equipe vai liberar seu acesso em instantes.'
+    : 'Pagamento aprovado\n\nSeu acesso foi liberado.\n\nAcesse por aqui: {{delivery.link}}'
 
   return (
     <div className="space-y-4">
@@ -767,24 +767,24 @@ function AdvancedDeliveryEditor({ config, onChange, products }: { config: any; o
         hint="Use as variáveis abaixo para personalizar a mensagem."
       />
 
-      <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-        <p className="mb-2 text-xs font-semibold text-slate-300">Variáveis disponíveis</p>
-        <div className="flex flex-wrap gap-1.5">
-          {deliveryVariables.map(variable => (
-            <button
-              key={variable}
-              type="button"
-              onClick={() => navigator.clipboard?.writeText(variable)}
-              className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-1 text-[10px] text-slate-300 hover:border-violet-400/50 hover:text-white"
-              title="Clique para copiar"
-            >
-              {variable}
-            </button>
-          ))}
-        </div>
-      </div>
+		<div className="rounded-xl border border-[rgba(8,24,39,0.08)] bg-[#F3F7FB] p-3">
+			<p className="mb-2 text-xs font-semibold text-[#35516B]">Variáveis disponíveis</p>
+			<div className="flex flex-wrap gap-1.5">
+				{deliveryVariables.map(variable => (
+					<button
+						key={variable}
+						type="button"
+						onClick={() => navigator.clipboard?.writeText(variable)}
+						className="rounded-full border border-[rgba(8,24,39,0.08)] bg-white px-2 py-1 text-[10px] text-[#35516B] hover:border-[#0B7CFF]/50 hover:text-[#0B7CFF]"
+						title="Clique para copiar"
+					>
+						{variable}
+					</button>
+				))}
+			</div>
+		</div>
 
-      <div className="rounded-xl border border-cyan-400/20 bg-cyan-400/5 p-3 text-xs leading-relaxed text-slate-300">
+		<div className="rounded-xl border border-[rgba(0,194,255,0.2)] bg-[rgba(0,194,255,0.05)] p-3 text-xs leading-relaxed text-[#35516B]">
         Conecte as saídas do nó no canvas: <strong>Sucesso</strong>, <strong>Sem estoque</strong> e <strong>Erro</strong>.
       </div>
     </div>
@@ -798,20 +798,20 @@ function ObjectionEditor({ config, onChange }: { config: any; onChange: (u: any)
 
   return (
     <div className="space-y-2">
-      <p className="text-xs font-medium text-slate-300">Objecoes comuns</p>
-      {objections.map((item: any, idx: number) => (
-        <div key={item.id} className="space-y-2 rounded-xl border border-white/8 bg-white/3 p-3">
-          <div className="flex items-center gap-2">
-            <input
-              value={item.label || ''}
-              onChange={e => updateObjections(objections.map((o: any, i: number) => i === idx ? { ...o, label: e.target.value } : o))}
-              placeholder="Ex: Esta caro"
-              className="flex-1 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-sm text-white focus:outline-none"
-            />
-            <button onClick={() => updateObjections(objections.filter((_: any, i: number) => i !== idx))} className="p-1 text-slate-500 hover:text-red-400">
-              <X size={14} />
-            </button>
-          </div>
+		<p className="text-xs font-medium text-[#35516B]">Objecoes comuns</p>
+		{objections.map((item: any, idx: number) => (
+			<div key={item.id} className="space-y-2 rounded-xl border border-[rgba(8,24,39,0.06)] bg-[#F3F7FB] p-3">
+				<div className="flex items-center gap-2">
+					<input
+						value={item.label || ''}
+						onChange={e => updateObjections(objections.map((o: any, i: number) => i === idx ? { ...o, label: e.target.value } : o))}
+						placeholder="Ex: Esta caro"
+						className="flex-1 rounded-lg border border-[rgba(8,24,39,0.08)] bg-white px-2.5 py-1.5 text-sm text-[#081827] focus:outline-none"
+					/>
+					<button onClick={() => updateObjections(objections.filter((_: any, i: number) => i !== idx))} className="p-1 text-[#71869B] hover:text-red-500">
+						<X size={14} />
+					</button>
+				</div>
           <Textarea
             label="Resposta automatica"
             value={item.response || ''}
@@ -822,11 +822,11 @@ function ObjectionEditor({ config, onChange }: { config: any; onChange: (u: any)
       ))}
       <button
         onClick={() => updateObjections([...objections, { id: uuidv4(), label: 'Esta caro', response: 'Entendo. Posso te mostrar por que muita gente escolhe mesmo assim?' }])}
-        className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 py-2 text-xs text-slate-500 hover:text-violet-400"
-      >
-        <Plus size={13} />
-        Adicionar objecao
-      </button>
+		className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-[rgba(8,24,39,0.12)] py-2 text-xs text-[#71869B] hover:text-[#0B7CFF]"
+		>
+			<Plus size={13} />
+			Adicionar objecao
+		</button>
     </div>
   )
 }
@@ -888,16 +888,16 @@ function EndEditor({ config, onChange }: { config: any; onChange: (u: any) => vo
         label="Mensagem final"
         value={config.final_message || ''}
         onChange={e => onChange({ final_message: e.target.value })}
-        placeholder="Obrigado! Até logo! 👋"
+        placeholder="Obrigado! Ate logo!"
         rows={3}
       />
-      <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
-        <input
-          type="checkbox"
-          checked={config.restart_button || false}
-          onChange={e => onChange({ restart_button: e.target.checked })}
-          className="w-4 h-4 accent-violet-500 rounded"
-        />
+	<label className="flex items-center gap-2 text-sm text-[#35516B] cursor-pointer">
+		<input
+			type="checkbox"
+			checked={config.restart_button || false}
+			onChange={e => onChange({ restart_button: e.target.checked })}
+			className="w-4 h-4 accent-[#0B7CFF] rounded"
+		/>
         Mostrar botão de reiniciar
       </label>
     </div>

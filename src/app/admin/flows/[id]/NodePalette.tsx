@@ -56,32 +56,32 @@ interface NodePaletteProps {
 export function NodePalette({ onAddNode }: NodePaletteProps) {
   return (
     <div className="p-3">
-      <p className="px-1 mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
-        Sales Flow Builder
-      </p>
-      <div className="space-y-1">
-        {NODE_TYPES.map(node => {
-          const Icon = node.icon
-          return (
-            <button
-              key={node.type}
-              onClick={() => onAddNode(node.type)}
-              className="group flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left transition-all duration-150 hover:bg-white/5"
-            >
-              <div
-                className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg"
-                style={{ background: `${node.color}18`, color: node.color }}
-              >
-                <Icon size={13} />
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs font-medium text-slate-300 group-hover:text-white">{node.label}</p>
-                <p className="truncate text-[10px] text-slate-600">{node.desc}</p>
-              </div>
-            </button>
-          )
-        })}
-      </div>
+		<p className="px-1 mb-3 text-xs font-semibold uppercase tracking-wider text-[#71869B]">
+			Sales Flow Builder
+		</p>
+		<div className="space-y-1">
+			{NODE_TYPES.map(node => {
+				const Icon = node.icon
+				return (
+					<button
+						key={node.type}
+						onClick={() => onAddNode(node.type)}
+						className="group flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left transition-all duration-150 hover:bg-[rgba(8,24,39,0.04)]"
+					>
+						<div
+							className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg"
+							style={{ background: `${node.color}14`, color: node.color }}
+						>
+							<Icon size={13} />
+						</div>
+						<div className="min-w-0">
+							<p className="text-xs font-medium text-[#35516B] group-hover:text-[#081827]">{node.label}</p>
+							<p className="truncate text-[10px] text-[#71869B]">{node.desc}</p>
+						</div>
+					</button>
+				)
+			})}
+		</div>
     </div>
   )
 }

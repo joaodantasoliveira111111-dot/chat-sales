@@ -71,10 +71,10 @@ export function SupportContent({ requests: initialRequests }: { requests: Suppor
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-2xl font-bold text-[#081827]">
             Suporte
           </h1>
-          <p className="text-sm text-slate-600 mt-1">
+          <p className="text-sm text-[#35516B] mt-1">
             {openCount} solicitação{openCount !== 1 ? 'ões' : ''} aberta{openCount !== 1 ? 's' : ''}
           </p>
         </div>
@@ -83,19 +83,19 @@ export function SupportContent({ requests: initialRequests }: { requests: Suppor
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 min-w-[200px]">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71869B] pointer-events-none" />
           <input
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar..."
-            className="w-full h-10 pl-10 pr-4 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full h-10 pl-10 pr-4 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
         </div>
         <select
           value={statusFilter}
           onChange={e => setStatusFilter(e.target.value)}
-          className="h-10 px-4 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+          className="h-10 px-4 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
         >
           {statusOptions.map(option => (
             <option key={option.value} value={option.value}>
@@ -110,7 +110,7 @@ export function SupportContent({ requests: initialRequests }: { requests: Suppor
         <Card>
           <CardContent className="p-8">
             <EmptyState
-              icon={<HeadphonesIcon className="w-12 h-12 text-slate-300" />}
+              icon={<HeadphonesIcon className="w-12 h-12 text-[#71869B]" />}
               title={requests.length === 0 ? 'Nenhuma solicitação de suporte' : 'Nenhum resultado'}
               description={requests.length === 0 ? 'As solicitações de suporte dos seus clientes aparecerão aqui.' : 'Tente ajustar os filtros.'}
             />
@@ -130,20 +130,20 @@ export function SupportContent({ requests: initialRequests }: { requests: Suppor
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-slate-900">
+                      <h3 className="font-semibold text-[#081827]">
                         {req.customer_name || req.customer_email || 'Anônimo'}
                       </h3>
                       <Badge variant={statusVariantMap[req.status] || 'default'} size="sm">
                         {statusLabelMap[req.status] || req.status}
                       </Badge>
                     </div>
-                    <p className="text-sm text-slate-600 line-clamp-2">
+                    <p className="text-sm text-[#35516B] line-clamp-2">
                       {req.message}
                     </p>
                   </div>
 
                   {/* Date */}
-                  <div className="text-sm text-slate-500 flex-shrink-0">
+                  <div className="text-sm text-[#71869B] flex-shrink-0">
                     {formatDate(req.created_at)}
                   </div>
                 </div>
@@ -165,31 +165,31 @@ export function SupportContent({ requests: initialRequests }: { requests: Suppor
             {/* Customer Info */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <p className="text-xs text-slate-500 font-medium">Nome</p>
-                <p className="text-sm font-semibold text-slate-900">
+                <p className="text-xs text-[#71869B] font-medium">Nome</p>
+                <p className="text-sm font-semibold text-[#081827]">
                   {selected.customer_name || '-'}
                 </p>
               </div>
 
               <div className="space-y-1">
-                <p className="text-xs text-slate-500 font-medium">E-mail</p>
-                <p className="text-sm font-semibold text-slate-900">
+                <p className="text-xs text-[#71869B] font-medium">E-mail</p>
+                <p className="text-sm font-semibold text-[#081827]">
                   {selected.customer_email || '-'}
                 </p>
               </div>
 
               {selected.customer_whatsapp && (
                 <div className="space-y-1">
-                  <p className="text-xs text-slate-500 font-medium">WhatsApp</p>
-                  <p className="text-sm font-semibold text-slate-900">
+                  <p className="text-xs text-[#71869B] font-medium">WhatsApp</p>
+                  <p className="text-sm font-semibold text-[#081827]">
                     {selected.customer_whatsapp}
                   </p>
                 </div>
               )}
 
               <div className="space-y-1">
-                <p className="text-xs text-slate-500 font-medium">Data</p>
-                <p className="text-sm font-semibold text-slate-900">
+                <p className="text-xs text-[#71869B] font-medium">Data</p>
+                <p className="text-sm font-semibold text-[#081827]">
                   {formatDate(selected.created_at)}
                 </p>
               </div>
@@ -197,14 +197,14 @@ export function SupportContent({ requests: initialRequests }: { requests: Suppor
 
             {/* Message */}
             <div className="space-y-2">
-              <p className="text-sm font-semibold text-slate-900">Mensagem</p>
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 text-sm text-slate-700 whitespace-pre-wrap">
+              <p className="text-sm font-semibold text-[#081827]">Mensagem</p>
+              <div className="p-4 bg-[#F3F7FB] rounded-xl border border-[rgba(8,24,39,0.08)] text-sm text-[#4A6178] whitespace-pre-wrap">
                 {selected.message}
               </div>
             </div>
 
             {/* Status Update */}
-            <div className="pt-4 border-t border-slate-200">
+            <div className="pt-4 border-t border-[rgba(8,24,39,0.08)]">
               <Select
                 label="Alterar status"
                 value={selected.status}

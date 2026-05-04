@@ -163,8 +163,8 @@ export function FlowsContent({
     <div style={{ padding: '1.5rem', maxWidth: '1100px', margin: '0 auto' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 style={{ fontSize: '1.375rem', fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.02em' }}>Fluxos</h1>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>{flows.length} fluxo(s) criado(s)</p>
+          <h1 style={{ fontSize: '1.375rem', fontWeight: 800, color: '#081827', letterSpacing: '-0.02em' }}>Fluxos</h1>
+          <p style={{ fontSize: '0.8rem', color: '#71869B', marginTop: '0.25rem' }}>{flows.length} fluxo(s) criado(s)</p>
         </div>
         <Button onClick={() => { setFormError(null); setShowCreate(true) }} size="md">
           <Plus size={15} />
@@ -196,17 +196,17 @@ export function FlowsContent({
                   background: 'rgba(124,58,237,0.12)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <Workflow size={20} style={{ color: 'var(--primary-light)' }} />
+                  <Workflow size={20} style={{ color: '#0B7CFF' }} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.2rem' }}>
-                    <span style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text)' }}>{flow.name}</span>
+                    <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#081827' }}>{flow.name}</span>
                     <Badge status={flow.status} />
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                    {flow.product && <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Produto: {flow.product.name}</span>}
-                    <span style={{ fontSize: '0.72rem', color: 'var(--text-subtle)', fontWeight: 600 }}>v{flow.version}</span>
-                    <span style={{ fontSize: '0.72rem', color: 'var(--text-subtle)' }}>{formatDate(flow.updated_at)}</span>
+                    {flow.product && <span style={{ fontSize: '0.72rem', color: '#71869B' }}>Produto: {flow.product.name}</span>}
+                    <span style={{ fontSize: '0.72rem', color: '#71869B', fontWeight: 600 }}>v{flow.version}</span>
+                    <span style={{ fontSize: '0.72rem', color: '#71869B' }}>{formatDate(flow.updated_at)}</span>
                   </div>
                   <FlowFunnelStrip funnel={funnelByFlow[flow.id]} />
                 </div>
@@ -222,7 +222,7 @@ export function FlowsContent({
                     title="Excluir"
                     style={{
                       padding: '0.5rem', borderRadius: '8px', background: 'transparent',
-                      border: 'none', color: 'var(--text-subtle)', cursor: 'pointer',
+                      border: 'none', color: '#71869B', cursor: 'pointer',
                       display: 'flex', transition: 'all 0.15s',
                     }}
                     onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.1)'; e.currentTarget.style.color = '#F87171' }}
@@ -258,7 +258,7 @@ export function FlowsContent({
           />
 
           <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text)', fontSize: '0.78rem', fontWeight: 700 }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', color: '#081827', fontSize: '0.78rem', fontWeight: 700 }}>
               Template pronto
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '0.65rem' }}>
@@ -270,14 +270,14 @@ export function FlowsContent({
                   style={{
                     padding: '0.9rem',
                     borderRadius: '14px',
-                    border: form.template_id === template.id ? '1px solid rgba(99,91,255,0.75)' : '1px solid var(--border)',
-                    background: form.template_id === template.id ? 'rgba(99,91,255,0.12)' : 'var(--surface)',
+                    border: form.template_id === template.id ? '1px solid rgba(11,124,255,0.75)' : '1px solid rgba(8,24,39,0.08)',
+                    background: form.template_id === template.id ? 'rgba(11,124,255,0.12)' : '#FFFFFF',
                     textAlign: 'left',
                     cursor: 'pointer',
                   }}
                 >
-                  <strong style={{ display: 'block', color: 'var(--text)', fontSize: '0.82rem', marginBottom: '0.25rem' }}>{template.name}</strong>
-                  <span style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.72rem', lineHeight: 1.45 }}>{template.description}</span>
+                  <strong style={{ display: 'block', color: '#081827', fontSize: '0.82rem', marginBottom: '0.25rem' }}>{template.name}</strong>
+                  <span style={{ display: 'block', color: '#71869B', fontSize: '0.72rem', lineHeight: 1.45 }}>{template.description}</span>
                 </button>
               ))}
             </div>
@@ -340,7 +340,7 @@ export function FlowsContent({
             />
           </div>
 
-          <div style={{ border: '1px solid rgba(34,211,238,0.22)', background: 'rgba(34,211,238,0.06)', color: 'var(--text-muted)', borderRadius: '14px', padding: '0.85rem', fontSize: '0.76rem', lineHeight: 1.55 }}>
+          <div style={{ border: '1px solid rgba(34,211,238,0.22)', background: 'rgba(34,211,238,0.06)', color: '#71869B', borderRadius: '14px', padding: '0.85rem', fontSize: '0.76rem', lineHeight: 1.55 }}>
             O Chatfy vai montar automaticamente: boas-vindas, dor, solucao, oferta, captura por conversa, Pix, aguardar pagamento, entrega, suporte e fim. Tudo fica editavel no React Flow.
           </div>
         </div>
@@ -373,13 +373,13 @@ function FlowFunnelStrip({ funnel }: { funnel?: FlowFunnel }) {
 
   return (
     <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginTop: '0.65rem' }}>
-      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', color: 'var(--text-subtle)', fontSize: '0.68rem', fontWeight: 700 }}>
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', color: '#71869B', fontSize: '0.68rem', fontWeight: 700 }}>
         <BarChart3 size={12} />
         Funil
       </span>
       {items.map(([label, value]) => (
-        <span key={label} style={{ border: '1px solid var(--border)', borderRadius: '999px', padding: '0.2rem 0.48rem', color: 'var(--text-muted)', fontSize: '0.68rem', background: 'rgba(255,255,255,0.03)' }}>
-          {label}: <strong style={{ color: 'var(--text)' }}>{value}</strong>
+        <span key={label} style={{ border: '1px solid rgba(8,24,39,0.08)', borderRadius: '999px', padding: '0.2rem 0.48rem', color: '#71869B', fontSize: '0.68rem', background: 'rgba(8,24,39,0.03)' }}>
+          {label}: <strong style={{ color: '#081827' }}>{value}</strong>
         </span>
       ))}
     </div>

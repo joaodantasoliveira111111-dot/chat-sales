@@ -14,32 +14,32 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ 
-    className, 
-    variant = 'primary', 
-    size = 'md', 
+  ({
+    className,
+    variant = 'primary',
+    size = 'md',
     isLoading = false,
     leftIcon,
     rightIcon,
     fullWidth = false,
-    children, 
+    children,
     disabled,
-    ...props 
+    ...props
   }, ref) => {
-    const baseStyles = 'inline-flex items-center justify-center gap-2 font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
+    const baseStyles = 'inline-flex items-center justify-center gap-2 font-semibold rounded-xl transition-all duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed active:shadow-[inset_4px_4px_8px_rgba(8,24,39,0.06),inset_-2px_-2px_6px_rgba(255,255,255,0.6)]'
 
     const variants = {
-      primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 shadow-sm',
-      secondary: 'bg-slate-100 text-slate-900 hover:bg-slate-200 focus:ring-slate-500',
-      outline: 'border-2 border-slate-300 text-slate-700 hover:bg-slate-50 focus:ring-slate-500',
-      ghost: 'text-slate-700 hover:bg-slate-100 focus:ring-slate-500',
-      danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 shadow-sm',
+      primary: 'bg-[#0B7CFF] text-white hover:bg-[#0A6FE6] hover:shadow-[0_0_18px_rgba(11,124,255,0.25)] focus:ring-2 focus:ring-[#0B7CFF]/30 focus:ring-offset-2 shadow-[0_2px_8px_rgba(11,124,255,0.2)]',
+      secondary: 'bg-[#F8FBFF] text-[#35516B] hover:bg-[#EAF1F8] focus:ring-2 focus:ring-[rgba(8,24,39,0.08)] focus:ring-offset-2 border border-[rgba(8,24,39,0.08)]',
+      outline: 'border-2 border-[rgba(8,24,39,0.14)] text-[#35516B] hover:bg-[#F8FBFF] focus:ring-2 focus:ring-[rgba(8,24,39,0.08)] focus:ring-offset-2',
+      ghost: 'text-[#35516B] hover:bg-[rgba(8,24,39,0.04)] focus:ring-2 focus:ring-[rgba(8,24,39,0.08)] focus:ring-offset-2',
+      danger: 'bg-[#DC2626] text-white hover:bg-[#B91C1C] hover:shadow-[0_0_18px_rgba(220,38,38,0.2)] focus:ring-2 focus:ring-[#DC2626]/30 focus:ring-offset-2 shadow-[0_2px_8px_rgba(220,38,38,0.15)]',
     }
 
     const sizes = {
-      sm: 'px-3 py-1.5 text-sm',
-      md: 'px-4 py-2 text-sm',
-      lg: 'px-6 py-3 text-base',
+      sm: 'px-3 py-1.5 text-[13px] h-8',
+      md: 'px-4 py-2.5 text-[14px] h-10',
+      lg: 'px-6 py-3 text-[16px] h-12',
     }
 
     return (

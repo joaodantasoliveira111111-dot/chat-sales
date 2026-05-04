@@ -181,10 +181,10 @@ export function ProductsContent({ products: initialProducts, userId }: ProductsC
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-2xl font-bold text-[#081827]">
             Produtos
           </h1>
-          <p className="text-sm text-slate-600 mt-1">
+          <p className="text-sm text-[#35516B] mt-1">
             {products.length} produto{products.length !== 1 ? 's' : ''} cadastrado{products.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -196,19 +196,19 @@ export function ProductsContent({ products: initialProducts, userId }: ProductsC
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 min-w-[200px]">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71869B] pointer-events-none" />
           <input
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar produto..."
-            className="w-full h-10 pl-10 pr-4 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full h-10 pl-10 pr-4 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
         </div>
         <select
           value={statusFilter}
           onChange={e => setStatusFilter(e.target.value)}
-          className="h-10 px-4 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+          className="h-10 px-4 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
         >
           <option value="all">Todos os status</option>
           <option value="draft">Rascunho</option>
@@ -223,7 +223,7 @@ export function ProductsContent({ products: initialProducts, userId }: ProductsC
         <Card>
           <CardContent className="p-8">
             <EmptyState
-              icon={<Package className="w-12 h-12 text-slate-300" />}
+              icon={<Package className="w-12 h-12 text-[#71869B]" />}
               title={products.length === 0 ? 'Nenhum produto ainda' : 'Nenhum resultado'}
               description={products.length === 0 ? 'Crie seu primeiro produto digital para começar a vender.' : 'Tente ajustar os filtros de busca.'}
               action={products.length === 0 ? (
@@ -250,7 +250,7 @@ export function ProductsContent({ products: initialProducts, userId }: ProductsC
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-slate-900 truncate">{product.name}</h3>
+                      <h3 className="font-semibold text-[#081827] truncate">{product.name}</h3>
                       <Badge variant={statusVariantMap[product.status] || 'default'} size="sm">
                         {product.status === 'active' ? 'Ativo' : 
                          product.status === 'draft' ? 'Rascunho' : 
@@ -258,12 +258,12 @@ export function ProductsContent({ products: initialProducts, userId }: ProductsC
                       </Badge>
                     </div>
                     <div className="flex items-center gap-3 text-sm">
-                      <span className="text-slate-500 font-mono">/{product.slug}</span>
+                      <span className="text-[#71869B] font-mono">/{product.slug}</span>
                       <span className="font-semibold text-violet-600">
                         {formatCurrency(product.price)}
                       </span>
                       {product.delivery_type && (
-                        <span className="text-slate-500 text-xs">
+                        <span className="text-[#71869B] text-xs">
                           {product.delivery_type.replace(/_/g, ' ')}
                         </span>
                       )}
@@ -276,21 +276,21 @@ export function ProductsContent({ products: initialProducts, userId }: ProductsC
                       href={`/p/${product.slug}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                      className="p-2 rounded-lg text-[#71869B] hover:text-[#35516B] hover:bg-[#F3F7FB] transition-colors"
                       title="Ver página pública"
                     >
                       <ExternalLink size={18} />
                     </a>
                     <button
                       onClick={() => openEdit(product)}
-                      className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                      className="p-2 rounded-lg text-[#71869B] hover:text-[#35516B] hover:bg-[#F3F7FB] transition-colors"
                       title="Editar"
                     >
                       <Edit size={18} />
                     </button>
                     <button
                       onClick={() => setDeleteProduct(product)}
-                      className="p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                      className="p-2 rounded-lg text-[#71869B] hover:text-red-600 hover:bg-red-50 transition-colors"
                       title="Excluir"
                     >
                       <Trash2 size={18} />
@@ -347,7 +347,7 @@ export function ProductsContent({ products: initialProducts, userId }: ProductsC
           />
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-slate-700">
+            <label className="block text-sm font-medium text-[#4A6178]">
               Descrição
             </label>
             <textarea
@@ -355,7 +355,7 @@ export function ProductsContent({ products: initialProducts, userId }: ProductsC
               onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
               placeholder="Descreva brevemente o produto..."
               rows={3}
-              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
             />
           </div>
 
@@ -401,7 +401,7 @@ export function ProductsContent({ products: initialProducts, userId }: ProductsC
           />
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-slate-700">
+            <label className="block text-sm font-medium text-[#4A6178]">
               Instruções de entrega padrão
             </label>
             <textarea
@@ -409,12 +409,12 @@ export function ProductsContent({ products: initialProducts, userId }: ProductsC
               onChange={e => setForm(f => ({ ...f, default_instructions: e.target.value }))}
               placeholder="Instruções enviadas ao comprador após o pagamento confirmado..."
               rows={3}
-              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-slate-700">
+            <label className="block text-sm font-medium text-[#4A6178]">
               Texto de suporte
             </label>
             <textarea
@@ -422,7 +422,7 @@ export function ProductsContent({ products: initialProducts, userId }: ProductsC
               onChange={e => setForm(f => ({ ...f, support_text: e.target.value }))}
               placeholder="Como o comprador pode entrar em contato para suporte..."
               rows={2}
-              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
             />
           </div>
         </div>

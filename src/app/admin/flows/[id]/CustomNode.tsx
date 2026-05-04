@@ -57,7 +57,7 @@ const nodeConfig: Record<string, { icon: React.ElementType; color: string; label
 }
 
 function UniversalHandles({ color }: { color: string }) {
-  const base = { background: color, border: '2px solid #0D1020', width: 10, height: 10 }
+	const base = { background: color, border: '2px solid white', width: 10, height: 10, boxShadow: '0 1px 4px rgba(8,24,39,0.12)' }
 
   return (
     <>

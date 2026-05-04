@@ -87,10 +87,10 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-2xl font-bold text-[#081827]">
             Pedidos
           </h1>
-          <p className="text-sm text-slate-600 mt-1">
+          <p className="text-sm text-[#35516B] mt-1">
             {orders.length} pedido{orders.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -99,19 +99,19 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 min-w-[200px]">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71869B] pointer-events-none" />
           <input
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar por email, nome ou ID..."
-            className="w-full h-10 pl-10 pr-4 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full h-10 pl-10 pr-4 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
         </div>
         <select
           value={statusFilter}
           onChange={e => setStatusFilter(e.target.value)}
-          className="h-10 px-4 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+          className="h-10 px-4 text-sm border border-[rgba(8,24,39,0.08)] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
         >
           {statusOptions.map(option => (
             <option key={option.value} value={option.value}>
@@ -126,7 +126,7 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
         <Card>
           <CardContent className="p-8">
             <EmptyState
-              icon={<ShoppingCart className="w-12 h-12 text-slate-300" />}
+              icon={<ShoppingCart className="w-12 h-12 text-[#71869B]" />}
               title={orders.length === 0 ? 'Nenhum pedido ainda' : 'Nenhum resultado'}
               description={orders.length === 0 ? 'Quando seus clientes comprarem, os pedidos aparecerão aqui.' : 'Tente ajustar os filtros.'}
             />
@@ -146,7 +146,7 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-slate-900">{order.customer_name}</h3>
+                      <h3 className="font-semibold text-[#081827]">{order.customer_name}</h3>
                       <Badge variant={statusVariantMap[order.status] || 'default'} size="sm">
                         {statusLabelMap[order.status] || order.status}
                       </Badge>
@@ -158,7 +158,7 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
                       )}
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-3 text-sm text-slate-600">
+                    <div className="flex flex-wrap items-center gap-3 text-sm text-[#35516B]">
                       <span className="flex items-center gap-1">
                         <Mail size={14} />
                         {order.customer_email}
@@ -194,7 +194,7 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
                   {/* View Details Button */}
                   <button
                     onClick={() => setSelectedOrder(order)}
-                    className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                    className="p-2 rounded-lg text-[#71869B] hover:text-[#35516B] hover:bg-[#EAF1F8] transition-colors"
                     title="Ver detalhes"
                   >
                     <Eye size={18} />
@@ -218,57 +218,57 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
             {/* Order Info Grid */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <p className="text-xs text-slate-500 font-medium">ID do Pedido</p>
-                <p className="text-sm font-semibold text-slate-900 font-mono">
+                <p className="text-xs text-[#71869B] font-medium">ID do Pedido</p>
+                <p className="text-sm font-semibold text-[#081827] font-mono">
                   {selectedOrder.id.slice(0, 12)}...
                 </p>
               </div>
 
               <div className="space-y-1">
-                <p className="text-xs text-slate-500 font-medium">Status</p>
+                <p className="text-xs text-[#71869B] font-medium">Status</p>
                 <Badge variant={statusVariantMap[selectedOrder.status] || 'default'}>
                   {statusLabelMap[selectedOrder.status] || selectedOrder.status}
                 </Badge>
               </div>
 
               <div className="space-y-1">
-                <p className="text-xs text-slate-500 font-medium">Cliente</p>
-                <p className="text-sm font-semibold text-slate-900">
+                <p className="text-xs text-[#71869B] font-medium">Cliente</p>
+                <p className="text-sm font-semibold text-[#081827]">
                   {selectedOrder.customer_name}
                 </p>
               </div>
 
               <div className="space-y-1">
-                <p className="text-xs text-slate-500 font-medium">E-mail</p>
-                <p className="text-sm font-semibold text-slate-900">
+                <p className="text-xs text-[#71869B] font-medium">E-mail</p>
+                <p className="text-sm font-semibold text-[#081827]">
                   {selectedOrder.customer_email}
                 </p>
               </div>
 
               <div className="space-y-1">
-                <p className="text-xs text-slate-500 font-medium">Produto</p>
-                <p className="text-sm font-semibold text-slate-900">
+                <p className="text-xs text-[#71869B] font-medium">Produto</p>
+                <p className="text-sm font-semibold text-[#081827]">
                   {selectedOrder.product?.name || 'N/A'}
                 </p>
               </div>
 
               <div className="space-y-1">
-                <p className="text-xs text-slate-500 font-medium">Valor</p>
+                <p className="text-xs text-[#71869B] font-medium">Valor</p>
                 <p className="text-sm font-bold text-cyan-600">
                   {formatCurrency(selectedOrder.amount)}
                 </p>
               </div>
 
               <div className="space-y-1">
-                <p className="text-xs text-slate-500 font-medium">Criado em</p>
-                <p className="text-sm font-semibold text-slate-900">
+                <p className="text-xs text-[#71869B] font-medium">Criado em</p>
+                <p className="text-sm font-semibold text-[#081827]">
                   {formatDate(selectedOrder.created_at)}
                 </p>
               </div>
 
               <div className="space-y-1">
-                <p className="text-xs text-slate-500 font-medium">Provider</p>
-                <p className="text-sm font-semibold text-slate-900">
+                <p className="text-xs text-[#71869B] font-medium">Provider</p>
+                <p className="text-sm font-semibold text-[#081827]">
                   {selectedOrder.payment_provider || 'Mock'}
                 </p>
               </div>
@@ -277,17 +277,17 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
             {/* PIX Code */}
             {selectedOrder.pix_code && (
               <div className="space-y-2">
-                <p className="text-sm font-semibold text-slate-900">Código PIX</p>
+                <p className="text-sm font-semibold text-[#081827]">Código PIX</p>
                 <div className="relative">
-                  <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs font-mono text-slate-600 break-all">
+                  <div className="p-3 bg-[#F3F7FB] rounded-lg border border-[rgba(8,24,39,0.08)] text-xs font-mono text-[#35516B] break-all">
                     {selectedOrder.pix_code}
                   </div>
                   <button
                     onClick={() => selectedOrder.pix_code && handleCopyPix(selectedOrder.pix_code)}
-                    className="absolute top-2 right-2 p-1.5 bg-white rounded-md border border-slate-200 hover:bg-slate-50 transition-colors"
+                    className="absolute top-2 right-2 p-1.5 bg-white rounded-md border border-[rgba(8,24,39,0.08)] hover:bg-[#F3F7FB] transition-colors"
                     title="Copiar código PIX"
                   >
-                    <Copy size={14} className="text-slate-600" />
+                    <Copy size={14} className="text-[#35516B]" />
                   </button>
                 </div>
               </div>
@@ -308,9 +308,9 @@ export function OrdersContent({ orders: initialOrders }: { orders: (Order & { pr
 
             {/* Simulate Payment */}
             {selectedOrder.status === 'pending' && (
-              <div className="pt-4 border-t border-slate-200">
-                <p className="text-xs text-slate-500 mb-3">
-                  🧪 Modo Mock - Simular pagamento aprovado
+              <div className="pt-4 border-t border-[rgba(8,24,39,0.08)]">
+                <p className="text-xs text-[#71869B] mb-3">
+                  <Zap size={14} className="inline-block mr-1 text-[#F97316] align-text-bottom" /> Modo Mock - Simular pagamento aprovado
                 </p>
                 <Button
                   onClick={() => simulatePayment(selectedOrder.id)}

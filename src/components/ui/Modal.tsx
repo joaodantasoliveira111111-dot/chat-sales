@@ -25,41 +25,41 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
     }
 
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 z-[1070] flex items-center justify-center">
         <div
-          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+          className="absolute inset-0 bg-[rgba(8,24,39,0.5)] backdrop-blur-sm"
           onClick={onClose}
         />
         <div
           ref={ref}
           className={cn(
-            'relative bg-white rounded-xl shadow-2xl w-full mx-4 overflow-hidden',
+            'relative bg-white rounded-[22px] shadow-[var(--shadow-elevated)] w-full mx-4 overflow-hidden border border-[rgba(8,24,39,0.08)]',
             sizeStyles[size],
             className
           )}
           {...props}
         >
           {title && (
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[rgba(8,24,39,0.08)]">
               <div>
-                <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
+                <h2 className="text-xl font-semibold text-[#081827]">{title}</h2>
                 {description && (
-                  <p className="text-sm text-slate-500 mt-1">{description}</p>
+                  <p className="text-[13px] text-[#71869B] mt-1">{description}</p>
                 )}
               </div>
               {onClose && (
                 <button
                   onClick={onClose}
-                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-[rgba(8,24,39,0.04)] rounded-xl transition-colors"
                 >
-                  <X className="w-5 h-5 text-slate-500" />
+                  <X className="w-5 h-5 text-[#71869B]" />
                 </button>
               )}
             </div>
           )}
           <div className="p-6">{children}</div>
           {footer && (
-            <div className="px-6 py-4 border-t border-slate-200 bg-slate-50">
+            <div className="px-6 py-4 border-t border-[rgba(8,24,39,0.08)] bg-[#F8FBFF]">
               {footer}
             </div>
           )}

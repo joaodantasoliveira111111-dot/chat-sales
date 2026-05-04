@@ -107,7 +107,7 @@ export function AnalyticsDashboardContent({ userId }: Props) {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-slate-500">Carregando analytics...</div>
+        <div className="text-[#71869B]">Carregando analytics...</div>
       </div>
     )
   }
@@ -117,10 +117,10 @@ export function AnalyticsDashboardContent({ userId }: Props) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Analytics</h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Métricas de funil, engajamento e desempenho
-          </p>
+      <h1 className="text-2xl font-bold text-[#081827]">Analytics</h1>
+      <p className="text-sm text-[#71869B] mt-1">
+        Metricas de funil, engajamento e desempenho
+      </p>
         </div>
         <div className="flex gap-2">
           {['hoje', 'ontem', 7, 30, 90].map(d => (
@@ -137,11 +137,13 @@ export function AnalyticsDashboardContent({ userId }: Props) {
 
       {/* Diagnostics Alerts */}
       {diagnosticsData && diagnosticsData.alerts.length > 0 && (
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <Activity className="w-5 h-5 text-blue-500" />
-              <h3 className="font-bold">Diagnóstico Automático</h3>
+    <Card variant="neu">
+      <CardContent className="p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-9 h-9 rounded-xl bg-[rgba(11,124,255,0.08)] flex items-center justify-center text-[#0B7CFF]">
+            <Activity size={16} />
+          </div>
+          <h3 className="font-bold text-[#081827]">Diagnostico Automatico</h3>
             </div>
             <div className="space-y-3">
               {diagnosticsData.alerts.map((alert, index) => (
@@ -157,33 +159,39 @@ export function AnalyticsDashboardContent({ userId }: Props) {
         <div className="grid gap-6 md:grid-cols-3">
           <Card>
             <CardContent className="p-6">
-              <div className="flex items-center gap-3 mb-2">
-                <Users className="w-5 h-5 text-blue-500" />
-                <p className="text-sm text-slate-500">Total de Visitas</p>
-              </div>
-              <p className="text-3xl font-bold">{funnelData.totalVisits.toLocaleString()}</p>
+    <div className="flex items-center gap-3 mb-2">
+          <div className="w-9 h-9 rounded-xl bg-[rgba(11,124,255,0.08)] flex items-center justify-center text-[#0B7CFF]">
+            <Users size={16} />
+          </div>
+          <p className="text-sm text-[#71869B]">Total de Visitas</p>
+        </div>
+        <p className="text-3xl font-extrabold text-[#081827]">{funnelData.totalVisits.toLocaleString()}</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-6">
-              <div className="flex items-center gap-3 mb-2">
-                <TrendingUp className="w-5 h-5 text-green-500" />
-                <p className="text-sm text-slate-500">Taxa de Conversão</p>
-              </div>
-              <p className="text-3xl font-bold">
-                {funnelData.funnel.find(f => f.name === 'Purchase')?.percentage || 0}%
-              </p>
+    <div className="flex items-center gap-3 mb-2">
+          <div className="w-9 h-9 rounded-xl bg-[rgba(22,163,74,0.08)] flex items-center justify-center text-[#16A34A]">
+            <TrendingUp size={16} />
+          </div>
+          <p className="text-sm text-[#71869B]">Taxa de Conversao</p>
+        </div>
+        <p className="text-3xl font-extrabold text-[#081827]">
+          {funnelData.funnel.find(f => f.name === 'Purchase')?.percentage || 0}%
+        </p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-6">
-              <div className="flex items-center gap-3 mb-2">
-                <Activity className="w-5 h-5 text-purple-500" />
-                <p className="text-sm text-slate-500">Total de Interações</p>
-              </div>
-              <p className="text-3xl font-bold">
-                {engagementData?.totalInteractions.toLocaleString() || 0}
-              </p>
+    <div className="flex items-center gap-3 mb-2">
+          <div className="w-9 h-9 rounded-xl bg-[rgba(124,58,237,0.08)] flex items-center justify-center text-violet-600">
+            <Activity size={16} />
+          </div>
+          <p className="text-sm text-[#71869B]">Total de Interacoes</p>
+        </div>
+        <p className="text-3xl font-extrabold text-[#081827]">
+          {engagementData?.totalInteractions.toLocaleString() || 0}
+        </p>
             </CardContent>
           </Card>
         </div>
@@ -215,19 +223,19 @@ function AlertCard({ alert }: { alert: Alert }) {
   }
 
   const bgColors = {
-    error: 'bg-red-50 border-red-200',
-    warning: 'bg-yellow-50 border-yellow-200',
-    info: 'bg-blue-50 border-blue-200',
-    success: 'bg-green-50 border-green-200',
+    error: 'bg-[rgba(220,38,38,0.06)] border-[rgba(220,38,38,0.15)]',
+    warning: 'bg-[rgba(249,115,22,0.06)] border-[rgba(249,115,22,0.15)]',
+    info: 'bg-[rgba(11,124,255,0.06)] border-[rgba(11,124,255,0.15)]',
+    success: 'bg-[rgba(22,163,74,0.06)] border-[rgba(22,163,74,0.15)]',
   }
 
   return (
-    <div className={`p-4 rounded-lg border ${bgColors[alert.type]}`}>
+    <div className={`p-4 rounded-xl border ${bgColors[alert.type]}`}>
       <div className="flex items-start gap-3">
         {icons[alert.type]}
         <div className="flex-1">
-          <p className="font-semibold text-sm">{alert.title}</p>
-          <p className="text-sm text-slate-600 mt-1">{alert.message}</p>
+          <p className="font-semibold text-sm text-[#081827]">{alert.title}</p>
+          <p className="text-sm text-[#35516B] mt-1">{alert.message}</p>
         </div>
       </div>
     </div>
@@ -238,25 +246,27 @@ function FunnelChart({ funnel }: { funnel: FunnelStage[] }) {
   const maxCount = Math.max(...funnel.map(f => f.count))
 
   return (
-    <Card>
+    <Card variant="neu">
       <CardContent className="p-6">
-        <h3 className="font-bold mb-6">Funil de Conversão</h3>
+        <h3 className="font-bold text-[#081827] mb-6">Funil de Conversao</h3>
         <div className="space-y-4">
           {funnel.map((stage, index) => (
             <div key={stage.name} className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">{stage.icon}</span>
+                  <div className="w-8 h-8 rounded-lg bg-[rgba(11,124,255,0.08)] flex items-center justify-center text-[#0B7CFF] text-sm font-bold">
+                    {index + 1}
+                  </div>
                   <div>
-                    <p className="font-semibold">{stage.label}</p>
-                    <p className="text-sm text-slate-500">{stage.count.toLocaleString()} usuários</p>
+                    <p className="font-semibold text-[#081827]">{stage.label}</p>
+                    <p className="text-sm text-[#71869B]">{stage.count.toLocaleString()} usuarios</p>
                   </div>
                 </div>
-                <p className="text-2xl font-bold">{stage.percentage}%</p>
+                <p className="text-2xl font-extrabold text-[#081827]">{stage.percentage}%</p>
               </div>
-              <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+              <div className="h-3 bg-[#EAF1F8] rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-500"
+                  className="h-full bg-gradient-to-r from-[#0B7CFF] to-[#00C2FF] rounded-full transition-all duration-500"
                   style={{ width: `${(stage.count / maxCount) * 100}%` }}
                 />
               </div>
@@ -270,20 +280,20 @@ function FunnelChart({ funnel }: { funnel: FunnelStage[] }) {
 
 function ConversionRatesCard({ rates }: { rates: ConversionRate[] }) {
   return (
-    <Card>
+    <Card variant="neu">
       <CardContent className="p-6">
-        <h3 className="font-bold mb-6">Taxas de Conversão</h3>
+        <h3 className="font-bold text-[#081827] mb-6">Taxas de Conversao</h3>
         <div className="space-y-4">
           {rates.map((rate, index) => (
-            <div key={index} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+            <div key={index} className="flex items-center justify-between p-4 bg-[#F3F7FB] rounded-xl">
               <div className="flex-1">
-                <p className="text-sm text-slate-500">
-                  {rate.from} → {rate.to}
+                <p className="text-sm text-[#71869B]">
+                  {rate.from} &gt; {rate.to}
                 </p>
-                <p className="font-semibold mt-1">{rate.rate}% conversão</p>
+                <p className="font-semibold text-[#081827] mt-1">{rate.rate}% conversao</p>
               </div>
               <div className="text-right">
-                <p className={`text-sm font-semibold ${rate.dropOff > 50 ? 'text-red-500' : rate.dropOff > 30 ? 'text-yellow-500' : 'text-green-500'}`}>
+                <p className={`text-sm font-semibold ${rate.dropOff > 50 ? 'text-[#DC2626]' : rate.dropOff > 30 ? 'text-[#F97316]' : 'text-[#16A34A]'}`}>
                   {rate.dropOff}% abandono
                 </p>
               </div>
@@ -297,34 +307,34 @@ function ConversionRatesCard({ rates }: { rates: ConversionRate[] }) {
 
 function EngagementMetrics({ data }: { data: EngagementData }) {
   return (
-    <Card>
+    <Card variant="neu">
       <CardContent className="p-6">
-        <h3 className="font-bold mb-6">Engajamento</h3>
+        <h3 className="font-bold text-[#081827] mb-6">Engajamento</h3>
         <div className="grid gap-6 md:grid-cols-2">
-          <div className="p-4 bg-slate-50 rounded-lg">
-            <p className="text-sm text-slate-500">Total de Interações</p>
-            <p className="text-2xl font-bold mt-1">{data.totalInteractions.toLocaleString()}</p>
-            <p className="text-sm text-slate-500 mt-2">
-              {data.averageInteractionsPerUser} média por usuário
+          <div className="p-4 bg-[#F3F7FB] rounded-xl">
+            <p className="text-sm text-[#71869B]">Total de Interacoes</p>
+            <p className="text-2xl font-extrabold text-[#081827] mt-1">{data.totalInteractions.toLocaleString()}</p>
+            <p className="text-sm text-[#71869B] mt-2">
+              {data.averageInteractionsPerUser} media por usuario
             </p>
           </div>
-          <div className="p-4 bg-slate-50 rounded-lg">
-            <p className="text-sm text-slate-500">Nós Visualizados</p>
-            <p className="text-2xl font-bold mt-1">{data.totalNodesViewed.toLocaleString()}</p>
-            <p className="text-sm text-slate-500 mt-2">
-              {data.averageNodesPerUser} média por usuário
+          <div className="p-4 bg-[#F3F7FB] rounded-xl">
+            <p className="text-sm text-[#71869B]">Nos Visualizados</p>
+            <p className="text-2xl font-extrabold text-[#081827] mt-1">{data.totalNodesViewed.toLocaleString()}</p>
+            <p className="text-sm text-[#71869B] mt-2">
+              {data.averageNodesPerUser} media por usuario
             </p>
           </div>
         </div>
 
         {data.topNodes.length > 0 && (
           <div className="mt-6">
-            <h4 className="font-semibold mb-4">Top Nós Mais Visualizados</h4>
-            <div className="space-y-2">
-              {data.topNodes.slice(0, 5).map((node, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                  <p className="text-sm font-medium">{node.nodeId}</p>
-                  <p className="text-sm text-slate-500">{node.count} visualizações</p>
+        <h4 className="font-semibold text-[#081827] mb-4">Top Nos Mais Visualizados</h4>
+        <div className="space-y-2">
+          {data.topNodes.slice(0, 5).map((node, index) => (
+            <div key={index} className="flex items-center justify-between p-3 bg-[#F3F7FB] rounded-xl">
+              <p className="text-sm font-medium text-[#081827]">{node.nodeId}</p>
+              <p className="text-sm text-[#71869B]">{node.count} visualizacoes</p>
                 </div>
               ))}
             </div>
@@ -337,55 +347,55 @@ function EngagementMetrics({ data }: { data: EngagementData }) {
 
 function TrafficSourcesCard({ data }: { data: TrafficData }) {
   return (
-    <Card>
+    <Card variant="neu">
       <CardContent className="p-6">
-        <h3 className="font-bold mb-6">Origem do Tráfego</h3>
+        <h3 className="font-bold text-[#081827] mb-6">Origem do Trafego</h3>
         <div className="grid gap-6 md:grid-cols-2">
           <div>
-            <h4 className="font-semibold mb-4">UTM Sources</h4>
+            <h4 className="font-semibold text-[#081827] mb-4">UTM Sources</h4>
             {data.utmSources.length > 0 ? (
               <div className="space-y-2">
                 {data.utmSources.map((source, index) => (
                   <div key={index} className="flex items-center justify-between">
-                    <p className="text-sm">{source.source}</p>
-                    <div className="flex items-center gap-2">
-                      <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-blue-500 rounded-full"
-                          style={{ width: `${source.percentage}%` }}
-                        />
-                      </div>
-                      <p className="text-sm text-slate-500">{source.percentage}%</p>
+                <p className="text-sm text-[#081827]">{source.source}</p>
+                <div className="flex items-center gap-2">
+                  <div className="w-24 h-2 bg-[#EAF1F8] rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#0B7CFF] rounded-full"
+                      style={{ width: `${source.percentage}%` }}
+                    />
+                  </div>
+                  <p className="text-sm text-[#71869B]">{source.percentage}%</p>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-slate-500">Nenhum dado disponível</p>
+              <p className="text-sm text-[#71869B]">Nenhum dado disponível</p>
             )}
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">Referrers</h4>
+            <h4 className="font-semibold text-[#081827] mb-4">Referrers</h4>
             {data.referrers.length > 0 ? (
               <div className="space-y-2">
                 {data.referrers.map((referrer, index) => (
                   <div key={index} className="flex items-center justify-between">
-                    <p className="text-sm">{referrer.referrer}</p>
-                    <div className="flex items-center gap-2">
-                      <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-purple-500 rounded-full"
-                          style={{ width: `${referrer.percentage}%` }}
-                        />
-                      </div>
-                      <p className="text-sm text-slate-500">{referrer.percentage}%</p>
+                <p className="text-sm text-[#081827]">{referrer.referrer}</p>
+                <div className="flex items-center gap-2">
+                  <div className="w-24 h-2 bg-[#EAF1F8] rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-violet-500 rounded-full"
+                      style={{ width: `${referrer.percentage}%` }}
+                    />
+                  </div>
+                  <p className="text-sm text-[#71869B]">{referrer.percentage}%</p>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-slate-500">Nenhum dado disponível</p>
+              <p className="text-sm text-[#71869B]">Nenhum dado disponível</p>
             )}
           </div>
         </div>

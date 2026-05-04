@@ -50,7 +50,7 @@ export function WhatsAppMediaMessage({
         )}
         {mediaType === 'file' && (
           <a href={mediaUrl} target="_blank" rel="noopener noreferrer" className="whatsapp-media-file">
-            📎 {payload?.file_name || 'Arquivo'}
+            <span style={{ marginRight: 4 }}>&#128206;</span>{payload?.file_name || 'Arquivo'}
           </a>
         )}
         {caption && <span className="whatsapp-message-text">{caption}</span>}
