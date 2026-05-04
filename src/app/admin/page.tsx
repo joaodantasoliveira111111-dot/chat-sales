@@ -77,12 +77,17 @@ export default async function AdminDashboard() {
     serverTracking: (metaSettings?.value as any)?.server_tracking_enabled ?? false,
   }
 
+  const normalizedOrders = (recentOrders || []).map((o: any) => ({
+    ...o,
+    product: Array.isArray(o.product) ? o.product[0] || null : o.product || null,
+  }))
+
   return (
     <AdminLayout>
       <DashboardContent
         metrics={metrics}
         checklist={checklist}
-        recentOrders={recentOrders || []}
+        recentOrders={normalizedOrders}
         trackingHealth={trackingHealth}
       />
     </AdminLayout>

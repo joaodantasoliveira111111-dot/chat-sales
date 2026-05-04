@@ -71,7 +71,7 @@ interface RecentOrder {
   amount: number
   status: string
   created_at: string
-  product?: { name: string }[] | { name: string } | null
+  product?: { name: string } | null
 }
 
 interface DashboardContentProps {
@@ -423,7 +423,7 @@ export function DashboardContent({ metrics, checklist, recentOrders, trackingHea
                           {statusLabelMap[order.status] || order.status}
                         </Badge>
                       </div>
-                      <p className="text-xs text-[#71869B] truncate">{(Array.isArray(order.product) ? order.product[0]?.name : order.product?.name) || 'N/A'}</p>
+                      <p className="text-xs text-[#71869B] truncate">{order.product?.name || 'N/A'}</p>
                     </div>
                     <div className="text-right flex-shrink-0">
                       <p className="text-sm font-bold text-[#081827]">{formatCurrency(order.amount)}</p>
