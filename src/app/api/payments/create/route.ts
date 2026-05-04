@@ -55,9 +55,17 @@ export async function POST(request: NextRequest) {
       userId = product.user_id
     }
 
-    // Create order
-    const orderId = uuidv4()
-    const webhookUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/payments/webhook?u=${userId}`
+  // Create order
+  const orderId = uuidv4()
+
+  const { data: webhookSecretData } = await supabase
+    .from('admin_settings')
+    .select('value')
+    .eq('user_id', userId)
+    .eq('key', 'webhook_secret')
+    .single()
+  const webhookSecret = (webhookSecretData?.value as any)?.secret || ''
+  const webhookUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/payments/webhook?u=${userId}${webhookSecret ? `&s=${webhookSecret}` : ''}`
 
     // Create PIX payment
     const { provider, providerName } = await getPaymentProvider(userId)

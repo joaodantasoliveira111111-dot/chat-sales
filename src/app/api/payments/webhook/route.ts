@@ -14,6 +14,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing user id in webhook URL' }, { status: 400 })
     }
 
+    const signature = request.nextUrl.searchParams.get('s')
+    if (signature) {
+      const supabaseAdmin = createAdminClient()
+      const { data: secretData } = await supabaseAdmin
+        .from('admin_settings')
+        .select('value')
+        .eq('user_id', userId)
+        .eq('key', 'webhook_secret')
+        .single()
+      const storedSecret = (secretData?.value as any)?.secret
+      if (!storedSecret || signature !== storedSecret) {
+        return NextResponse.json({ error: 'Invalid webhook signature' }, { status: 403 })
+      }
+    }
+
     const body = await request.json()
     const headers = Object.fromEntries(request.headers.entries())
     const supabase = createAdminClient()

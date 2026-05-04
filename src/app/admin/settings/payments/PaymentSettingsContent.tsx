@@ -8,7 +8,7 @@ import { copyToClipboard } from '@/lib/utils'
 import {
   CreditCard, Copy, CheckCircle, AlertCircle,
   Zap, Globe, Eye, EyeOff, Save, Shield,
-  FlaskConical, Landmark,
+  FlaskConical, Landmark, RefreshCw,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
@@ -84,10 +84,10 @@ export function PaymentSettingsContent({
   const [saving, setSaving] = useState(false)
   const [loading, setLoading] = useState(true)
   const [copiedWebhook, setCopiedWebhook] = useState(false)
+  const [webhookSecret, setWebhookSecret] = useState('')
 
-  const webhookUrl = `${appUrl}/api/payments/webhook?u=${userId}`
+  const webhookUrl = `${appUrl}/api/payments/webhook?u=${userId}&s=${webhookSecret}`
 
-  // Load saved settings from Supabase
   useEffect(() => {
     const load = async () => {
       try {
@@ -96,7 +96,7 @@ export function PaymentSettingsContent({
           .from('admin_settings')
           .select('key, value')
           .eq('user_id', userId)
-          .in('key', ['active_gateway', 'gateway_pushinpay', 'gateway_amplopay'])
+          .in('key', ['active_gateway', 'gateway_pushinpay', 'gateway_amplopay', 'webhook_secret'])
 
         if (data) {
           for (const row of data) {
@@ -106,6 +106,8 @@ export function PaymentSettingsContent({
               setCredentials(prev => ({ ...prev, pushinpay: row.value as any }))
             } else if (row.key === 'gateway_amplopay') {
               setCredentials(prev => ({ ...prev, amplopay: row.value as any }))
+            } else if (row.key === 'webhook_secret') {
+              setWebhookSecret((row.value as any)?.secret || '')
             }
           }
         }
@@ -130,7 +132,6 @@ export function PaymentSettingsContent({
     try {
       const supabase = createClient()
 
-      // Save active gateway
       await supabase.from('admin_settings').upsert({
         user_id: userId,
         key: 'active_gateway',
@@ -138,7 +139,6 @@ export function PaymentSettingsContent({
         updated_at: new Date().toISOString(),
       }, { onConflict: 'user_id,key' })
 
-      // Save credentials for each gateway (never expose in frontend response)
       for (const gateway of GATEWAYS.filter(g => g.fields.length > 0)) {
         const creds = credentials[gateway.id]
         if (creds && Object.keys(creds).length > 0) {
@@ -150,6 +150,18 @@ export function PaymentSettingsContent({
           }, { onConflict: 'user_id,key' })
         }
       }
+
+      let secret = webhookSecret
+      if (!secret) {
+        secret = crypto.randomUUID()
+        setWebhookSecret(secret)
+      }
+      await supabase.from('admin_settings').upsert({
+        user_id: userId,
+        key: 'webhook_secret',
+        value: { secret },
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'user_id,key' })
     } catch {
       // Handle error silently
     } finally {
@@ -289,33 +301,63 @@ export function PaymentSettingsContent({
         </Card>
       )}
 
-      {/* Webhook URL */}
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 rounded-xl bg-[rgba(0,194,255,0.08)] flex items-center justify-center">
-          <Globe size={20} className="text-[#00C2FF]" />
-            </div>
-            <div>
-              <p className="text-base font-semibold text-[#081827]">URL do Webhook</p>
-              <p className="text-sm text-[#35516B]">Configure no painel do gateway para confirmação automática</p>
-            </div>
+    {/* Webhook URL */}
+    <Card>
+      <CardContent className="p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-xl bg-[rgba(0,194,255,0.08)] flex items-center justify-center">
+            <Globe size={20} className="text-[#00C2FF]" />
           </div>
-          <div className="flex gap-3 items-center">
-            <code className="flex-1 text-xs text-[#4A6178] bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl p-3 break-all">
-              {webhookUrl}
-            </code>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={handleCopyWebhook}
-              leftIcon={copiedWebhook ? <CheckCircle size={16} className="text-[#16A34A]" /> : <Copy size={16} />}
-            >
-              {copiedWebhook ? 'Copiado!' : 'Copiar'}
-            </Button>
+          <div>
+            <p className="text-base font-semibold text-[#081827]">URL do Webhook</p>
+            <p className="text-sm text-[#35516B]">Configure no painel do gateway para confirmação automática</p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        {!webhookSecret && (
+          <div className="mb-4 p-4 bg-[rgba(234,179,8,0.06)] rounded-xl border border-[rgba(234,179,8,0.15)]">
+            <div className="flex items-center gap-2 mb-1">
+              <AlertCircle size={16} className="text-[#CA8A04]" />
+              <p className="text-sm font-semibold text-[#854D0E]">Webhook não protegido</p>
+            </div>
+            <p className="text-xs text-[#92400E]">
+              Salve as configurações para gerar um secret de verificação. Isso protege seu webhook contra chamadas falsas.
+            </p>
+          </div>
+        )}
+        <div className="flex gap-3 items-center">
+          <code className="flex-1 text-xs text-[#4A6178] bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl p-3 break-all">
+            {webhookSecret ? webhookUrl : `${appUrl}/api/payments/webhook?u=${userId}`}
+          </code>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={handleCopyWebhook}
+            leftIcon={copiedWebhook ? <CheckCircle size={16} className="text-[#16A34A]" /> : <Copy size={16} />}
+          >
+            {copiedWebhook ? 'Copiado!' : 'Copiar'}
+          </Button>
+        </div>
+        {webhookSecret && (
+          <button
+            onClick={async () => {
+              const newSecret = crypto.randomUUID()
+              setWebhookSecret(newSecret)
+              const supabase = createClient()
+              await supabase.from('admin_settings').upsert({
+                user_id: userId,
+                key: 'webhook_secret',
+                value: { secret: newSecret },
+                updated_at: new Date().toISOString(),
+              }, { onConflict: 'user_id,key' })
+            }}
+            className="mt-3 flex items-center gap-1.5 text-xs text-[#71869B] hover:text-[#35516B] font-medium transition-colors"
+          >
+            <RefreshCw size={12} />
+            Regenerar secret
+          </button>
+        )}
+      </CardContent>
+    </Card>
 
       {/* Flow explanation */}
       <Card>
