@@ -444,56 +444,14 @@ export function PagesContent({
               </div>
               
               <div className="space-y-4">
-                <Select
-                  label="Template visual"
-                  value={form.theme_id}
-                  onChange={value => setForm(f => ({ ...f, theme_id: value }))}
-                  options={themeOptions}
-                  fullWidth
-                />
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-[#4A6178]">
-                      Cor primária
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="color"
-                        value={form.primary_color}
-                        onChange={e => setForm(f => ({ ...f, primary_color: e.target.value }))}
-          className="w-10 h-10 rounded-xl cursor-pointer border border-[rgba(8,24,39,0.08)]"
+        <Select
+          label="Template visual"
+          value={form.theme_id}
+          onChange={value => setForm(f => ({ ...f, theme_id: value }))}
+          options={themeOptions}
+          fullWidth
         />
-        <input
-          type="text"
-          value={form.primary_color}
-          onChange={e => setForm(f => ({ ...f, primary_color: e.target.value }))}
-          className="flex-1 h-10 px-3 text-sm bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15)] text-[#081827]"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-[#4A6178]">
-                      Cor secundária
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="color"
-                        value={form.secondary_color}
-                        onChange={e => setForm(f => ({ ...f, secondary_color: e.target.value }))}
-          className="w-10 h-10 rounded-xl cursor-pointer border border-[rgba(8,24,39,0.08)]"
-        />
-        <input
-          type="text"
-          value={form.secondary_color}
-          onChange={e => setForm(f => ({ ...f, secondary_color: e.target.value }))}
-          className="flex-1 h-10 px-3 text-sm bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15)] text-[#081827]"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
+      </div>
             </CardContent>
           </Card>
 

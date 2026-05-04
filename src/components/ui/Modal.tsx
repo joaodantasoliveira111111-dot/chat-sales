@@ -33,7 +33,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
       <div
         ref={ref}
         className={cn(
-          'relative bg-white rounded-[22px] shadow-[var(--shadow-elevated)] w-full mx-4 max-h-[85vh] flex flex-col overflow-hidden border border-[rgba(8,24,39,0.08)]',
+          'relative bg-white rounded-[22px] shadow-[var(--shadow-elevated)] w-full mx-4 max-h-[85vh] flex flex-col border border-[rgba(8,24,39,0.08)]',
           sizeStyles[size],
           className
         )}
