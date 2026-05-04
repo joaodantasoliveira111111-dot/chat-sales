@@ -21,17 +21,6 @@ export function InstagramMessageBubble({
 
   return (
     <div className={`instagram-message-row ${isUser ? 'instagram-message-row-user' : 'instagram-message-row-bot'} ${compact ? 'instagram-message-row-compact' : ''}`}>
-      {!isUser && (
-        <div className="instagram-message-avatar-slot">
-          {showAvatar && (
-            avatarUrl ? (
-              <img src={avatarUrl} alt="" className="instagram-message-avatar" />
-            ) : (
-              <div className="instagram-message-avatar instagram-message-avatar-fallback">C</div>
-            )
-          )}
-        </div>
-      )}
       <div className={`instagram-message-bubble ${isUser ? 'instagram-message-bubble-user' : 'instagram-message-bubble-bot'}`}>
         <span className="instagram-message-text">{message.content}</span>
         <span className="instagram-message-time">{time}</span>

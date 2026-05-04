@@ -21,17 +21,6 @@ export function WhatsAppMessageBubble({
 
   return (
     <div className={`whatsapp-message-row ${isUser ? 'whatsapp-message-row-user' : 'whatsapp-message-row-bot'} ${compact ? 'whatsapp-message-row-compact' : ''}`}>
-      {!isUser && (
-        <div className="whatsapp-message-avatar-slot">
-          {showAvatar && (
-            avatarUrl ? (
-              <img src={avatarUrl} alt="" className="whatsapp-message-avatar" />
-            ) : (
-              <div className="whatsapp-message-avatar whatsapp-message-avatar-fallback">C</div>
-            )
-          )}
-        </div>
-      )}
       <div className={`whatsapp-message-bubble ${isUser ? 'whatsapp-message-bubble-user' : 'whatsapp-message-bubble-bot'}`}>
         <span className="whatsapp-message-text">{message.content}</span>
         <span className="whatsapp-message-time">
