@@ -174,11 +174,21 @@ export function ProductsContent({ products: initialProducts, userId, totalCount,
     setDeleting(true)
     try {
       const supabase = createClient()
-      const { error } = await supabase.from('products').delete().eq('id', deleteProduct.id).eq('user_id', userId)
+      const { error } = await supabase.from('products').update({ deleted_at: new Date().toISOString() }).eq('id', deleteProduct.id).eq('user_id', userId)
       if (error) throw error
-      setProducts(prev => prev.filter(p => p.id !== deleteProduct.id))
+      const deletedProduct = deleteProduct
+      setProducts(prev => prev.filter(p => p.id !== deletedProduct.id))
       setDeleteProduct(null)
-      toast.success('Produto excluído')
+      toast.warning('Produto excluído', 6000, {
+        label: 'Desfazer',
+        onClick: async () => {
+          const { error: undoError } = await supabase.from('products').update({ deleted_at: null }).eq('id', deletedProduct.id)
+          if (!undoError) {
+            setProducts(prev => [deletedProduct, ...prev])
+            toast.success('Exclusão desfeita')
+          }
+        },
+      })
     } catch {
       toast.error('Erro ao excluir produto')
     } finally {
@@ -209,7 +219,7 @@ export function ProductsContent({ products: initialProducts, userId, totalCount,
     try {
       const supabase = createClient()
       const ids = Array.from(selectedIds)
-      const { error } = await supabase.from('products').delete().in('id', ids).eq('user_id', userId)
+      const { error } = await supabase.from('products').update({ deleted_at: new Date().toISOString() }).in('id', ids).eq('user_id', userId)
       if (error) throw error
       setProducts(prev => prev.filter(p => !selectedIds.has(p.id)))
       const count = selectedIds.size

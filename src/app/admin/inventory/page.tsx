@@ -16,8 +16,8 @@ export default async function InventoryPage({ searchParams }: { searchParams: Pr
   const to = from + PAGE_SIZE - 1
 
   const [{ data: items, count }, { data: products }] = await Promise.all([
-    supabase.from('inventory_items').select('*, product:products(name)', { count: 'exact' }).eq('user_id', user.id).order('created_at', { ascending: false }).range(from, to),
-    supabase.from('products').select('id, name, delivery_type').eq('user_id', user.id).neq('status', 'archived'),
+    supabase.from('inventory_items').select('*, product:products(name)', { count: 'exact' }).eq('user_id', user.id).is('deleted_at', null).order('created_at', { ascending: false }).range(from, to),
+    supabase.from('products').select('id, name, delivery_type').eq('user_id', user.id).neq('status', 'archived').is('deleted_at', null),
   ])
 
   const totalPages = Math.ceil((count || 0) / PAGE_SIZE)

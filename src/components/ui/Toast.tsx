@@ -11,15 +11,16 @@ interface Toast {
   type: ToastType
   message: string
   duration?: number
+  action?: { label: string; onClick: () => void }
 }
 
 interface ToastContextType {
   toasts: Toast[]
-  addToast: (type: ToastType, message: string, duration?: number) => void
+  addToast: (type: ToastType, message: string, duration?: number, action?: { label: string; onClick: () => void }) => void
   removeToast: (id: string) => void
   success: (message: string, duration?: number) => void
   error: (message: string, duration?: number) => void
-  warning: (message: string, duration?: number) => void
+  warning: (message: string, duration?: number, action?: { label: string; onClick: () => void }) => void
   info: (message: string, duration?: number) => void
 }
 
@@ -28,9 +29,9 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined)
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([])
 
-  const addToast = useCallback((type: ToastType, message: string, duration = 5000) => {
+  const addToast = useCallback((type: ToastType, message: string, duration = 5000, action?: { label: string; onClick: () => void }) => {
     const id = Math.random().toString(36).substring(7)
-    setToasts((prev) => [...prev, { id, type, message, duration }])
+    setToasts((prev) => [...prev, { id, type, message, duration, action }])
 
     if (duration > 0) {
       setTimeout(() => {
@@ -51,8 +52,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     addToast('error', message, duration)
   }, [addToast])
 
-  const warning = useCallback((message: string, duration?: number) => {
-    addToast('warning', message, duration)
+  const warning = useCallback((message: string, duration?: number, action?: { label: string; onClick: () => void }) => {
+    addToast('warning', message, duration, action)
   }, [addToast])
 
   const info = useCallback((message: string, duration?: number) => {
@@ -102,9 +103,19 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
         bgColors[toast.type]
       )}
     >
-      {icons[toast.type]}
-      <p className="flex-1 text-sm font-medium text-slate-900">{toast.message}</p>
-      <button
+    {icons[toast.type]}
+    <div className="flex-1">
+      <p className="text-sm font-medium text-slate-900">{toast.message}</p>
+      {toast.action && (
+        <button
+          onClick={() => { toast.action!.onClick(); onClose() }}
+          className="mt-1 text-xs font-semibold text-[#0B7CFF] hover:underline"
+        >
+          {toast.action.label}
+        </button>
+      )}
+    </div>
+    <button
         onClick={onClose}
         className="p-1 hover:bg-white/50 rounded transition-colors"
       >
