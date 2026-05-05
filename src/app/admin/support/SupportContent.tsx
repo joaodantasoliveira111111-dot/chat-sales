@@ -12,7 +12,7 @@ import Select from '@/components/ui/Select'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Pagination } from '@/components/ui/Pagination'
 import { formatDate } from '@/lib/utils'
-import { HeadphonesIcon, Search, MessageSquare, Mail, Phone, Calendar, User } from 'lucide-react'
+import { HeadphonesIcon, Search, MessageSquare, Mail, Phone, Calendar, User, Send, Reply } from 'lucide-react'
 
 export function SupportContent({
   requests: initialRequests,
@@ -32,6 +32,8 @@ export function SupportContent({
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [updating, setUpdating] = useState(false)
+  const [replyText, setReplyText] = useState('')
+  const [sendingReply, setSendingReply] = useState(false)
 
   const statusOptions = [
     { value: 'all', label: 'Todos' },
@@ -79,6 +81,27 @@ export function SupportContent({
   }
 
   const openCount = requests.filter(r => r.status === 'open').length
+
+  const sendReply = async () => {
+    if (!selected || !replyText.trim()) return
+    setSendingReply(true)
+    try {
+      const supabase = createClient()
+      const { error } = await supabase
+        .from('support_requests')
+        .update({ admin_reply: replyText.trim(), replied_at: new Date().toISOString() })
+        .eq('id', selected.id)
+      if (error) throw error
+      const updated = { ...selected, admin_reply: replyText.trim(), replied_at: new Date().toISOString() }
+      setSelected(updated)
+      setRequests(prev => prev.map(r => r.id === selected.id ? updated : r))
+      setReplyText('')
+    } catch {
+      // Handle error silently
+    } finally {
+      setSendingReply(false)
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -209,13 +232,47 @@ export function SupportContent({
               </div>
             </div>
 
-            {/* Message */}
-            <div className="space-y-2">
-              <p className="text-sm font-semibold text-[#081827]">Mensagem</p>
-              <div className="p-4 bg-[#F3F7FB] rounded-xl border border-[rgba(8,24,39,0.08)] text-sm text-[#4A6178] whitespace-pre-wrap">
-                {selected.message}
-              </div>
-            </div>
+      {/* Message */}
+      <div className="space-y-2">
+        <p className="text-sm font-semibold text-[#081827]">Mensagem</p>
+        <div className="p-4 bg-[#F3F7FB] rounded-xl border border-[rgba(8,24,39,0.08)] text-sm text-[#4A6178] whitespace-pre-wrap">
+          {selected.message}
+        </div>
+      </div>
+
+      {/* Existing Reply */}
+      {(selected as any).admin_reply && (
+        <div className="space-y-2">
+          <p className="text-sm font-semibold text-[#081827] flex items-center gap-1.5">
+            <Reply size={14} className="text-[#0B7CFF]" />
+            Sua resposta
+          </p>
+          <div className="p-4 bg-[rgba(11,124,255,0.04)] rounded-xl border border-[rgba(11,124,255,0.12)] text-sm text-[#35516B] whitespace-pre-wrap">
+            {(selected as any).admin_reply}
+          </div>
+        </div>
+      )}
+
+      {/* Reply Form */}
+      <div className="space-y-2">
+        <p className="text-sm font-semibold text-[#081827]">Responder</p>
+        <textarea
+          value={replyText}
+          onChange={(e) => setReplyText(e.target.value)}
+          placeholder="Escreva sua resposta ao cliente..."
+          rows={3}
+          className="w-full px-4 py-3 text-sm bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15)] text-[#081827] placeholder:text-[#71869B] resize-none"
+        />
+        <Button
+          onClick={sendReply}
+          isLoading={sendingReply}
+          disabled={!replyText.trim()}
+          leftIcon={<Send size={14} />}
+          size="sm"
+        >
+          Enviar resposta
+        </Button>
+      </div>
 
             {/* Status Update */}
             <div className="pt-4 border-t border-[rgba(8,24,39,0.08)]">
