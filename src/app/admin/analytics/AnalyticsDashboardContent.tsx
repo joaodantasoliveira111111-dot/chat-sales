@@ -1,9 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import useSWR from 'swr'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { Activity, TrendingUp, Users, AlertTriangle, CheckCircle, XCircle, Info } from 'lucide-react'
+import { useToast } from '@/components/ui/Toast'
+import { Activity, TrendingUp, Users, AlertTriangle, CheckCircle, XCircle, Info, RefreshCw } from 'lucide-react'
 
 interface FunnelStage {
   name: string
@@ -64,44 +66,57 @@ interface Props {
   userId: string
 }
 
+const fetcher = (url: string) => fetch(url).then(r => r.json())
+
 export function AnalyticsDashboardContent({ userId }: Props) {
   const [days, setDays] = useState<string | number>(30)
-  const [loading, setLoading] = useState(true)
-  const [funnelData, setFunnelData] = useState<FunnelData | null>(null)
-  const [engagementData, setEngagementData] = useState<EngagementData | null>(null)
-  const [trafficData, setTrafficData] = useState<TrafficData | null>(null)
-  const [diagnosticsData, setDiagnosticsData] = useState<DiagnosticsData | null>(null)
+  const toast = useToast()
 
-  useEffect(() => {
-    loadData()
-  }, [days, userId])
+  const { data: funnelData, error: funnelError, isLoading: funnelLoading, mutate: mutateFunnel } = useSWR<FunnelData>(
+    `/api/analytics/funnel?days=${days}`,
+    fetcher,
+    { revalidateOnFocus: false, dedupingInterval: 30000 }
+  )
+  const { data: engagementData, error: engagementError, isLoading: engagementLoading, mutate: mutateEngagement } = useSWR<EngagementData>(
+    `/api/analytics/engagement?days=${days}`,
+    fetcher,
+    { revalidateOnFocus: false, dedupingInterval: 30000 }
+  )
+  const { data: trafficData, error: trafficError, isLoading: trafficLoading, mutate: mutateTraffic } = useSWR<TrafficData>(
+    `/api/analytics/traffic?days=${days}`,
+    fetcher,
+    { revalidateOnFocus: false, dedupingInterval: 30000 }
+  )
+  const { data: diagnosticsData, error: diagnosticsError, isLoading: diagnosticsLoading, mutate: mutateDiagnostics } = useSWR<DiagnosticsData>(
+    `/api/analytics/diagnostics?days=${days}`,
+    fetcher,
+    { revalidateOnFocus: false, dedupingInterval: 30000 }
+  )
 
-  const loadData = async () => {
-    setLoading(true)
-    try {
-      const [funnelRes, engagementRes, trafficRes, diagnosticsRes] = await Promise.all([
-        fetch(`/api/analytics/funnel?days=${days}`),
-        fetch(`/api/analytics/engagement?days=${days}`),
-        fetch(`/api/analytics/traffic?days=${days}`),
-        fetch(`/api/analytics/diagnostics?days=${days}`),
-      ])
+  const loading = funnelLoading || engagementLoading || trafficLoading || diagnosticsLoading
+  const hasError = funnelError || engagementError || trafficError || diagnosticsError
 
-      const [funnel, engagement, traffic, diagnostics] = await Promise.all([
-        funnelRes.json(),
-        engagementRes.json(),
-        trafficRes.json(),
-        diagnosticsRes.json(),
-      ])
+  const refreshAll = () => {
+    mutateFunnel()
+    mutateEngagement()
+    mutateTraffic()
+    mutateDiagnostics()
+    toast.info('Atualizando dados...')
+  }
 
-      setFunnelData(funnel)
-      setEngagementData(engagement)
-      setTrafficData(traffic)
-      setDiagnosticsData(diagnostics)
-    } catch (error) {
-      console.error('Error loading analytics:', error)
-    } finally {
-      setLoading(false)
-    }
+  if (hasError) {
+    return (
+      <div className="space-y-6">
+        <div className="p-6 bg-[rgba(220,38,38,0.06)] border border-[rgba(220,38,38,0.15)] rounded-xl text-center">
+          <XCircle className="w-8 h-8 text-[#DC2626] mx-auto mb-3" />
+          <p className="font-semibold text-[#081827]">Erro ao carregar analytics</p>
+          <p className="text-sm text-[#35516B] mt-1">Algumas seções podem não estar disponíveis.</p>
+          <Button variant="secondary" size="sm" onClick={refreshAll} className="mt-4" leftIcon={<RefreshCw size={14} />}>
+            Tentar novamente
+          </Button>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {
@@ -122,17 +137,20 @@ export function AnalyticsDashboardContent({ userId }: Props) {
         Metricas de funil, engajamento e desempenho
       </p>
         </div>
-        <div className="flex gap-2">
-          {['hoje', 'ontem', 7, 30, 90].map(d => (
-            <Button
-              key={d}
-              variant={days === d ? 'primary' : 'secondary'}
-              onClick={() => setDays(d)}
-            >
-              {typeof d === 'number' ? `${d} dias` : d}
-            </Button>
-          ))}
-        </div>
+      <div className="flex gap-2">
+        {['hoje', 'ontem', 7, 30, 90].map(d => (
+          <Button
+            key={d}
+            variant={days === d ? 'primary' : 'secondary'}
+            onClick={() => setDays(d)}
+          >
+            {typeof d === 'number' ? `${d} dias` : d}
+          </Button>
+        ))}
+        <Button variant="secondary" size="sm" onClick={refreshAll} leftIcon={<RefreshCw size={14} />}>
+          Atualizar
+        </Button>
+      </div>
       </div>
 
       {/* Diagnostics Alerts */}
