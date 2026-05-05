@@ -10,6 +10,8 @@ import { Modal } from '@/components/ui/Modal'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Pagination } from '@/components/ui/Pagination'
 import { useToast } from '@/components/ui/Toast'
+import { SearchInput } from '@/components/ui/SearchInput'
+import { FilterSelect } from '@/components/ui/FilterSelect'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { ShoppingCart, Search, Eye, Zap, Copy, CheckCircle, Calendar, User, Mail, Package, CreditCard } from 'lucide-react'
 
@@ -119,29 +121,10 @@ export function OrdersContent({
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71869B] pointer-events-none" />
-        <input
-          type="text"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="Buscar por email, nome ou ID..."
-          className="w-full h-10 pl-10 pr-4 text-sm bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15)] text-[#081827] placeholder:text-[#71869B]"
-        />
-      </div>
-      <select
-        value={statusFilter}
-        onChange={e => setStatusFilter(e.target.value)}
-        className="h-10 px-4 text-sm bg-[#F3F7FB] border border-[rgba(8,24,39,0.08)] rounded-xl focus:outline-none focus:border-[#0B7CFF] focus:shadow-[0_0_0_3px_rgba(0,194,255,0.15)] text-[#081827]"
-        >
-          {statusOptions.map(option => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+{/* Filters */}
+<div className="flex flex-col sm:flex-row gap-3">
+  <SearchInput value={search} onChange={setSearch} placeholder="Buscar por email, nome ou ID..." />
+  <FilterSelect value={statusFilter} onChange={setStatusFilter} options={statusOptions} />
       </div>
 
       {/* Orders List */}
