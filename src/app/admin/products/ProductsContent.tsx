@@ -12,6 +12,7 @@ import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Pagination } from '@/components/ui/Pagination'
+import { useToast } from '@/components/ui/Toast'
 import { formatCurrency, slugify } from '@/lib/utils'
 import { Plus, Package, Edit, Trash2, Search, ExternalLink, DollarSign, Tag, X } from 'lucide-react'
 
@@ -71,6 +72,7 @@ export function ProductsContent({ products: initialProducts, userId, totalCount,
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const toast = useToast()
   const [formError, setFormError] = useState<string | null>(null)
 
   const filtered = products.filter(p => {
@@ -174,8 +176,9 @@ export function ProductsContent({ products: initialProducts, userId, totalCount,
       if (error) throw error
       setProducts(prev => prev.filter(p => p.id !== deleteProduct.id))
       setDeleteProduct(null)
+      toast.success('Produto excluído')
     } catch {
-      // Handle error silently
+      toast.error('Erro ao excluir produto')
     } finally {
       setDeleting(false)
     }

@@ -12,6 +12,7 @@ import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Pagination } from '@/components/ui/Pagination'
+import { useToast } from '@/components/ui/Toast'
 import { formatDate } from '@/lib/utils'
 import { Plus, Archive, Edit, Trash2, Search, Upload, Download, Mail, Key, Link as LinkIcon, FileText } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
@@ -95,6 +96,7 @@ export function InventoryContent({
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const toast = useToast()
 
   const filtered = items.filter(i => {
     const matchSearch = !search || i.title?.toLowerCase().includes(search.toLowerCase()) || i.access_email?.toLowerCase().includes(search.toLowerCase())
@@ -166,8 +168,9 @@ export function InventoryContent({
         setItems([{ ...newItem, product: product ? { name: product.name } : null }, ...items])
       }
       setShowForm(false)
+      toast.success(editItem ? 'Item atualizado' : 'Item criado')
     } catch {
-      // Handle error silently
+      toast.error('Erro ao salvar item')
     } finally {
       setSaving(false)
     }
@@ -181,8 +184,9 @@ export function InventoryContent({
       await supabase.from('inventory_items').delete().eq('id', deleteItem.id)
       setItems(items.filter(i => i.id !== deleteItem.id))
       setDeleteItem(null)
+      toast.success('Item excluído')
     } catch {
-      // Handle error silently
+      toast.error('Erro ao excluir item')
     } finally {
       setDeleting(false)
     }

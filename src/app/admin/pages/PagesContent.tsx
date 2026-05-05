@@ -12,6 +12,7 @@ import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Pagination } from '@/components/ui/Pagination'
+import { useToast } from '@/components/ui/Toast'
 import { slugify, copyToClipboard } from '@/lib/utils'
 import { Plus, Globe, Edit, Trash2, ExternalLink, Copy, Palette, CheckCircle } from 'lucide-react'
 
@@ -82,6 +83,7 @@ export function PagesContent({
   const [deleting, setDeleting] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const [copiedSlug, setCopiedSlug] = useState<string | null>(null)
+  const toast = useToast()
 
   const openCreate = () => {
     setEditPage(null)
@@ -208,7 +210,7 @@ export function PagesContent({
       setPages(prev => prev.filter(p => p.id !== deletePage.id))
       setDeletePage(null)
     } catch {
-      // Handle error silently
+      toast.error('Erro ao excluir página')
     } finally {
       setDeleting(false)
     }

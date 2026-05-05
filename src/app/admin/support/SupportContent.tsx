@@ -11,6 +11,7 @@ import { Modal } from '@/components/ui/Modal'
 import Select from '@/components/ui/Select'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Pagination } from '@/components/ui/Pagination'
+import { useToast } from '@/components/ui/Toast'
 import { formatDate } from '@/lib/utils'
 import { HeadphonesIcon, Search, MessageSquare, Mail, Phone, Calendar, User, Send, Reply } from 'lucide-react'
 
@@ -34,6 +35,7 @@ export function SupportContent({
   const [updating, setUpdating] = useState(false)
   const [replyText, setReplyText] = useState('')
   const [sendingReply, setSendingReply] = useState(false)
+  const toast = useToast()
 
   const statusOptions = [
     { value: 'all', label: 'Todos' },
@@ -73,8 +75,9 @@ export function SupportContent({
       await supabase.from('support_requests').update({ status }).eq('id', id)
       setRequests(prev => prev.map(r => r.id === id ? { ...r, status: status as any } : r))
       setSelected(prev => prev?.id === id ? { ...prev, status: status as any } : prev)
+      toast.success('Status atualizado')
     } catch {
-      // Handle error silently
+      toast.error('Erro ao atualizar status')
     } finally {
       setUpdating(false)
     }
@@ -96,8 +99,9 @@ export function SupportContent({
       setSelected(updated)
       setRequests(prev => prev.map(r => r.id === selected.id ? updated : r))
       setReplyText('')
+      toast.success('Resposta enviada')
     } catch {
-      // Handle error silently
+      toast.error('Erro ao enviar resposta')
     } finally {
       setSendingReply(false)
     }

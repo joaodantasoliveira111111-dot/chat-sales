@@ -11,6 +11,7 @@ import {
   FlaskConical, Landmark, RefreshCw,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { useToast } from '@/components/ui/Toast'
 
 interface GatewayField {
   key: string
@@ -85,6 +86,7 @@ export function PaymentSettingsContent({
   const [loading, setLoading] = useState(true)
   const [copiedWebhook, setCopiedWebhook] = useState(false)
   const [webhookSecret, setWebhookSecret] = useState('')
+  const toast = useToast()
 
   const webhookUrl = `${appUrl}/api/payments/webhook?u=${userId}&s=${webhookSecret}`
 
@@ -111,9 +113,9 @@ export function PaymentSettingsContent({
             }
           }
         }
-      } catch {
-        // silently ignore
-      } finally {
+} catch {
+      toast.error('Erro ao carregar configurações de pagamento')
+    } finally {
         setLoading(false)
       }
     }
@@ -162,8 +164,9 @@ export function PaymentSettingsContent({
         value: { secret },
         updated_at: new Date().toISOString(),
       }, { onConflict: 'user_id,key' })
+      toast.success('Configurações salvas com sucesso')
     } catch {
-      // Handle error silently
+      toast.error('Erro ao salvar configurações')
     } finally {
       setSaving(false)
     }

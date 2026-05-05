@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button'
 import { Modal } from '@/components/ui/Modal'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Pagination } from '@/components/ui/Pagination'
+import { useToast } from '@/components/ui/Toast'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { ShoppingCart, Search, Eye, Zap, Copy, CheckCircle, Calendar, User, Mail, Package, CreditCard } from 'lucide-react'
 
@@ -30,6 +31,7 @@ export function OrdersContent({
   const [statusFilter, setStatusFilter] = useState('all')
   const [selectedOrder, setSelectedOrder] = useState<typeof initialOrders[0] | null>(null)
   const [simulating, setSimulating] = useState<string | null>(null)
+  const toast = useToast()
 
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -86,8 +88,9 @@ export function OrdersContent({
         ))
         setSelectedOrder(null)
       }
+      toast.success('Entrega processada com sucesso')
     } catch {
-      // Handle error silently
+      toast.error('Erro ao processar entrega')
     } finally {
       setSimulating(null)
     }
@@ -96,9 +99,9 @@ export function OrdersContent({
   const handleCopyPix = async (pixCode: string) => {
     try {
       await navigator.clipboard.writeText(pixCode)
-      // Could add toast notification here
+      toast.success('Código Pix copiado!')
     } catch {
-      // Handle error silently
+      toast.error('Erro ao copiar código Pix')
     }
   }
 
