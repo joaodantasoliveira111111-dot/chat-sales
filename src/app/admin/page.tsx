@@ -30,7 +30,7 @@ export default async function AdminDashboard() {
     supabase.from('orders').select('*', { count: 'exact', head: true }).eq('user_id', user.id).in('status', ['paid', 'delivered']),
     supabase.from('orders').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'pending'),
     supabase.from('orders').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'expired'),
-    supabase.from('products').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'active').is('deleted_at', null),
+    supabase.from('products').select('*', { count: 'exact', head: true }).eq('user_id', user.id).in('status', ['active', 'draft']).is('deleted_at', null),
     supabase.from('public_pages').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'published'),
     supabase.from('inventory_items').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'available').is('deleted_at', null),
     supabase.from('inventory_items').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'available').is('deleted_at', null).lt('created_at', new Date(Date.now() - 30 * 86400000).toISOString()),
@@ -63,7 +63,7 @@ export default async function AdminDashboard() {
   }
 
   const checklist = {
-    hasProduct: (productCount || 0) > 0,
+    hasProduct: (activeProducts || 0) > 0,
     hasPage: (publishedPages || 0) > 0 || ((await supabase.from('public_pages').select('*', { count: 'exact', head: true }).eq('user_id', user.id)).count || 0) > 0,
     hasFlow: (flowCount || 0) > 0,
     hasInventory: (inventoryCount || 0) > 0,
