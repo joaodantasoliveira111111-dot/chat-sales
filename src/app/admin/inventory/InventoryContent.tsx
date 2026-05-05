@@ -254,12 +254,13 @@ export function InventoryContent({
         const rows = results.data as any[]
         const supabase = createClient()
         let imported = 0
+        let errors = 0
 
         for (const row of rows) {
           const product = products.find(p => p.name.toLowerCase() === row.product_slug?.toLowerCase() || p.id === row.product_slug)
-          if (!product) continue
+          if (!product) { errors++; continue }
 
-          await supabase.from('inventory_items').insert({
+          const { data: newItem, error } = await supabase.from('inventory_items').insert({
             id: uuidv4(),
             user_id: userId,
             product_id: product.id,
@@ -272,13 +273,20 @@ export function InventoryContent({
             custom_content: row.custom_content || null,
             extra_instructions: row.extra_instructions || null,
             status: 'available',
-          })
-          imported++
+          }).select('*, product:products(name)').single()
+
+          if (error) { errors++; continue }
+          if (newItem) {
+            setItems(prev => [{ ...newItem, product: newItem.product || product }, ...prev])
+            imported++
+          }
         }
 
-        window.location.reload()
+        if (imported > 0) toast.success(`${imported} item${imported > 1 ? 's' : ''} importado${imported > 1 ? 's' : ''}`)
+        if (errors > 0) toast.warning(`${errors} linha${errors > 1 ? 's' : ''} com erro${errors > 1 ? 's' : ''} (produto não encontrado ou dados inválidos)`)
       },
     })
+    e.target.value = ''
   }
 
   const exportCSV = () => {
