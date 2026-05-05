@@ -14,7 +14,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { Pagination } from '@/components/ui/Pagination'
 import { useToast } from '@/components/ui/Toast'
 import { formatCurrency, slugify } from '@/lib/utils'
-import { Plus, Package, Edit, Trash2, Search, ExternalLink, DollarSign, Tag, X } from 'lucide-react'
+import { Plus, Package, Edit, Trash2, Search, ExternalLink, DollarSign, Tag, X, CheckSquare, Square, Trash } from 'lucide-react'
 
 interface ProductsContentProps {
   products: Product[]
@@ -74,6 +74,8 @@ export function ProductsContent({ products: initialProducts, userId, totalCount,
   const [deleting, setDeleting] = useState(false)
   const toast = useToast()
   const [formError, setFormError] = useState<string | null>(null)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [bulkDeleting, setBulkDeleting] = useState(false)
 
   const filtered = products.filter(p => {
     const matchSearch = !search || p.name.toLowerCase().includes(search.toLowerCase()) || p.slug.includes(search.toLowerCase())
@@ -184,6 +186,42 @@ export function ProductsContent({ products: initialProducts, userId, totalCount,
     }
   }
 
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filtered.length) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(filtered.map(p => p.id)))
+    }
+  }
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return
+    setBulkDeleting(true)
+    try {
+      const supabase = createClient()
+      const ids = Array.from(selectedIds)
+      const { error } = await supabase.from('products').delete().in('id', ids).eq('user_id', userId)
+      if (error) throw error
+      setProducts(prev => prev.filter(p => !selectedIds.has(p.id)))
+      const count = selectedIds.size
+      setSelectedIds(new Set())
+      toast.success(`${count} produto${count > 1 ? 's' : ''} excluído${count > 1 ? 's' : ''}`)
+    } catch {
+      toast.error('Erro ao excluir produtos')
+    } finally {
+      setBulkDeleting(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -223,10 +261,23 @@ export function ProductsContent({ products: initialProducts, userId, totalCount,
           <option value="active">Ativo</option>
           <option value="inactive">Inativo</option>
           <option value="archived">Arquivado</option>
-        </select>
-      </div>
+  </select>
+  </div>
 
-      {/* Products List */}
+  {/* Bulk Actions Bar */}
+  {selectedIds.size > 0 && (
+    <div className="flex items-center gap-3 p-3 bg-[rgba(220,38,38,0.04)] border border-[rgba(220,38,38,0.12)] rounded-xl">
+      <span className="text-sm font-medium text-[#081827]">{selectedIds.size} selecionado{selectedIds.size > 1 ? 's' : ''}</span>
+      <Button variant="danger" size="sm" onClick={handleBulkDelete} isLoading={bulkDeleting} leftIcon={<Trash size={14} />}>
+        Excluir selecionados
+      </Button>
+      <Button variant="secondary" size="sm" onClick={() => setSelectedIds(new Set())}>
+        Cancelar
+      </Button>
+    </div>
+  )}
+
+  {/* Products List */}
       {filtered.length === 0 ? (
         <Card>
           <CardContent className="p-8">
@@ -241,12 +292,39 @@ export function ProductsContent({ products: initialProducts, userId, totalCount,
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-3">
-          {filtered.map(product => (
+  <div className="space-y-3">
+  {/* Select All */}
+  {filtered.length > 0 && (
+    <button
+      onClick={toggleSelectAll}
+      className="flex items-center gap-2 text-sm text-[#35516B] hover:text-[#081827] transition-colors px-1"
+    >
+      {selectedIds.size === filtered.length ? (
+        <CheckSquare size={16} className="text-[#0B7CFF]" />
+      ) : (
+        <Square size={16} className="text-[#71869B]" />
+      )}
+      Selecionar todos
+    </button>
+  )}
+  {filtered.map(product => (
             <Card key={product.id} hoverable>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-4">
-                  {/* Icon / Image */}
+  <CardContent className="p-4">
+  <div className="flex items-center gap-4">
+  {/* Checkbox */}
+  <button
+    onClick={() => toggleSelect(product.id)}
+    className="flex-shrink-0"
+    aria-label={`Selecionar ${product.name}`}
+  >
+    {selectedIds.has(product.id) ? (
+      <CheckSquare size={18} className="text-[#0B7CFF]" />
+    ) : (
+      <Square size={18} className="text-[#71869B] hover:text-[#35516B]" />
+    )}
+  </button>
+
+  {/* Icon / Image */}
                   <div className="w-12 h-12 rounded-xl flex-shrink-0 overflow-hidden bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
                     {product.image_url ? (
                       <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />

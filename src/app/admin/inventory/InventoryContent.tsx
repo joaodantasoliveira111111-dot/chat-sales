@@ -14,7 +14,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { Pagination } from '@/components/ui/Pagination'
 import { useToast } from '@/components/ui/Toast'
 import { formatDate } from '@/lib/utils'
-import { Plus, Archive, Edit, Trash2, Search, Upload, Download, Mail, Key, Link as LinkIcon, FileText } from 'lucide-react'
+import { Plus, Archive, Edit, Trash2, Search, Upload, Download, Mail, Key, Link as LinkIcon, FileText, CheckSquare, Square, Trash } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import Papa from 'papaparse'
 
@@ -97,6 +97,8 @@ export function InventoryContent({
   const [deleting, setDeleting] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const toast = useToast()
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [bulkDeleting, setBulkDeleting] = useState(false)
 
   const filtered = items.filter(i => {
     const matchSearch = !search || i.title?.toLowerCase().includes(search.toLowerCase()) || i.access_email?.toLowerCase().includes(search.toLowerCase())
@@ -189,6 +191,43 @@ export function InventoryContent({
       toast.error('Erro ao excluir item')
     } finally {
       setDeleting(false)
+    }
+  }
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const toggleSelectAll = () => {
+    const available = filtered.filter(i => i.status === 'available')
+    if (selectedIds.size === available.length) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(available.map(i => i.id)))
+    }
+  }
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return
+    setBulkDeleting(true)
+    try {
+      const supabase = createClient()
+      const ids = Array.from(selectedIds)
+      const { error } = await supabase.from('inventory_items').delete().in('id', ids)
+      if (error) throw error
+      setItems(prev => prev.filter(i => !selectedIds.has(i.id)))
+      const count = selectedIds.size
+      setSelectedIds(new Set())
+      toast.success(`${count} item${count > 1 ? 's' : ''} excluído${count > 1 ? 's' : ''}`)
+    } catch {
+      toast.error('Erro ao excluir itens')
+    } finally {
+      setBulkDeleting(false)
     }
   }
 
@@ -329,10 +368,23 @@ export function InventoryContent({
               {option.label}
             </option>
           ))}
-        </select>
-      </div>
+  </select>
+  </div>
 
-      {/* Items List */}
+  {/* Bulk Actions Bar */}
+  {selectedIds.size > 0 && (
+    <div className="flex items-center gap-3 p-3 bg-[rgba(220,38,38,0.04)] border border-[rgba(220,38,38,0.12)] rounded-xl">
+      <span className="text-sm font-medium text-[#081827]">{selectedIds.size} selecionado{selectedIds.size > 1 ? 's' : ''}</span>
+      <Button variant="danger" size="sm" onClick={handleBulkDelete} isLoading={bulkDeleting} leftIcon={<Trash size={14} />}>
+        Excluir selecionados
+      </Button>
+      <Button variant="secondary" size="sm" onClick={() => setSelectedIds(new Set())}>
+        Cancelar
+      </Button>
+    </div>
+  )}
+
+  {/* Items List */}
       {filtered.length === 0 ? (
         <Card>
           <CardContent className="p-8">
@@ -346,13 +398,44 @@ export function InventoryContent({
             />
           </CardContent>
         </Card>
+) : (
+  <div className="space-y-3">
+  {/* Select All */}
+  {filtered.filter(i => i.status === 'available').length > 0 && (
+    <button
+      onClick={toggleSelectAll}
+      className="flex items-center gap-2 text-sm text-[#35516B] hover:text-[#081827] transition-colors px-1"
+    >
+      {selectedIds.size === filtered.filter(i => i.status === 'available').length ? (
+        <CheckSquare size={16} className="text-[#0B7CFF]" />
       ) : (
-        <div className="space-y-3">
-          {filtered.map(item => (
-            <Card key={item.id} hoverable>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-4">
-                  {/* Icon */}
+        <Square size={16} className="text-[#71869B]" />
+      )}
+      Selecionar todos disponíveis
+    </button>
+  )}
+  {filtered.map(item => (
+  <Card key={item.id} hoverable>
+  <CardContent className="p-4">
+  <div className="flex items-center gap-4">
+  {/* Checkbox (only for available items) */}
+  {item.status === 'available' ? (
+    <button
+      onClick={() => toggleSelect(item.id)}
+      className="flex-shrink-0"
+      aria-label={`Selecionar ${item.title || 'item'}`}
+    >
+      {selectedIds.has(item.id) ? (
+        <CheckSquare size={18} className="text-[#0B7CFF]" />
+      ) : (
+        <Square size={18} className="text-[#71869B] hover:text-[#35516B]" />
+      )}
+    </button>
+  ) : (
+    <div className="w-[18px] flex-shrink-0" />
+  )}
+
+  {/* Icon */}
                   <div className="w-12 h-12 rounded-xl flex-shrink-0 bg-[#F3F7FB] flex items-center justify-center">
                     {getDeliveryIcon(item.delivery_type)}
                   </div>
