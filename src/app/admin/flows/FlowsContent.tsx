@@ -160,11 +160,11 @@ export function FlowsContent({
   }
 
   return (
-    <div style={{ padding: '1.5rem', maxWidth: '1100px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+    <div className="p-6 max-w-[1100px] mx-auto">
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
         <div>
-          <h1 style={{ fontSize: '1.375rem', fontWeight: 800, color: '#081827', letterSpacing: '-0.02em' }}>Fluxos</h1>
-          <p style={{ fontSize: '0.8rem', color: '#71869B', marginTop: '0.25rem' }}>{flows.length} fluxo(s) criado(s)</p>
+          <h1 className="text-[1.375rem] font-extrabold text-[#081827] tracking-tight">Fluxos</h1>
+          <p className="text-[0.8rem] text-[#71869B] mt-1">{flows.length} fluxo(s) criado(s)</p>
         </div>
         <Button onClick={() => { setFormError(null); setShowCreate(true) }} size="md">
           <Plus size={15} />
@@ -187,68 +187,58 @@ export function FlowsContent({
           />
         </Card>
       ) : (
-        <div style={{ display: 'grid', gap: '0.75rem' }}>
-          {flows.map(flow => (
-            <Card key={flow.id} hover>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{
-              width: '44px', height: '44px', borderRadius: '12px', flexShrink: 0,
-              background: 'rgba(11,124,255,0.08)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <Workflow size={20} style={{ color: '#0B7CFF' }} />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.2rem' }}>
-                    <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#081827' }}>{flow.name}</span>
-                    <Badge status={flow.status} />
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                    {flow.product && <span style={{ fontSize: '0.72rem', color: '#71869B' }}>Produto: {flow.product.name}</span>}
-                    <span style={{ fontSize: '0.72rem', color: '#71869B', fontWeight: 600 }}>v{flow.version}</span>
-                    <span style={{ fontSize: '0.72rem', color: '#71869B' }}>{formatDate(flow.updated_at)}</span>
-                  </div>
-                  <FlowFunnelStrip funnel={funnelByFlow[flow.id]} />
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <Link href={`/admin/flows/${flow.id}`} style={{ textDecoration: 'none' }}>
-                    <Button variant="secondary" size="sm">
-                      <Edit size={14} />
-                      Editar
-                    </Button>
-                  </Link>
-                  <button
-                    onClick={() => setDeleteFlow(flow)}
-                    title="Excluir"
-                    style={{
-                      padding: '0.5rem', borderRadius: '8px', background: 'transparent',
-                      border: 'none', color: '#71869B', cursor: 'pointer',
-                      display: 'flex', transition: 'all 0.15s',
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.1)'; e.currentTarget.style.color = '#F87171' }}
-                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#71869B' }}
-                  >
-                    <Trash2 size={15} />
-                  </button>
-                </div>
+      <div className="grid gap-3">
+        {flows.map(flow => (
+          <Card key={flow.id} hover>
+            <div className="flex items-center gap-4">
+              <div className="w-[44px] h-[44px] rounded-[12px] shrink-0 bg-[rgba(11,124,255,0.08)] flex items-center justify-center">
+                <Workflow size={20} className="text-[#0B7CFF]" />
               </div>
-            </Card>
-          ))}
-        </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap mb-[0.2rem]">
+                  <span className="text-sm font-bold text-[#081827]">{flow.name}</span>
+                  <Badge status={flow.status} />
+                </div>
+                <div className="flex items-center gap-4 flex-wrap">
+                  {flow.product && <span className="text-xs text-[#71869B]">Produto: {flow.product.name}</span>}
+                  <span className="text-xs text-[#71869B] font-semibold">v{flow.version}</span>
+                  <span className="text-xs text-[#71869B]">{formatDate(flow.updated_at)}</span>
+                </div>
+                <FlowFunnelStrip funnel={funnelByFlow[flow.id]} />
+              </div>
+              <div className="flex items-center gap-2">
+                <Link href={`/admin/flows/${flow.id}`} className="no-underline">
+                  <Button variant="secondary" size="sm">
+                    <Edit size={14} />
+                    Editar
+                  </Button>
+                </Link>
+                <button
+                  onClick={() => setDeleteFlow(flow)}
+                  title="Excluir"
+                  className="p-2 rounded-[8px] bg-transparent border-none text-[#71869B] cursor-pointer flex transition-all duration-150 hover:bg-[rgba(239,68,68,0.1)] hover:text-[#F87171]"
+                >
+                  <Trash2 size={15} />
+                </button>
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
       )}
 
       <Modal isOpen={showCreate} onClose={() => setShowCreate(false)} title="Novo fluxo de venda X1" size="lg" footer={
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <Button variant="secondary" onClick={() => setShowCreate(false)} fullWidth>Cancelar</Button>
-          <Button onClick={handleCreate} isLoading={creating} fullWidth>Montar fluxo</Button>
-        </div>
+    <div className="flex gap-3">
+        <Button variant="secondary" onClick={() => setShowCreate(false)} fullWidth>Cancelar</Button>
+        <Button onClick={handleCreate} isLoading={creating} fullWidth>Montar fluxo</Button>
+      </div>
       }>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {formError && (
-            <div role="alert" aria-live="polite" style={{ padding: '0.75rem 0.875rem', borderRadius: '10px', border: '1px solid rgba(239,68,68,0.35)', background: 'rgba(239,68,68,0.12)', color: '#FCA5A5', fontSize: '0.78rem', lineHeight: 1.45 }}>
-              {formError}
-            </div>
-          )}
+    <div className="flex flex-col gap-4">
+        {formError && (
+          <div role="alert" aria-live="polite" className="px-[0.875rem] py-3 rounded-[10px] border border-[rgba(239,68,68,0.35)] bg-[rgba(239,68,68,0.12)] text-[#FCA5A5] text-[0.78rem] leading-relaxed">
+            {formError}
+          </div>
+        )}
           <Input
             label="Nome do fluxo"
             value={form.name}
@@ -258,29 +248,26 @@ export function FlowsContent({
           />
 
           <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: '#081827', fontSize: '0.78rem', fontWeight: 700 }}>
-              Template pronto
-            </label>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '0.65rem' }}>
-              {salesTemplates.map(template => (
-                <button
-                  key={template.id}
-                  type="button"
-                  onClick={() => setForm(f => ({ ...f, template_id: template.id, delivery_type: f.delivery_type || template.suggestedDeliveryType }))}
-                  style={{
-                    padding: '0.9rem',
-                    borderRadius: '14px',
-                    border: form.template_id === template.id ? '1px solid rgba(11,124,255,0.75)' : '1px solid rgba(8,24,39,0.08)',
-                    background: form.template_id === template.id ? 'rgba(11,124,255,0.12)' : '#FFFFFF',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <strong style={{ display: 'block', color: '#081827', fontSize: '0.82rem', marginBottom: '0.25rem' }}>{template.name}</strong>
-                  <span style={{ display: 'block', color: '#71869B', fontSize: '0.72rem', lineHeight: 1.45 }}>{template.description}</span>
-                </button>
-              ))}
-            </div>
+        <label className="block mb-2 text-[#081827] text-[0.78rem] font-bold">
+          Template pronto
+        </label>
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(210px,1fr))] gap-[0.65rem]">
+          {salesTemplates.map(template => (
+            <button
+              key={template.id}
+              type="button"
+              onClick={() => setForm(f => ({ ...f, template_id: template.id, delivery_type: f.delivery_type || template.suggestedDeliveryType }))}
+              className={`p-[0.9rem] rounded-[14px] text-left cursor-pointer ${
+                form.template_id === template.id
+                  ? 'border border-[rgba(11,124,255,0.75)] bg-[rgba(11,124,255,0.12)]'
+                  : 'border border-[rgba(8,24,39,0.08)] bg-white'
+              }`}
+            >
+              <strong className="block text-[#081827] text-[0.82rem] mb-1">{template.name}</strong>
+              <span className="block text-[#71869B] text-xs leading-relaxed">{template.description}</span>
+            </button>
+          ))}
+        </div>
           </div>
 
           {products.length > 0 && (
@@ -296,9 +283,9 @@ export function FlowsContent({
             />
           )}
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
-            <Select
-              label="Template visual"
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3">
+        <Select
+          label="Template visual"
               value={form.visual_template}
               onChange={value => setForm(f => ({ ...f, visual_template: value }))}
               options={[
@@ -322,9 +309,9 @@ export function FlowsContent({
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
-            <Input
-              label="Suporte"
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3">
+        <Input
+          label="Suporte"
               value={form.support_whatsapp}
               onChange={e => setForm(f => ({ ...f, support_whatsapp: e.target.value }))}
               placeholder="{{system.support_whatsapp}}"
@@ -340,9 +327,9 @@ export function FlowsContent({
             />
           </div>
 
-          <div style={{ border: '1px solid rgba(34,211,238,0.22)', background: 'rgba(34,211,238,0.06)', color: '#71869B', borderRadius: '14px', padding: '0.85rem', fontSize: '0.76rem', lineHeight: 1.55 }}>
-            O Chatfy vai montar automaticamente: boas-vindas, dor, solucao, oferta, captura por conversa, Pix, aguardar pagamento, entrega, suporte e fim. Tudo fica editavel no React Flow.
-          </div>
+      <div className="border border-[rgba(34,211,238,0.22)] bg-[rgba(34,211,238,0.06)] text-[#71869B] rounded-[14px] p-[0.85rem] text-[0.76rem] leading-relaxed">
+        O Chatfy vai montar automaticamente: boas-vindas, dor, solucao, oferta, captura por conversa, Pix, aguardar pagamento, entrega, suporte e fim. Tudo fica editavel no React Flow.
+      </div>
         </div>
       </Modal>
 
@@ -372,14 +359,14 @@ function FlowFunnelStrip({ funnel }: { funnel?: FlowFunnel }) {
   ]
 
   return (
-    <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginTop: '0.65rem' }}>
-      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', color: '#71869B', fontSize: '0.68rem', fontWeight: 700 }}>
+    <div className="flex gap-[0.4rem] flex-wrap mt-[0.65rem]">
+      <span className="inline-flex items-center gap-[0.3rem] text-[#71869B] text-[0.68rem] font-bold">
         <BarChart3 size={12} />
         Funil
       </span>
       {items.map(([label, value]) => (
-        <span key={label} style={{ border: '1px solid rgba(8,24,39,0.08)', borderRadius: '999px', padding: '0.2rem 0.48rem', color: '#71869B', fontSize: '0.68rem', background: 'rgba(8,24,39,0.03)' }}>
-          {label}: <strong style={{ color: '#081827' }}>{value}</strong>
+        <span key={label} className="border border-[rgba(8,24,39,0.08)] rounded-full py-[0.2rem] px-[0.48rem] text-[#71869B] text-[0.68rem] bg-[rgba(8,24,39,0.03)]">
+          {label}: <strong className="text-[#081827]">{value}</strong>
         </span>
       ))}
     </div>
