@@ -140,27 +140,24 @@ export function ProductsContent({ products: initialProducts, userId, totalCount,
         default_instructions: form.default_instructions.trim() || null,
       }
 
-      if (editProduct) {
-        const { data: updatedProduct, error } = await supabase
-          .from('products')
-          .update(data)
-          .eq('id', editProduct.id)
-          .eq('user_id', userId)
-          .select('*')
-          .single()
-        if (error) throw error
-        setProducts(prev => prev.map(p => p.id === editProduct.id ? updatedProduct : p))
-      } else {
-        const { data: newProduct, error } = await supabase
-          .from('products')
-          .insert({ ...data, user_id: userId, currency: 'BRL' })
-          .select('*')
-          .single()
-        if (error) throw error
-        setProducts(prev => [newProduct, ...prev])
-      }
-      setShowForm(false)
-      router.refresh()
+    if (editProduct) {
+      const { error } = await supabase
+        .from('products')
+        .update(data)
+        .eq('id', editProduct.id)
+        .eq('user_id', userId)
+      if (error) throw error
+    } else {
+      const { error } = await supabase
+        .from('products')
+        .insert({ ...data, user_id: userId, currency: 'BRL' })
+      if (error) throw error
+    }
+    setShowForm(false)
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete('page')
+    router.push(`/admin/products?${params.toString()}`)
+    router.refresh()
     } catch (err: unknown) {
       console.error('[products] erro ao salvar produto', err)
       const message = err instanceof Error ? err.message : ''
