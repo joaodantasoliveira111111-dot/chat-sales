@@ -5,7 +5,7 @@ import useSWR from 'swr'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
-import { Activity, TrendingUp, Users, AlertTriangle, CheckCircle, XCircle, Info, RefreshCw } from 'lucide-react'
+import { Activity, TrendingUp, Users, AlertTriangle, CheckCircle, XCircle, Info, RefreshCw, ChevronDown } from 'lucide-react'
 
 interface FunnelStage {
   name: string
@@ -262,48 +262,109 @@ function AlertCard({ alert }: { alert: Alert }) {
 
 function FunnelChart({ funnel }: { funnel: FunnelStage[] }) {
   const maxCount = Math.max(...funnel.map(f => f.count))
+  const gradientColors = [
+    'from-[#0B7CFF] to-[#0092FF]',
+    'from-[#0092FF] to-[#00A8FF]',
+    'from-[#00A8FF] to-[#00BFFF]',
+    'from-[#00BFFF] to-[#00C2FF]',
+    'from-[#00C2FF] to-[#00D4FF]',
+    'from-[#00D4FF] to-[#00E5FF]',
+  ]
 
   return (
     <Card variant="neu">
-      <CardContent className="p-6">
-        <h3 className="font-bold text-[#081827] mb-6">Funil de Conversao</h3>
-        <div className="max-w-lg mx-auto">
+      <CardContent className="p-8">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h3 className="text-lg font-bold text-[#081827]">Funil de Conversão</h3>
+            <p className="text-[13px] text-[#71869B] mt-1">Jornada do visitante até o pagamento</p>
+          </div>
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[rgba(11,124,255,0.06)] border border-[rgba(11,124,255,0.12)]">
+            <div className="w-2 h-2 rounded-full bg-[#0B7CFF] animate-pulse" />
+            <span className="text-[11px] font-semibold text-[#0B7CFF]">Tempo real</span>
+          </div>
+        </div>
+
+        <div className="max-w-2xl mx-auto">
           {funnel.map((stage, index) => {
-            const pct = Math.max(20, (stage.count / maxCount) * 100)
-            const nextPct = index < funnel.length - 1
-              ? Math.max(20, (funnel[index + 1].count / maxCount) * 100)
-              : pct * 0.65
-            const inset = (100 - pct) / 2
-            const nextInset = (100 - nextPct) / 2
+            const widthPct = Math.max(24, (stage.count / maxCount) * 100)
+            const nextWidthPct = index < funnel.length - 1
+              ? Math.max(24, (funnel[index + 1].count / maxCount) * 100)
+              : widthPct * 0.6
+            const conversionPct = index < funnel.length - 1
+              ? Math.round((funnel[index + 1].count / stage.count) * 100)
+              : null
 
             return (
-              <div key={stage.name}>
-                <div
-                  className="relative bg-gradient-to-r from-[#0B7CFF] to-[#00C2FF] text-white transition-all duration-500"
-                  style={{
-                    clipPath: `polygon(${inset}% 0%, ${100 - inset}% 0%, ${100 - nextInset}% 100%, ${nextInset}% 100%)`,
-                    minHeight: 52,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <div className="flex items-center justify-between w-full px-6" style={{ maxWidth: `${pct}%` }}>
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="text-[10px] font-bold bg-white/20 rounded-md px-1.5 py-0.5">{index + 1}</span>
-                      <span className="font-semibold text-sm truncate">{stage.label}</span>
-                    </div>
-                    <div className="text-right flex-shrink-0 ml-3">
-                      <span className="text-sm font-extrabold">{stage.count.toLocaleString()}</span>
-                      <span className="text-[10px] opacity-75 ml-1.5">{stage.percentage}%</span>
+              <div key={stage.name} className="relative">
+                {/* Stage row: label left, bar center, count right */}
+                <div className="flex items-center gap-4">
+                  {/* Left label */}
+                  <div className="w-28 flex-shrink-0 text-right">
+                    <p className="text-[13px] font-semibold text-[#081827] leading-tight">{stage.label}</p>
+                    <p className="text-[11px] text-[#71869B] mt-0.5">{stage.percentage}% do total</p>
+                  </div>
+
+                  {/* Funnel trapezoid bar */}
+                  <div className="flex-1 relative">
+                    <div
+                      className={`relative bg-gradient-to-r ${gradientColors[index % gradientColors.length]} rounded-lg overflow-visible`}
+                      style={{
+                        width: `${widthPct}%`,
+                        height: 56,
+                        margin: '0 auto',
+                      }}
+                    >
+                      {/* Trapezoid shape via clip-path on the bg */}
+                      <div
+                        className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/0"
+                        style={{
+                          clipPath: `polygon(
+                            0% 0%,
+                            100% 0%,
+                            ${100 - ((widthPct - nextWidthPct) / 2 / widthPct * 100)}% 100%,
+                            ${((widthPct - nextWidthPct) / 2 / widthPct * 100)}% 100%
+                          )`,
+                        }}
+                      />
+                      {/* Glass shine */}
+                      <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent rounded-t-lg" />
+                      {/* Inner count */}
+                      <div className="relative z-10 flex items-center justify-center h-full">
+                        <span className="text-white text-lg font-extrabold tracking-tight drop-shadow-sm">
+                          {stage.count.toLocaleString()}
+                        </span>
+                      </div>
                     </div>
                   </div>
+
+                  {/* Right percentage badge */}
+                  <div className="w-20 flex-shrink-0">
+                    {index === 0 ? (
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-[rgba(11,124,255,0.06)] text-[12px] font-bold text-[#0B7CFF]">
+                        100%
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#F3F7FB] text-[12px] font-bold text-[#35516B]">
+                        {stage.percentage}%
+                      </span>
+                    )}
+                  </div>
                 </div>
-                {index < funnel.length - 1 && (
-                  <div className="text-center py-1">
-                    <span className="inline-flex items-center text-[11px] font-semibold text-[#0B7CFF]">
-                      ↓ {Math.round((funnel[index + 1].count / stage.count) * 100)}%
-                    </span>
+
+                {/* Conversion connector arrow */}
+                {conversionPct !== null && (
+                  <div className="flex items-center gap-4 my-1">
+                    <div className="w-28 flex-shrink-0" />
+                    <div className="flex-1 flex justify-center">
+                      <div className="flex items-center gap-1.5 py-1 px-3 rounded-full bg-[#F3F7FB] border border-[rgba(8,24,39,0.06)]">
+                        <ChevronDown size={12} className={`${conversionPct < 30 ? 'text-[#DC2626]' : conversionPct < 60 ? 'text-[#F97316]' : 'text-[#16A34A]'}`} />
+                        <span className={`text-[11px] font-bold ${conversionPct < 30 ? 'text-[#DC2626]' : conversionPct < 60 ? 'text-[#F97316]' : 'text-[#16A34A]'}`}>
+                          {conversionPct}% converte
+                        </span>
+                      </div>
+                    </div>
+                    <div className="w-20 flex-shrink-0" />
                   </div>
                 )}
               </div>
