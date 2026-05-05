@@ -39,7 +39,6 @@ export async function POST(request: NextRequest) {
       .select('*')
       .eq('id', product_id)
       .eq('status', 'active')
-      .is('deleted_at', null)
       .single()
 
     if (productError || !product) {
