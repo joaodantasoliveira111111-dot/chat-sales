@@ -46,6 +46,7 @@ export interface Product {
   default_instructions: string | null
   created_at: string
   updated_at: string
+  deleted_at: string | null
 }
 
 // ---- Themes ----
@@ -398,6 +399,7 @@ export interface InventoryItem {
   delivered_at: string | null
   created_at: string
   updated_at: string
+  deleted_at: string | null
 }
 
 // ---- Orders ----

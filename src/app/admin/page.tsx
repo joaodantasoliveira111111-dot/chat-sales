@@ -30,18 +30,18 @@ export default async function AdminDashboard() {
     supabase.from('orders').select('*', { count: 'exact', head: true }).eq('user_id', user.id).in('status', ['paid', 'delivered']),
     supabase.from('orders').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'pending'),
     supabase.from('orders').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'expired'),
-    supabase.from('products').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'active'),
+    supabase.from('products').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'active').is('deleted_at', null),
     supabase.from('public_pages').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'published'),
-    supabase.from('inventory_items').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'available'),
-    supabase.from('inventory_items').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'available').lt('created_at', new Date(Date.now() - 30 * 86400000).toISOString()),
+    supabase.from('inventory_items').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'available').is('deleted_at', null),
+    supabase.from('inventory_items').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'available').is('deleted_at', null).lt('created_at', new Date(Date.now() - 30 * 86400000).toISOString()),
     supabase.from('deliveries').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
     supabase.from('orders').select('amount').eq('user_id', user.id).in('status', ['paid', 'delivered']),
     supabase.from('orders').select('id, customer_name, customer_email, amount, status, created_at, product:products(name)').eq('user_id', user.id).order('created_at', { ascending: false }).limit(5),
     supabase.from('support_requests').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'open'),
     supabase.from('admin_settings').select('value').eq('user_id', user.id).eq('key', 'meta_tracking').single(),
-    supabase.from('products').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
+    supabase.from('products').select('*', { count: 'exact', head: true }).eq('user_id', user.id).is('deleted_at', null),
     supabase.from('flows').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
-    supabase.from('inventory_items').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
+    supabase.from('inventory_items').select('*', { count: 'exact', head: true }).eq('user_id', user.id).is('deleted_at', null),
   ])
 
   const totalRevenue = revenue?.reduce((sum, o) => sum + (o.amount || 0), 0) || 0

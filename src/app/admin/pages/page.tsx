@@ -43,7 +43,7 @@ export default async function PagesPage({ searchParams }: { searchParams: Promis
     { data: themes, error: themesError },
   ] = await Promise.all([
     supabase.from('public_pages').select('*, product:products(name), flow:flows!public_pages_flow_id_fkey(name)', { count: 'exact' }).eq('user_id', user.id).order('created_at', { ascending: false }).range(from, to),
-    supabase.from('products').select('id, name').eq('user_id', user.id).neq('status', 'archived'),
+    supabase.from('products').select('id, name').eq('user_id', user.id).neq('status', 'archived').is('deleted_at', null),
     supabase.from('flows').select('id, name').eq('user_id', user.id),
     supabase.from('themes').select('id, name, description').order('name'),
   ])

@@ -22,6 +22,7 @@ export default async function FlowsPage() {
     .select('id, name, price')
     .eq('user_id', user.id)
     .eq('status', 'active')
+    .is('deleted_at', null)
 
   const { data: analytics, error: analyticsError } = await supabase
     .from('analytics_events')

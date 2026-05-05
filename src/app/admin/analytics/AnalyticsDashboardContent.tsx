@@ -267,29 +267,48 @@ function FunnelChart({ funnel }: { funnel: FunnelStage[] }) {
     <Card variant="neu">
       <CardContent className="p-6">
         <h3 className="font-bold text-[#081827] mb-6">Funil de Conversao</h3>
-        <div className="space-y-4">
-          {funnel.map((stage, index) => (
-            <div key={stage.name} className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-[rgba(11,124,255,0.08)] flex items-center justify-center text-[#0B7CFF] text-sm font-bold">
-                    {index + 1}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-[#081827]">{stage.label}</p>
-                    <p className="text-sm text-[#71869B]">{stage.count.toLocaleString()} usuarios</p>
+        <div className="max-w-lg mx-auto">
+          {funnel.map((stage, index) => {
+            const pct = Math.max(20, (stage.count / maxCount) * 100)
+            const nextPct = index < funnel.length - 1
+              ? Math.max(20, (funnel[index + 1].count / maxCount) * 100)
+              : pct * 0.65
+            const inset = (100 - pct) / 2
+            const nextInset = (100 - nextPct) / 2
+
+            return (
+              <div key={stage.name}>
+                <div
+                  className="relative bg-gradient-to-r from-[#0B7CFF] to-[#00C2FF] text-white transition-all duration-500"
+                  style={{
+                    clipPath: `polygon(${inset}% 0%, ${100 - inset}% 0%, ${100 - nextInset}% 100%, ${nextInset}% 100%)`,
+                    minHeight: 52,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <div className="flex items-center justify-between w-full px-6" style={{ maxWidth: `${pct}%` }}>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-[10px] font-bold bg-white/20 rounded-md px-1.5 py-0.5">{index + 1}</span>
+                      <span className="font-semibold text-sm truncate">{stage.label}</span>
+                    </div>
+                    <div className="text-right flex-shrink-0 ml-3">
+                      <span className="text-sm font-extrabold">{stage.count.toLocaleString()}</span>
+                      <span className="text-[10px] opacity-75 ml-1.5">{stage.percentage}%</span>
+                    </div>
                   </div>
                 </div>
-                <p className="text-2xl font-extrabold text-[#081827]">{stage.percentage}%</p>
+                {index < funnel.length - 1 && (
+                  <div className="text-center py-1">
+                    <span className="inline-flex items-center text-[11px] font-semibold text-[#0B7CFF]">
+                      ↓ {Math.round((funnel[index + 1].count / stage.count) * 100)}%
+                    </span>
+                  </div>
+                )}
               </div>
-              <div className="h-3 bg-[#EAF1F8] rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-[#0B7CFF] to-[#00C2FF] rounded-full transition-all duration-500"
-                  style={{ width: `${(stage.count / maxCount) * 100}%` }}
-                />
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </CardContent>
     </Card>

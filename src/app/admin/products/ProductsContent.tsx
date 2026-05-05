@@ -184,7 +184,7 @@ export function ProductsContent({ products: initialProducts, userId, totalCount,
       toast.warning('Produto excluído', 6000, {
         label: 'Desfazer',
         onClick: async () => {
-          const { error: undoError } = await supabase.from('products').update({ deleted_at: null }).eq('id', deletedProduct.id)
+          const { error: undoError } = await supabase.from('products').update({ deleted_at: null }).eq('id', deletedProduct.id).eq('user_id', userId)
           if (!undoError) {
             setProducts(prev => [deletedProduct, ...prev])
             toast.success('Exclusão desfeita')

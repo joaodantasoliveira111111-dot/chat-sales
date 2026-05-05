@@ -22,7 +22,7 @@ export default async function FlowBuilderPage({
     supabase.from('flows').select('*').eq('id', id).eq('user_id', user.id).single(),
     supabase.from('flow_nodes').select('*').eq('flow_id', id).order('created_at'),
     supabase.from('flow_edges').select('*').eq('flow_id', id),
-    supabase.from('products').select('id, name, price').eq('user_id', user.id).eq('status', 'active'),
+    supabase.from('products').select('id, name, price').eq('user_id', user.id).eq('status', 'active').is('deleted_at', null),
   ])
 
   if (flowError) console.error('[flow builder] erro ao carregar fluxo', flowError)

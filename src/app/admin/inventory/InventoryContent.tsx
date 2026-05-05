@@ -185,14 +185,14 @@ export function InventoryContent({
     setDeleting(true)
     try {
       const supabase = createClient()
-      await supabase.from('inventory_items').update({ deleted_at: new Date().toISOString() }).eq('id', deleteItem.id)
+      await supabase.from('inventory_items').update({ deleted_at: new Date().toISOString() }).eq('id', deleteItem.id).eq('user_id', userId)
       const deletedItem = deleteItem
       setItems(items.filter(i => i.id !== deletedItem.id))
       setDeleteItem(null)
       toast.warning('Item excluído', 6000, {
         label: 'Desfazer',
         onClick: async () => {
-          const { error: undoError } = await supabase.from('inventory_items').update({ deleted_at: null }).eq('id', deletedItem.id)
+          const { error: undoError } = await supabase.from('inventory_items').update({ deleted_at: null }).eq('id', deletedItem.id).eq('user_id', userId)
           if (!undoError) {
             setItems(prev => [deletedItem, ...prev])
             toast.success('Exclusão desfeita')
@@ -230,7 +230,7 @@ export function InventoryContent({
     try {
       const supabase = createClient()
       const ids = Array.from(selectedIds)
-      const { error } = await supabase.from('inventory_items').update({ deleted_at: new Date().toISOString() }).in('id', ids)
+      const { error } = await supabase.from('inventory_items').update({ deleted_at: new Date().toISOString() }).in('id', ids).eq('user_id', userId)
       if (error) throw error
       setItems(prev => prev.filter(i => !selectedIds.has(i.id)))
       const count = selectedIds.size
