@@ -5,7 +5,8 @@ import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import { Save, CheckCircle, AlertCircle } from 'lucide-react'
+import { Tabs } from '@/components/ui/Tabs'
+import { Save, CheckCircle, AlertCircle, User, Lock } from 'lucide-react'
 
 export function AccountSettingsContent({
   userId,
@@ -76,84 +77,99 @@ export function AccountSettingsContent({
         <p className="text-[14px] text-[#71869B] mt-1">Gerencie seu perfil e credenciais.</p>
       </div>
 
-      {/* Profile */}
-      <Card variant="neu">
-        <CardContent className="p-6 space-y-4">
-          <h2 className="text-[15px] font-semibold text-[#081827]">Perfil</h2>
+      <Tabs
+        tabs={[
+          {
+            id: 'profile',
+            label: 'Perfil',
+            icon: <User size={15} />,
+            content: (
+              <Card variant="neu">
+                <CardContent className="p-6 space-y-4">
+                  <Input
+                    label="Nome"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Seu nome"
+                  />
 
-          <Input
-            label="Nome"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Seu nome"
-          />
+                  <div>
+                    <p className="text-[11px] font-semibold text-[#71869B] uppercase tracking-wide mb-1">E-mail</p>
+                    <p className="text-[14px] font-medium text-[#081827]">{email}</p>
+                    <p className="text-[11px] text-[#71869B] mt-0.5">O e-mail não pode ser alterado nesta página.</p>
+                  </div>
 
-          <div>
-            <p className="text-[11px] font-semibold text-[#71869B] uppercase tracking-wide mb-1">E-mail</p>
-            <p className="text-[14px] font-medium text-[#081827]">{email}</p>
-            <p className="text-[11px] text-[#71869B] mt-0.5">O e-mail não pode ser alterado nesta página.</p>
-          </div>
+                  <div>
+                    <p className="text-[11px] font-semibold text-[#71869B] uppercase tracking-wide mb-1">ID da Conta</p>
+                    <p className="text-[13px] text-[#35516B] font-mono">{userId}</p>
+                  </div>
 
-          <div>
-            <p className="text-[11px] font-semibold text-[#71869B] uppercase tracking-wide mb-1">ID da Conta</p>
-            <p className="text-[13px] text-[#35516B] font-mono">{userId}</p>
-          </div>
+                  {nameMsg && (
+                    <div className={`flex items-center gap-2 text-[13px] font-medium ${nameMsg.type === 'success' ? 'text-[#16A34A]' : 'text-[#DC2626]'}`}>
+                      {nameMsg.type === 'success' ? <CheckCircle size={14} /> : <AlertCircle size={14} />}
+                      {nameMsg.text}
+                    </div>
+                  )}
 
-          {nameMsg && (
-            <div className={`flex items-center gap-2 text-[13px] font-medium ${nameMsg.type === 'success' ? 'text-[#16A34A]' : 'text-[#DC2626]'}`}>
-              {nameMsg.type === 'success' ? <CheckCircle size={14} /> : <AlertCircle size={14} />}
-              {nameMsg.text}
-            </div>
-          )}
+                  <Button
+                    onClick={handleSaveName}
+                    isLoading={savingName}
+                    leftIcon={<Save size={16} />}
+                  >
+                    Salvar nome
+                  </Button>
+                </CardContent>
+              </Card>
+            ),
+          },
+          {
+            id: 'password',
+            label: 'Senha',
+            icon: <Lock size={15} />,
+            content: (
+              <Card variant="neu">
+                <CardContent className="p-6 space-y-4">
+                  <h2 className="text-[15px] font-semibold text-[#081827]">Alterar Senha</h2>
 
-          <Button
-            onClick={handleSaveName}
-            isLoading={savingName}
-            leftIcon={<Save size={16} />}
-          >
-            Salvar nome
-          </Button>
-        </CardContent>
-      </Card>
+                  <Input
+                    label="Nova senha"
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Mínimo 6 caracteres"
+                    required
+                  />
 
-      {/* Password */}
-      <Card variant="neu">
-        <CardContent className="p-6 space-y-4">
-          <h2 className="text-[15px] font-semibold text-[#081827]">Alterar Senha</h2>
+                  <Input
+                    label="Confirmar nova senha"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Repita a nova senha"
+                    required
+                  />
 
-          <Input
-            label="Nova senha"
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            placeholder="Mínimo 6 caracteres"
-          />
+                  {passwordMsg && (
+                    <div className={`flex items-center gap-2 text-[13px] font-medium ${passwordMsg.type === 'success' ? 'text-[#16A34A]' : 'text-[#DC2626]'}`}>
+                      {passwordMsg.type === 'success' ? <CheckCircle size={14} /> : <AlertCircle size={14} />}
+                      {passwordMsg.text}
+                    </div>
+                  )}
 
-          <Input
-            label="Confirmar nova senha"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Repita a nova senha"
-          />
-
-          {passwordMsg && (
-            <div className={`flex items-center gap-2 text-[13px] font-medium ${passwordMsg.type === 'success' ? 'text-[#16A34A]' : 'text-[#DC2626]'}`}>
-              {passwordMsg.type === 'success' ? <CheckCircle size={14} /> : <AlertCircle size={14} />}
-              {passwordMsg.text}
-            </div>
-          )}
-
-          <Button
-            onClick={handleSavePassword}
-            isLoading={savingPassword}
-            leftIcon={<Save size={16} />}
-            disabled={!newPassword || !confirmPassword}
-          >
-            Alterar senha
-          </Button>
-        </CardContent>
-      </Card>
+                  <Button
+                    onClick={handleSavePassword}
+                    isLoading={savingPassword}
+                    leftIcon={<Save size={16} />}
+                    disabled={!newPassword || !confirmPassword}
+                  >
+                    Alterar senha
+                  </Button>
+                </CardContent>
+              </Card>
+            ),
+          },
+        ]}
+      />
     </div>
   )
 }

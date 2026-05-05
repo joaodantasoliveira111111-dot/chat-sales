@@ -24,6 +24,7 @@ import {
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { ChatfyLogo } from '@/components/ui/ChatfyLogo'
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary'
 
 const navGroups = [
   {
@@ -224,9 +225,11 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Page Content */}
-        <main className="admin-content">
+<main className="admin-content">
+        <ErrorBoundary>
           {children}
-        </main>
+        </ErrorBoundary>
+      </main>
       </div>
     </div>
   )
