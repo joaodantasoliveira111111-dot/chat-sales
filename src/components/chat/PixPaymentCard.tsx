@@ -113,12 +113,17 @@ export function PixPaymentCard({
           }),
         })
 
-        if (!res.ok) {
-          const err = await res.json()
-          setError(err.error || 'Erro ao gerar PIX')
-          setLoading(false)
-          return
-        }
+      if (!res.ok) {
+        const err = await res.json()
+        const fieldErrors = err.details?.fieldErrors
+        const detailMsg = fieldErrors
+          ? Object.entries(fieldErrors).map(([k, v]) => `${k}: ${(v as string[]).join(', ')}`).join('; ')
+          : ''
+        console.error('[PixPaymentCard] payment create failed:', res.status, err, 'request body:', { productId, page_id: page.id, flow_id: page.flow_id, session_id: sessionId })
+        setError(detailMsg || err.error || 'Erro ao gerar PIX')
+        setLoading(false)
+        return
+      }
 
         const data = await res.json()
         setOrderId(data.order_id)

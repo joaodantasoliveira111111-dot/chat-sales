@@ -14,7 +14,7 @@ const createPaymentSchema = z.object({
   flow_id: z.string().uuid().optional(),
   session_id: z.string(),
   customer_name: z.string().min(1),
-  customer_email: z.string().email().or(z.literal('')).optional(),
+  customer_email: z.string().optional(),
   customer_whatsapp: z.string().optional(),
 })
 
