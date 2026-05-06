@@ -1,7 +1,8 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { forwardRef, useState, useRef, useEffect, useId } from 'react'
+import { forwardRef, useState, useRef, useEffect, useId, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { ChevronDown, Check } from 'lucide-react'
 
 export interface SelectOption {
@@ -43,11 +44,37 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(
   ) => {
     const [isOpen, setIsOpen] = useState(false)
     const [highlightedIndex, setHighlightedIndex] = useState(-1)
+    const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({})
     const triggerRef = useRef<HTMLButtonElement>(null)
     const listboxRef = useRef<HTMLDivElement>(null)
     const buttonId = useId()
     const listboxId = useId()
     const labelId = useId()
+
+    const updatePosition = useCallback(() => {
+      if (!triggerRef.current) return
+      const rect = triggerRef.current.getBoundingClientRect()
+      setDropdownStyle({
+        position: 'fixed',
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: rect.width,
+        zIndex: 1100,
+      })
+    }, [])
+
+    useEffect(() => {
+      if (!isOpen) return
+      updatePosition()
+      const onScroll = () => updatePosition()
+      const onResize = () => updatePosition()
+      window.addEventListener('scroll', onScroll, true)
+      window.addEventListener('resize', onResize)
+      return () => {
+        window.removeEventListener('scroll', onScroll, true)
+        window.removeEventListener('resize', onResize)
+      }
+    }, [isOpen, updatePosition])
 
     const selectedOption = options.find((opt) => opt.value === value)
 
@@ -209,49 +236,51 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(
             />
           </button>
 
-          {isOpen && (
-            <>
-              <div
-                className="fixed inset-0 z-[1080]"
-                onClick={() => setIsOpen(false)}
-                aria-hidden="true"
-              />
-              <div
-                ref={listboxRef}
-                id={listboxId}
-                role="listbox"
-                aria-activedescendant={highlightedIndex >= 0 ? `${listboxId}-option-${highlightedIndex}` : undefined}
-                className="absolute z-[1090] w-full mt-1 bg-white border border-[rgba(8,24,39,0.08)] rounded-xl shadow-[var(--shadow-elevated)] max-h-60 overflow-auto"
+      {isOpen && createPortal(
+        <>
+          <div
+            className="fixed inset-0 z-[1099]"
+            onClick={() => setIsOpen(false)}
+            aria-hidden="true"
+          />
+          <div
+            ref={listboxRef}
+            id={listboxId}
+            role="listbox"
+            aria-activedescendant={highlightedIndex >= 0 ? `${listboxId}-option-${highlightedIndex}` : undefined}
+            style={dropdownStyle}
+            className="bg-white border border-[rgba(8,24,39,0.08)] rounded-xl shadow-[var(--shadow-elevated)] max-h-60 overflow-auto"
+          >
+            {options.map((option, index) => (
+              <button
+                key={option.value}
+                id={`${listboxId}-option-${index}`}
+                type="button"
+                role="option"
+                aria-selected={option.value === value}
+                aria-disabled={option.disabled || undefined}
+                onClick={() => handleSelect(option)}
+                onKeyDown={(e) => handleOptionKeyDown(e, option, index)}
+                disabled={option.disabled}
+                className={cn(
+                  'w-full px-4 py-2.5 text-[14px] text-left',
+                  'flex items-center justify-between',
+                  'hover:bg-[rgba(8,24,39,0.04)] transition-colors',
+                  index === highlightedIndex && 'bg-[rgba(8,24,39,0.04)]',
+                  option.disabled && 'opacity-50 cursor-not-allowed',
+                  option.value === value && 'bg-[rgba(11,124,255,0.08)] text-[#0B7CFF]'
+                )}
               >
-                {options.map((option, index) => (
-                  <button
-                    key={option.value}
-                    id={`${listboxId}-option-${index}`}
-                    type="button"
-                    role="option"
-                    aria-selected={option.value === value}
-                    aria-disabled={option.disabled || undefined}
-                    onClick={() => handleSelect(option)}
-                    onKeyDown={(e) => handleOptionKeyDown(e, option, index)}
-                    disabled={option.disabled}
-                    className={cn(
-                      'w-full px-4 py-2.5 text-[14px] text-left',
-                      'flex items-center justify-between',
-                      'hover:bg-[rgba(8,24,39,0.04)] transition-colors',
-                      index === highlightedIndex && 'bg-[rgba(8,24,39,0.04)]',
-                      option.disabled && 'opacity-50 cursor-not-allowed',
-                      option.value === value && 'bg-[rgba(11,124,255,0.08)] text-[#0B7CFF]'
-                    )}
-                  >
-                    <span>{option.label}</span>
-                    {option.value === value && (
-                      <Check className="w-4 h-4" aria-hidden="true" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
+                <span>{option.label}</span>
+                {option.value === value && (
+                  <Check className="w-4 h-4" aria-hidden="true" />
+                )}
+              </button>
+            ))}
+          </div>
+        </>,
+        document.body
+      )}
         </div>
 
         {error && (
