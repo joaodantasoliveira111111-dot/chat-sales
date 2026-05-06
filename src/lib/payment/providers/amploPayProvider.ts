@@ -52,13 +52,13 @@ export class AmploPayProvider implements PaymentProvider {
 
     const data = await response.json()
 
-    if (response.status === 400) {
+    if (response.status === 400 || response.status === 422) {
       const errMsg = data.message || data.errorCode || 'Erro na cobrança PIX'
       const details = data.details?.field ? ` (${data.details.field}: ${data.details.issue})` : ''
       throw new Error(`AmploPay: ${errMsg}${details}`)
     }
 
-    if (response.status !== 201) {
+    if (response.status !== 200 && response.status !== 201) {
       throw new Error(`AmploPay: status inesperado ${response.status} - ${JSON.stringify(data)}`)
     }
 
@@ -73,12 +73,12 @@ export class AmploPayProvider implements PaymentProvider {
     expiresAt.setMinutes(expiresAt.getMinutes() + 30)
 
     return {
-      gatewayPaymentId: data.transactionId || '',
+      gatewayPaymentId: data.transactionId || data.order?.id || '',
       pixCode,
       pixQrCodeUrl: qrUrl,
       pixQrCodeBase64: undefined,
       expiresAt,
-      status: data.status === 'OK' ? 'created' : data.status?.toLowerCase() || 'created',
+      status: (data.status === 'OK' || data.status === 'PENDING') ? 'created' : data.status?.toLowerCase() || 'created',
     }
   }
 
