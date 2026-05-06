@@ -13,8 +13,8 @@ const createPaymentSchema = z.object({
   page_id: z.string().uuid().optional(),
   flow_id: z.string().uuid().optional(),
   session_id: z.string(),
-  customer_name: z.string().min(2),
-  customer_email: z.string().email(),
+  customer_name: z.string().min(1),
+  customer_email: z.string().email().or(z.literal('')).optional(),
   customer_whatsapp: z.string().optional(),
 })
 
@@ -72,8 +72,8 @@ export async function POST(request: NextRequest) {
     const pixResult = await provider.createPixPayment({
       orderId,
       amount: product.price,
-      customerName: customer_name,
-      customerEmail: customer_email,
+      customerName: customer_name || 'Cliente',
+      customerEmail: customer_email || 'cliente@chatfy.com',
       customerPhone: customer_whatsapp || '',
       description: product.name,
       webhookUrl,

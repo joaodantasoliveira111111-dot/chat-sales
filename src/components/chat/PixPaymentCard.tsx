@@ -102,10 +102,11 @@ export function PixPaymentCard({
         const res = await fetch('/api/payments/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            product_id: productId,
-            page_id: page.id,
-            session_id: sessionId,
+      body: JSON.stringify({
+        product_id: productId,
+        page_id: page.id,
+        flow_id: page.flow_id || undefined,
+        session_id: sessionId,
             customer_name: String(getVariable(variables, 'lead.name') || variables.name || variables.customer_name || 'Cliente'),
             customer_email: String(getVariable(variables, 'lead.email') || variables.email || variables.customer_email || ''),
             customer_whatsapp: String(getVariable(variables, 'lead.phone') || variables.whatsapp || variables.customer_whatsapp || ''),
