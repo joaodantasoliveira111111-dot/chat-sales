@@ -33,9 +33,9 @@ export async function getPaymentProvider(userId: string): Promise<{ provider: Pa
     case 'pushinpay':
       provider = new PushinPayProvider(credentials.token)
       break
-    case 'amplopay':
-      provider = new AmploPayProvider(credentials.public_key, credentials.secret_key)
-      break
+  case 'amplopay':
+    provider = new AmploPayProvider(credentials.public_key || credentials.pix_public_key, credentials.secret_key || credentials.pix_secret_key)
+    break
     case 'mock':
     default:
       provider = new MockPaymentProvider()

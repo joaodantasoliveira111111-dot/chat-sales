@@ -74,6 +74,7 @@ export async function POST(request: NextRequest) {
       amount: product.price,
       customerName: customer_name,
       customerEmail: customer_email,
+      customerPhone: customer_whatsapp || '',
       description: product.name,
       webhookUrl,
     })
@@ -97,9 +98,8 @@ export async function POST(request: NextRequest) {
         payment_provider: providerName,
         gateway_payment_id: pixResult.gatewayPaymentId,
         pix_code: pixResult.pixCode,
-        pix_qr_code_url: pixResult.pixQrCodeUrl || null,
-        pix_qr_code_base64: pixResult.pixQrCodeBase64 || null,
-        expires_at: pixResult.expiresAt?.toISOString() || null,
+    pix_qr_code_url: pixResult.pixQrCodeUrl || null,
+    expires_at: pixResult.expiresAt?.toISOString() || null,
       })
       .select()
       .single()
@@ -188,11 +188,10 @@ export async function POST(request: NextRequest) {
     })
 
     return NextResponse.json({
-      order_id: orderId,
-      pix_code: pixResult.pixCode,
-      pix_qr_code_url: pixResult.pixQrCodeUrl,
-      pix_qr_code_base64: pixResult.pixQrCodeBase64,
-      expires_at: pixResult.expiresAt?.toISOString(),
+    order_id: orderId,
+    pix_code: pixResult.pixCode,
+    pix_qr_code_url: pixResult.pixQrCodeUrl,
+    expires_at: pixResult.expiresAt?.toISOString(),
       amount: product.price,
       status: 'pending',
     })

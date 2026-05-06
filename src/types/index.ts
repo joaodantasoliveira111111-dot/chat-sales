@@ -578,6 +578,7 @@ export interface CreatePixPaymentParams {
   amount: number
   customerName: string
   customerEmail: string
+  customerPhone?: string
   customerDocument?: string
   description?: string
   webhookUrl?: string

@@ -28,7 +28,6 @@ export function PixPaymentCard({
   const [orderId, setOrderId] = useState<string | null>(initialOrderId)
   const [pixCode, setPixCode] = useState<string | null>(null)
   const [pixQrUrl, setPixQrUrl] = useState<string | null>(null)
-  const [pixQrBase64, setPixQrBase64] = useState<string | null>(null)
   const [amount, setAmount] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
@@ -125,7 +124,6 @@ export function PixPaymentCard({
         setTrackedOrderId(data.order_id)
         setPixCode(data.pix_code)
         setPixQrUrl(data.pix_qr_code_url)
-        setPixQrBase64(data.pix_qr_code_base64)
         setAmount(data.amount)
         trackPaymentEvent('InitiateCheckout', {
           order_id: data.order_id,
@@ -181,7 +179,7 @@ export function PixPaymentCard({
     setTimeout(() => setCopied(false), 3000)
   }
 
-  const qrImageSrc = pixQrBase64 || pixQrUrl
+  const qrImageSrc = pixQrUrl
   const renderPaymentText = (value: unknown) => renderTemplateVariables(String(value || ''), {
     ...variables,
     product: {
