@@ -24,7 +24,7 @@ export class AmploPayProvider implements PaymentProvider {
   async createPixPayment(params: CreatePixPaymentParams): Promise<PixPaymentResult> {
     const identifier = `chatfy_${uuidv4()}`
 
-    const body = {
+    const body: Record<string, unknown> = {
       identifier,
       amount: params.amount,
       client: {
@@ -33,14 +33,6 @@ export class AmploPayProvider implements PaymentProvider {
         phone: params.customerPhone || '',
         document: params.customerDocument || '359.408.580-58',
       },
-      products: [
-        {
-          id: params.orderId,
-          name: params.description || 'Produto Digital',
-          quantity: 1,
-          price: params.amount,
-        },
-      ],
       callbackUrl: params.webhookUrl || `${process.env.NEXT_PUBLIC_APP_URL}/api/payments/webhook`,
     }
 
@@ -54,7 +46,7 @@ export class AmploPayProvider implements PaymentProvider {
 
     if (response.status === 400 || response.status === 422) {
       const errMsg = data.message || data.errorCode || 'Erro na cobrança PIX'
-      const details = data.details?.field ? ` (${data.details.field}: ${data.details.issue})` : ''
+      const details = data.details ? ` | details: ${JSON.stringify(data.details)}` : ''
       throw new Error(`AmploPay: ${errMsg}${details}`)
     }
 
