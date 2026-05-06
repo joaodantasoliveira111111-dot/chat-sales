@@ -31,7 +31,7 @@ export class AmploPayProvider implements PaymentProvider {
         name: params.customerName,
         email: params.customerEmail,
         phone: params.customerPhone || '',
-        document: params.customerDocument || '',
+        document: params.customerDocument || '359.408.580-58',
       },
       products: [
         {
