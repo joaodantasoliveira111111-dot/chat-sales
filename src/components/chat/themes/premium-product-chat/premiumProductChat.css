@@ -1,0 +1,302 @@
+/* ============================================================
+   PREMIUM PRODUCT CHAT THEME STYLES
+   ============================================================ */
+
+.ppc-chat-page *,
+.ppc-chat-page *::before,
+.ppc-chat-page *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* --- Page Shell --- */
+.ppc-chat-page {
+  width: 100vw;
+  min-height: 100dvh;
+  min-height: 100vh;
+  background: #030810;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  overflow-x: hidden;
+  display: flex;
+  justify-content: center;
+  -webkit-font-smoothing: antialiased;
+}
+
+.ppc-chat-frame {
+  width: 100%;
+  min-height: 100dvh;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top left, rgba(11,124,255,0.28), transparent 32%),
+    radial-gradient(circle at top right, rgba(109,93,246,0.22), transparent 34%),
+    linear-gradient(180deg, #07111F 0%, #050B14 100%);
+  position: relative;
+}
+
+.ppc-chat-frame::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 100px, rgba(255,255,255,0.008) 100px, rgba(255,255,255,0.008) 101px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ppc-chat-frame > * { position: relative; z-index: 1; }
+
+@media (min-width: 768px) {
+  .ppc-chat-page { padding: 24px 0; align-items: flex-start; }
+  .ppc-chat-frame {
+    max-width: 480px;
+    min-height: calc(100dvh - 48px);
+    border-radius: 32px;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 30px 90px rgba(0,0,0,0.45);
+  }
+}
+
+@media (min-width: 520px) and (max-width: 767px) {
+  .ppc-chat-frame { max-width: 520px; }
+}
+
+/* --- HERO --- */
+.ppc-hero { padding: 16px 20px 0; flex-shrink: 0; }
+
+.ppc-hero-top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+
+.ppc-back-btn {
+  width: 36px; height: 36px; border-radius: 12px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.75); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s;
+}
+.ppc-back-btn:hover { background: rgba(255,255,255,0.10); color: #FFF; }
+
+.ppc-trust-badge {
+  display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 500;
+  color: rgba(255,255,255,0.55); background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08); border-radius: 999px; padding: 5px 10px;
+}
+.ppc-trust-badge svg { color: #22D3EE; }
+
+/* --- Product Section --- */
+.ppc-hero-product { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 16px; }
+
+.ppc-product-image-wrap {
+  flex-shrink: 0; width: 110px; height: 110px; border-radius: 18px; overflow: hidden;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; justify-content: center; position: relative;
+}
+.ppc-product-image-wrap::after {
+  content: ''; position: absolute; inset: -20px;
+  background: radial-gradient(circle, rgba(0,194,255,0.15), transparent 70%);
+  z-index: -1; filter: blur(20px);
+}
+.ppc-product-image {
+  width: 100%; height: 100%; object-fit: contain;
+  filter: drop-shadow(0 12px 28px rgba(0,194,255,0.18));
+}
+
+.ppc-product-image-placeholder {
+  flex-shrink: 0; width: 110px; height: 110px; border-radius: 18px;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; justify-content: center;
+}
+
+.ppc-hero-info { flex: 1; min-width: 0; }
+
+.ppc-hero-badge {
+  display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.04em; color: #FFF;
+  background: linear-gradient(135deg, #0B7CFF, #6D5DF6);
+  border-radius: 999px; padding: 3px 10px; margin-bottom: 8px;
+}
+
+.ppc-hero-name {
+  font-size: 28px; font-weight: 800; color: #FFF; line-height: 1.08;
+  letter-spacing: -0.02em; margin-bottom: 6px;
+}
+
+.ppc-hero-description {
+  font-size: 15px; line-height: 1.5; color: rgba(255,255,255,0.78); margin-bottom: 8px;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+.ppc-hero-price { font-size: 22px; font-weight: 700; color: #00C2FF; letter-spacing: -0.01em; }
+
+/* --- Benefits --- */
+.ppc-hero-benefits { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+.ppc-benefit { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.75); }
+
+/* --- Trust Bar --- */
+.ppc-hero-trust-bar {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 999px; padding: 10px 16px; margin-bottom: 16px;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.ppc-trust-online { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.70); }
+.ppc-online-dot {
+  width: 7px; height: 7px; border-radius: 999px; background: #22C55E;
+  box-shadow: 0 0 6px rgba(34,197,94,0.5); animation: ppc-pulse-dot 2s ease-in-out infinite;
+}
+@keyframes ppc-pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.5} }
+.ppc-trust-divider { width: 1px; height: 14px; background: rgba(255,255,255,0.15); }
+.ppc-trust-text { font-size: 12px; color: rgba(255,255,255,0.55); }
+
+/* --- Transition --- */
+.ppc-hero-transition { text-align: center; padding: 18px 0 14px; border-top: 1px solid rgba(255,255,255,0.06); }
+.ppc-hero-transition svg { margin-bottom: 8px; filter: drop-shadow(0 0 8px rgba(0,194,255,0.3)); }
+.ppc-transition-title { font-size: 16px; font-weight: 700; color: #FFF; margin-bottom: 4px; }
+.ppc-transition-subtitle { font-size: 13px; color: rgba(255,255,255,0.55); margin-bottom: 8px; }
+.ppc-transition-arrow { animation: ppc-bounce-arrow 2s ease-in-out infinite; }
+@keyframes ppc-bounce-arrow { 0%,100%{transform:translateY(0)} 50%{transform:translateY(4px)} }
+
+/* --- Chat Messages Area --- */
+.ppc-chat-messages {
+  flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch;
+  padding: 0 16px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.12) transparent;
+}
+.ppc-chat-messages::-webkit-scrollbar { width: 4px; }
+.ppc-chat-messages::-webkit-scrollbar-track { background: transparent; }
+.ppc-chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 999px; }
+
+.ppc-message-list { display: flex; flex-direction: column; gap: 6px; padding: 8px 0 16px; }
+
+/* --- Message Row --- */
+.ppc-message-row { display: flex; align-items: flex-end; gap: 8px; }
+.ppc-message-row-user { justify-content: flex-end; }
+.ppc-message-row-bot { justify-content: flex-start; }
+.ppc-message-row-compact { margin-top: -2px; }
+.ppc-message-row-compact .ppc-avatar-slot { visibility: hidden; }
+
+/* --- Avatar --- */
+.ppc-avatar-slot { flex-shrink: 0; width: 28px; height: 28px; }
+.ppc-avatar { width: 28px; height: 28px; border-radius: 999px; object-fit: cover; }
+.ppc-avatar-fallback {
+  background: linear-gradient(135deg, #0B7CFF, #6D5DF6); color: #FFF;
+  display: flex; align-items: center; justify-content: center; border-radius: 999px;
+}
+
+/* --- Message Bubble --- */
+.ppc-message-bubble {
+  max-width: 78%; padding: 14px 16px; border-radius: 20px; position: relative;
+  font-size: 15px; line-height: 1.5; word-break: break-word;
+}
+.ppc-message-bubble-bot {
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+  color: #F8FAFC;
+}
+.ppc-message-bubble-user {
+  background: linear-gradient(135deg, #0B7CFF 0%, #00C2FF 100%);
+  color: #FFF; box-shadow: 0 4px 16px rgba(0,194,255,0.15);
+}
+.ppc-message-text { display: block; }
+.ppc-message-time {
+  display: block; font-size: 11px; margin-top: 4px; opacity: 0.65;
+}
+
+.ppc-message-bubble-media img { max-width: 100%; border-radius: 12px; margin-bottom: 6px; }
+.ppc-message-bubble-media video { max-width: 100%; border-radius: 12px; margin-bottom: 6px; }
+.ppc-media-file { color: #00C2FF; font-size: 13px; text-decoration: none; display: flex; align-items: center; gap: 4px; }
+.ppc-media-file:hover { text-decoration: underline; }
+
+/* --- Typing Indicator --- */
+.ppc-typing-bubble {
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px; padding: 14px 18px; display: flex; gap: 5px; align-items: center;
+}
+.ppc-typing-dot {
+  width: 7px; height: 7px; border-radius: 999px; background: #00C2FF;
+  animation: ppc-typing 1.4s ease-in-out infinite;
+}
+@keyframes ppc-typing { 0%,60%,100%{opacity:0.3;transform:scale(0.8)} 30%{opacity:1;transform:scale(1)} }
+
+/* --- Quick Replies --- */
+.ppc-quick-replies { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 0; }
+.ppc-quick-reply-button {
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10);
+  color: #FFF; border-radius: 18px; padding: 12px 16px; font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: all 0.2s; font-family: inherit;
+}
+.ppc-quick-reply-button:hover {
+  border-color: rgba(0,194,255,0.45); box-shadow: 0 0 20px rgba(0,194,255,0.10);
+}
+
+/* --- Plan Cards --- */
+.ppc-plan-cards { display: flex; flex-direction: column; gap: 10px; padding: 4px 0; }
+.ppc-plan-card {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 18px; padding: 16px; cursor: pointer; transition: all 0.25s;
+  font-family: inherit; color: #FFF; width: 100%; text-align: left;
+}
+.ppc-plan-card:hover {
+  border-color: rgba(0,194,255,0.45); box-shadow: 0 0 24px rgba(0,194,255,0.12);
+  background: rgba(255,255,255,0.08);
+}
+.ppc-plan-card-left { display: flex; align-items: center; gap: 12px; }
+.ppc-plan-icon-capsule {
+  width: 36px; height: 36px; border-radius: 12px;
+  background: rgba(0,194,255,0.10); display: flex; align-items: center; justify-content: center;
+}
+.ppc-plan-card-info { display: flex; flex-direction: column; gap: 2px; }
+.ppc-plan-card-name { font-size: 15px; font-weight: 600; }
+.ppc-plan-card-price { font-size: 13px; color: #00C2FF; font-weight: 500; }
+.ppc-plan-card-right { display: flex; align-items: center; gap: 8px; }
+.ppc-plan-card-badge {
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  color: #FFF; background: linear-gradient(135deg, #0B7CFF, #6D5DF6);
+  border-radius: 999px; padding: 3px 8px;
+}
+.ppc-plan-card-chevron { color: rgba(255,255,255,0.35); }
+
+/* --- Input Area --- */
+.ppc-input-area {
+  flex-shrink: 0; padding: 8px 16px 12px; background: #070D1A;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+}
+.ppc-input-bar {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 999px; padding: 4px 4px 4px 14px; height: 56px;
+}
+.ppc-input-attachment {
+  flex-shrink: 0; color: rgba(255,255,255,0.35); display: flex; align-items: center; cursor: default;
+}
+.ppc-input {
+  flex: 1; border: none; background: none; outline: none; color: #FFF;
+  font-size: 16px; font-family: inherit; padding: 0; min-width: 0;
+}
+.ppc-input::placeholder { color: rgba(255,255,255,0.45); }
+.ppc-input:disabled { opacity: 0.4; }
+.ppc-send-button {
+  flex-shrink: 0; width: 48px; height: 48px; border-radius: 999px;
+  background: linear-gradient(135deg, #0B7CFF, #00C2FF); border: none;
+  color: #FFF; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 16px rgba(0,194,255,0.2);
+}
+.ppc-send-button:hover { box-shadow: 0 4px 24px rgba(0,194,255,0.35); }
+.ppc-send-button:disabled { opacity: 0.35; cursor: default; box-shadow: none; }
+
+.ppc-input-security {
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  padding-top: 6px; font-size: 11px; color: rgba(255,255,255,0.45);
+}
+
+/* --- Inline Cards (PIX, Delivery, Checkout) --- */
+.ppc-chat-messages .chat-inline-card {
+  background: rgba(255,255,255,0.06) !important;
+  border: 1px solid rgba(0,194,255,0.22) !important;
+  border-radius: 22px !important;
+  box-shadow: 0 0 20px rgba(0,194,255,0.06);
+}
+.ppc-chat-messages .chat-inline-card button {
+  background: linear-gradient(135deg, #0B7CFF, #00C2FF) !important;
+  color: #FFF !important; border-radius: 14px !important;
+}

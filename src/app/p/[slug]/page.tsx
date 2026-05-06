@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import { PublicChatPage } from '@/components/chat/PublicChatPage'
 import './whatsapp.css'
 import './instagram.css'
+import './premiumProductChat.css'
 
 interface PageProps {
   params: Promise<{ slug: string }>

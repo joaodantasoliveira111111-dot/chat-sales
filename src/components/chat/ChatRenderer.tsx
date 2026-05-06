@@ -27,6 +27,17 @@ import {
   instagramTheme,
 } from './themes/instagram'
 
+import {
+  PremiumProductChatHeader,
+  PremiumProductChatMessageBubble,
+  PremiumProductChatQuickReplies,
+  PremiumProductChatInputBar,
+  PremiumProductChatMediaMessage,
+  PremiumProductChatLayout,
+  PremiumProductChatTypingIndicator,
+  premiumProductChatTheme,
+} from './themes/premium-product-chat'
+
 import { FlowEngineResult } from './useFlowEngine'
 
 interface ChatRendererProps {
@@ -57,14 +68,17 @@ export function ChatRenderer({ page, nodes, engine }: ChatRendererProps) {
 
   const template = (page.theme_id || 'whatsapp').replace(/[^a-z0-9_-]/gi, '_')
   const isWhatsApp = template === 'whatsapp'
+  const isPremiumProductChat = template === 'premium_product_chat' || template === 'premium-product-chat'
 
-  const Header = isWhatsApp ? WhatsAppHeader : InstagramHeader
-  const MessageBubble = isWhatsApp ? WhatsAppMessageBubble : InstagramMessageBubble
-  const QuickReplies = isWhatsApp ? WhatsAppQuickReplies : InstagramQuickReplies
-  const InputBar = isWhatsApp ? WhatsAppInputBar : InstagramInputBar
-  const MediaMessage = isWhatsApp ? WhatsAppMediaMessage : InstagramMediaMessage
-  const Layout = isWhatsApp ? WhatsAppLayout : InstagramLayout
-  const TypingIndicator = isWhatsApp ? WhatsAppTypingIndicator : InstagramTypingIndicator
+  const Header = isPremiumProductChat ? PremiumProductChatHeader : isWhatsApp ? WhatsAppHeader : InstagramHeader
+  const MessageBubble = isPremiumProductChat ? PremiumProductChatMessageBubble : isWhatsApp ? WhatsAppMessageBubble : InstagramMessageBubble
+  const QuickReplies = isPremiumProductChat ? PremiumProductChatQuickReplies : isWhatsApp ? WhatsAppQuickReplies : InstagramQuickReplies
+  const InputBar = isPremiumProductChat ? PremiumProductChatInputBar : isWhatsApp ? WhatsAppInputBar : InstagramInputBar
+  const MediaMessage = isPremiumProductChat ? PremiumProductChatMediaMessage : isWhatsApp ? WhatsAppMediaMessage : InstagramMediaMessage
+  const Layout = isPremiumProductChat ? PremiumProductChatLayout : isWhatsApp ? WhatsAppLayout : InstagramLayout
+  const TypingIndicator = isPremiumProductChat ? PremiumProductChatTypingIndicator : isWhatsApp ? WhatsAppTypingIndicator : InstagramTypingIndicator
+
+  const activeTheme = isPremiumProductChat ? premiumProductChatTheme : isWhatsApp ? whatsappTheme : instagramTheme
 
   const header = <Header page={page} />
   const inputBar = (
@@ -74,7 +88,7 @@ export function ChatRenderer({ page, nodes, engine }: ChatRendererProps) {
       onSend={handleUserInput}
       active={!!waitingInput}
       type={waitingInput?.config.input_type || 'text'}
-      placeholder={waitingInput?.config.placeholder || (isWhatsApp ? 'Digite uma mensagem' : 'Mensagem...')}
+      placeholder={waitingInput?.config.placeholder || (isWhatsApp ? 'Digite uma mensagem' : isPremiumProductChat ? 'Digite sua mensagem...' : 'Mensagem...')}
     />
   )
 
@@ -153,7 +167,7 @@ export function ChatRenderer({ page, nodes, engine }: ChatRendererProps) {
             <ConversationalFormFlow
               key={msg.id}
               config={msg.payload || {}}
-              theme={convertThemeToConfig(isWhatsApp ? whatsappTheme : instagramTheme)}
+              theme={convertThemeToConfig(activeTheme)}
               page={page}
               variables={variables}
               onSubmit={(data) => handleFormComplete(data, msg.nodeId || '')}
@@ -166,7 +180,7 @@ export function ChatRenderer({ page, nodes, engine }: ChatRendererProps) {
             <PixPaymentCard
               key={msg.id}
               config={msg.payload || {}}
-              theme={convertThemeToConfig(isWhatsApp ? whatsappTheme : instagramTheme)}
+              theme={convertThemeToConfig(activeTheme)}
               page={page}
               variables={variables}
               orderId={orderId}
@@ -181,7 +195,7 @@ export function ChatRenderer({ page, nodes, engine }: ChatRendererProps) {
             <DeliveryCard
               key={msg.id}
               config={msg.payload || {}}
-              theme={convertThemeToConfig(isWhatsApp ? whatsappTheme : instagramTheme)}
+              theme={convertThemeToConfig(activeTheme)}
               orderId={orderId}
               sessionId={state.session_id}
               onFetchDelivery={() => handleDeliveryFetch(msg.nodeId || '')}
